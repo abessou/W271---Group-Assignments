@@ -1,0 +1,456 @@
+---
+title: "W271-Lab1 Spring 2016"
+author: "Charles Kekeh"
+date: "Thursday, January 14, 2016"
+output: pdf_document
+---
+
+Question 1
+==========
+
+ML = 36\newline
+Stat = 28\newline
+Awesome = 18\newline
+ML $\cap$ Stat = 22\newline
+ML $\cap$ Awesome = 12\newline
+Stat $\cap$ Awesome = 9\newline
+ML $\cup$ Stat $\cup$ Awesome = 48\newline
+
+
+1)\newline
+$$ML \cup Stat = ML + Stat - ML \cap Stat = 42$$
+$$Awesome.Other = (ML \cup Stat \cup Awesome) - (ML \cup Stat) = 6$$
+$$Awesome = Awesome.Other \cup (Stat \cap Awesome) \cup (ML \cap Awesome) - (ML \cap Stat \cap Awesome)\newline$$
+$$18 = 6 + 9 + 12 - (ML \cap Stat \cap Awesome)\newline$$
+$$ML \cap Stat \cap Awesome = 9$$\newline
+$$\mathbf{Pr(ML \cap Stat \cap Awesome) = \frac{ML \cap Stat \cap Awesome}{ML \cup Stat \cup Awesome} = \frac{9}{48}}$$\newline
+
+
+2)\newline
+$$Pr(Awesome|ML) = \frac{Pr(Awesome \cap ML)}{Pr(ML)}$$
+$$Pr(Awesome|ML) = \frac{12}{36} = \frac{1}{3}$$
+$$\mathbf{Pr(!Awesome|ML) = 1- Pr(Awesome|ML) = 1 - \frac{12}{36} = 1 - \frac{1}{3} = \frac{2}{3}}$$
+
+3)\newline
+$$Pr(ML \cup Stat|Awesome) = \frac{Pr((ML \cup Stat) \cap Awesome)}{Pr(Awesome)}$$
+$$Pr(ML \cup Stat|Awesome) = \frac{Pr(ML \cup Awesome) + Pr(Stat \cup Awesome) - Pr(Stat \cap ML \cap Awesome)}{Pr(Awesome)}$$
+$$\mathbf{Pr(ML \cup Stat|Awesome) = \frac{12 + 9 - 9}{48} = \frac{12}{48} = \frac{1}{4}}$$
+
+Question 2
+===========
+$$Pr(A)=p \leq \frac{1}{2}, Pr(B)=q where \frac{1}{4}<q<\frac{1}{2}$$
+
+1)\newline
+We know that:
+$$Pr(A \cup B) = Pr(A) + Pr(B) - Pr(A \cap\ B)$$
+Pr(A $\cup$ B) is maximized when Pr(A $\cap$ B) is minimized (A and B are independent and Pr(A $\cap$ B) = 0). The maximum value is in the range: $$\mathbf{\frac{1}{4} < Max(Pr(A \cup B)) < 1}$$
+
+From there, we also know that Pr(A $\cup$ B) is minimized when Pr(A $\cap$\ B) is maximized and A and B are completely overlapping random events and Pr(A $\cap$ B) = Min (Pr(A), Pr(B)). In these conditions $$\mathbf{\frac{1}{4} < Min(Pr(A \cup B) < \frac{1}{2}}$$
+
+2)\newline
+We know that:
+$$Pr(A|B) = \frac{Pr(A \cap B)}{Pr(B)}$$
+Thus Pr(A|B) is minimized when Pr(A $\cap$ B) = 0. And $$\mathbf{Min(Pr(A \cup B)) = 0}$$
+Similarly, Pr(A|B) is maximized when the random event B is completely overlapped by the  random event A. In such cases $$\mathbf{Max(Pr(A|B)) = 1}$$
+
+Question 3
+==========
+1)\newline
+Given that the server's lifespan is a randon uniform distribution over the range [0,k], the probability of every additional year of operation is independent of the time elapsed and is equal to $$\mathbf{Pr(1 year of operation) = \frac{1}{k}}$$
+
+2)\newline
+We know that: 
+$$E(g(x)) = \int_{x=0}^{k}g(x)f_{x}(x)dx$$
+Considering g to be our refund function over time t:
+$$E(g(t)) = \int_{t=0}^{1}\frac{\theta}{k}dt + \int_{t=1}^{k/2}\frac{A(k-t)^{\frac{1}{2}}}{k}dt + \int_{t=k/2}^{\frac{3k}{4}}\frac{\theta}{10 k}dt$$
+$$E(g(t)) = \frac{\theta}{k}[t]_{0}^{1} + [\frac{-2}{3} (k - t)^{\frac{3}{2}}]_{1}^{k/2} + [\frac{\theta}{10k} t]_{\frac{k}{2}}^{\frac{3k}{4}}$$
+$$\mathbf{E(g(t)) = \frac{\theta}{k} + \frac{\theta}{40}  + \frac{2}{3}(k-1)^\frac{3}{2} - \frac{k}{2}^{\frac{3}{2}}}$$
+
+3)\newline
+We know that Var(X) = E[$X^{2}$] -$\mu^{2}$
+Thus Var(g(x)) = E[(g(x)$^{2}$] - $[E[g(X)]^{2}$]
+We previously computed E(g(x)). We now compute E[(g(x)$^{2}$]
+
+$$E[(g(x)^{2}] = \int_{0}^{1}\frac{\theta^{2}}{k}dt + \int_{1}^{k/2}\frac{A^{2} (k-t)}{k} dt + \int_{\frac{k}{2}}^{\frac{3k}{2}} \frac{Q^{2}}{100 k} dt$$
+
+$$\mathbf{E[(g(x)^{2}] = \frac{\theta^{2}}{k} - \frac{\theta^2}{400} - \frac{A^{2}(3k^{2} - 8k +4)}{8k}}$$
+
+We substract $E(g(x))^{2}$ as previously computed to obtain the variance
+
+Question 4
+==========
+f(x,y ) = 2e$^{-x}$e$^{-2y}$ for 0 < x < $\infty$, 0 < y < $\infty$, 0 otherwise
+
+1)\newline
+$$Pr(x > a, y < b) = \int_{y=0}^{b}\int_{x=a}^{\infty} 2 e^{-x} e^{-2y}$$
+$$Pr(x > a, y < b) = 2 \int_{y=0}^{b} e^{-2y} \int_{x=a}^{\infty} 2 e^{-x}$$
+$$Pr(x > a, y < b) = 2 \int_{y=0}^{b} e^{-2y} (1 - [e^{-x}]_{0}^{a})$$
+$$Pr(x > a, y < b) = 2 e^{-a} \int_{y=0}^{b} e^{-2y}$$
+$$Pr(x > a, y < b) = 2 e^{-a} [-\frac{1}{2}e^{-2y}]_{0}^{b}$$
+$$Pr(x > a, y < b) = e^{-a} (1 - e^{-2b})$$
+
+2)\newline
+$$Pr(x < y) = \int_{y=0}^{infty} \int_{x=0}^{y}2 e^{-x} e^{-2y} dx dy$$
+$$Pr(x < y) = 2 \int_{y=0}^{\infty} e^{-2y} dy \int_{x=0}^{y} e^{-x} dx$$
+$$Pr(x < y) = 2 \int_{y=0}^{\infty} e^{-2y} dy [-e^{-x}]_{0}^{y}$$
+$$Pr(x < y) = 2 \int_{y=0}^{\infty} e^{-2y} (1 - e^{-y}) dy$$
+$$Pr(x < y) = 2 \int_{y=0}^{\infty} e^{-2y} - e^{-3y} dy$$
+$$Pr(x < y) = 2 [\frac{1}{6} e^{-3y} (2 - 3 e^{y})]_0^{\infty}$$
+$$Pr(x < y) = \frac{1}{3}$$
+
+3)\newline
+$$Pr(X < a) = \int_{x=0}^{a} \int_{y=0}^{\infty} 2 e^{-x} e^{-2y} dx dy$$
+$$Pr(X < a) = 2 \int_{x=0}^{a} e^{-x} dx \int_{y=0}^{\infty} e^{-2y} dy$$
+$$Pr(X < a) = 2 \int_{x=0}^{a} e^{-x} dx [- \frac{1}{2} e^{-2y}]_{0}^{\infty}$$
+$$Pr(X < a) = \int_{x=0}^{a} e^{-x} dx$$
+$$Pr(X < a) = 1 - e^{-a}$$
+
+Question 5
+==========
+X random variable, x a real number.\newline
+Y = a + b (X - x$^{2}$)
+
+1)\newline
+$$E(Y) = a + b E[(x- x^{2})]$$
+$$E(Y) = a + b E[X^{2} - 2Xx - x^{2}]$$
+$$E(Y) = a + b [E[X^{2} - 2xE[X] + x^{2}]]$$
+
+E(Y) is minimized when $\frac{d}{dx}$E(Y) = 0
+$$\frac{d}{dx}E(Y) = -2bE(X) + 2bx$$
+$$\frac{d}{dx}E(Y) = 0 \Rightarrow \mathbf{x = E(X)}$$
+
+2)\newline
+$$When x = E(X): E(Y) = a + b[E[X^{2}] - 2 (E[X])^2 + (E[X])^2]$$
+$$E(Y) = a + b [E[X^{2}] - (E[X])^2]$$
+$$\mathbf{E(Y) = a + b Var[X]}$$
+
+3)\newline
+Y = ax + b(X - x$^{2}$)
+$$E(Y) = ax + b E[(x- x^{2})]$$
+$$E(Y) = ax + b E[X^{2} - 2Xx - x^{2}]$$
+$$E(Y) = ax + b [E[X^{2} - 2xE[X] + x^{2}]]$$
+
+E(Y) is minimized when $\frac{d}{dx}$E(Y) = 0
+$$\frac{d}{dx}E(Y) = a -2bE(X) + 2bx$$
+$$\frac{d}{dx}E(Y) = 0 \Rightarrow \mathbf{x = E(X) - \frac{a}{2b}}$$
+
+Question 6
+==========
+X, Y independent continuous variables, uniform over [0..1]\newline
+Z = X + Y
+
+1)\newline
+```{r}
+x_area = c(0:2)
+y_area = c(0:2)
+
+plot(x_area, y_area, type = "n")
+
+xx = c(0, 1, 1, 0)
+yy = c(0, 0, 1, 1)
+polygon(xx, yy, density = 0, border = "black")
+
+abline(.75, -1)
+xz = c (0, .75, 0)
+yz = c(0, 0, .75)
+polygon(xz, yz, col = "blue", border = "black")
+
+plot(x_area, y_area, type = "n")
+
+xx = c(0, 1, 1, 0)
+yy = c(0, 0, 1, 1)
+polygon(xx, yy, density = 0, border = "black")
+
+abline(1.75, -1)
+xz = c (0, 1, 1, .75, 0, 0)
+yz = c(0, 0, .75, 1, 1, 0)
+polygon(xz, yz, col = "blue", border = "black")
+```
+
+2)\newline
+From the areas above, we derive that:\newline
+For 0 <= z <= 1:
+$$\mathbf{Pr(Z < z) = \frac{z^{2}}{2}}$$
+For 1 < z <= 2:
+$$\mathbf{Pr(Z < z) = 1 - \frac{(2 - z)^{2}}{2}}$$
+
+Hence:\newline
+For 0 <= z <= 1:
+$$\mathbf{f(z) = \frac{d}{dz} \frac{z^{2}}{2} = z}$$
+For 1 < z <= 2:
+$$\mathbf{f(z) = \frac{d}{dz} 1 - \frac{(2 - z)^{2}}{2} = 2 - z}$$
+
+Question 7
+==========
+
+1)\newline
+$$
+\begin{tabular}{||l|r|l|r||}    \hline
+Event Class & Sum of Dices  & Events in Class   & Pr(Sum of Dices)  \\ \cline{1-4}
+House wins  & 2             & (1,1)             & $\frac{1}{36}$    \\
+            & 3             & (1,2)(2,1)        & $\frac{1}{18}$    \\
+            & 12            & (6,6)             & $\frac{1}{36}$    \\ \cline{1-4}
+You win     & 7             & (3,4)(4,3)(5,2)(2,5)(1,6)(6,1)    & $\frac{1}{6}$  \\
+            & 11            & (5,6)(6,5)        & $\frac{1}{18}$     \\ \cline{1-4}
+X           & 4             & (2,2)(3,1)(1,3)   & $\frac{1}{12}$     \\
+            & 5             & (2,3)(3,2)(1,4)(4,1)  & $\frac{1}{9}$  \\
+            & 6             & (3,3)(4,2)(2,4)(5,1)(1,5) & $\frac{5}{36}$  \\
+            & 8             & (4,4)(6,2)(2,6)(3,5)(5,3) & $\frac{5}{36}$ \\
+            & 9             & (3,6)(6,3)(5,4)(4,5)  & $\frac{1}{9}$  \\
+            & 10            & (5,5)(6,4)(4,6) & $\frac{1}{12}$  \\ \hline
+\end{tabular}
+$$
+
+We can now define
+$$
+\begin{aligned}
+E(Y_{Player wins}) = Pr(Player wins in one) * 1 + \\
+\sum_{n=0}^{\infty}(Pr(4))^{2}(1-(Pr(4)+Pr(7)))^{n}(n+2) + \\
+\sum_{n=0}^{\infty}(Pr(5))^{2}(1-(Pr(5)+Pr(7)))^{n}(n+2) + \\
+\sum_{n=0}^{\infty}(Pr(6))^{2}(1-(Pr(6)+Pr(7)))^{n}(n+2) + \\
+\sum_{n=0}^{\infty}(Pr(8))^{2}(1-(Pr(8)+Pr(7)))^{n}(n+2) + \\
+\sum_{n=0}^{\infty}(Pr(9))^{2}(1-(Pr(9)+Pr(7)))^{n}(n+2) + \\
+\sum_{n=0}^{\infty}(Pr(10))^{2}(1-(Pr(10)+Pr(7)))^{n}(n+2)
+\end{aligned}
+$$
+
+$$
+E(Y_{House wins}) = Pr(House wins in one) * 1 + 
+\sum_{n=0}^{\infty}Pr(X)Pr(7)(1 - Pr(7))^{n}(n+2)
+$$
+
+We know:
+$$\frac{1}{(1-x)^{2}} = 1 + 2x + 3x^{2} + 4x^{3} + \cdots$$
+$$\frac{1}{(1-x)^{2}} - 1 = 2x + 3x^{2} + 4x^{3} + \cdots$$
+$$\frac{1}{x(1-x)^{2}} - \frac{1}{x} = 2 + 3x + 4x^{2} + 5x^{3} \cdots$$
+$$\frac{1 - (1-x)^{2}}{x(1-x)^{2}} = 2 + 3x + 4x^{2} + 5x^{3} \cdots$$
+
+Thus:
+$$
+\begin{aligned}
+E(Y_{Player Wins}) = Pr(Player win) * 1 + 
+\Pr(4)^2 \frac{1 - (Pr(4)+Pr(7))^{2}}{(Pr(4)+Pr(7))^2(1-(Pr(4)+Pr(7)))} + \\
+\Pr(5)^2 \frac{1 - (Pr(5)+Pr(7))^{2}}{(Pr(5)+Pr(7))^2(1-(Pr(5)+Pr(7)))} + \\
+\Pr(6)^2 \frac{1 - (Pr(6)+Pr(7))^{2}}{(Pr(6)+Pr(7))^2(1-(Pr(6)+Pr(7)))} + \\
+\Pr(8)^2 \frac{1 - (Pr(8)+Pr(7))^{2}}{(Pr(8)+Pr(7))^2(1-(Pr(8)+Pr(7)))} + \\
+\Pr(9)^2 \frac{1 - (Pr(9)+Pr(7))^{2}}{(Pr(9)+Pr(7))^2(1-(Pr(9)+Pr(7)))} + \\
+\Pr(10)^2 \frac{1 - (Pr(10)+Pr(7))^{2}}{(Pr(10)+Pr(7))^2(1-(Pr(10)+Pr(7)))} + \\ 
+\end{aligned}
+$$
+
+$$
+\begin{aligned}
+E(Y_{House Wins}) = Pr(House win) * 1 + 
+\Pr(X)Pr(7) \frac{1 - (Pr(7)+Pr(X))^{2}}{(1-(Pr(7)+Pr(X)))(Pr(7)+Pr(X))^2}
+\end{aligned}
+$$
+
+```{r}
+pr.house.wins.in.one <- 4/36
+pr.player.wins.in.one <- 8/36
+pr.seven <- 6/36
+pr.x.events <- c(3/36, 4/36, 5/36/ 5/36, 4/36, 3/36)
+pr.x.plus.seven.events <- pr.x.events + pr.seven
+exp.y.player.wins <- pr.player.wins.in.one + 
+    sum((pr.x.events)^2 * (1 - pr.x.plus.seven.events^2)/((1- pr.x.plus.seven.events)*pr.x.plus.seven.events^2))
+
+exp.y.house.wins <- pr.house.wins.in.one + 
+    pr.seven*sum(pr.x.events)*(1 - (pr.seven + sum(pr.x.events))^2)/
+    ((1 - (pr.seven + sum(pr.x.events)))*(pr.seven + sum(pr.x.events))^2)
+
+print(sprintf("E(Y_Player_Wins) = %f", exp.y.player.wins))
+print(sprintf("E(Y_House_Wins) = %f", exp.y.house.wins))
+```
+
+2)\newline
+$$E(Payoff) = 100 * Pr(Y = 1) + 80 * Pr(Y = 2) + 60 * Pr(Y = 3) + 40 * Pr(Y = 4) + 0 * Pr(Y = 5)$$
+$$Pr(Y = 1) = Pr(Player wins in one)$$
+
+Question 8
+==========
+E(Y$_{1}$) = E(Y$_{2}$) = ... = E(Y$_{n}$) = $\mu$\newline
+Var(Y$_{1}$) = Var(Y$_{2}$) = ... = Var(Y$_{n}$) = $\sigma^{2}$
+
+1)\newline
+For W to be un unbiased estimator of $\mu$:
+$$E(W) = \mu$$
+$$\Rightarrow E(\sum_{i=1}^{n}a_{i}Y_{i}) = \mu$$
+$$\Rightarrow \sum_{i=1}^{n}a_{i}E(Y_{i}) = \mu$$
+$$\Rightarrow \sum_{i=1}^{n}a_{i}\mu = \mu$$
+$$\Rightarrow \mu \sum_{i=1}^{n}a_{i} = \mu$$
+$$\mathbf{\Rightarrow \sum_{i=1}^{n}a_{i} = 1}$$
+
+2)\newline
+$$Var(W) = Var(\sum_{i=1}^{n}a_{i}Y_{i})$$
+$$Var(W) = \sum_{i=1}^{n}a_{i}^{2}Var(Y_{i})$$
+$$\mathbf{Var(W) = \sigma^{2} \sum_{i=1}^{n}a_{i}^{2}}$$
+
+3)\newline
+We know that:
+$$\frac{1}{n}(\sum_{i=1}{n}a_i)^{2} \leq \sum_{i=1}^{n}a_i^{2}$$
+Knowing also that:
+$$Var(W) = \sigma^{2} \sum_{i=1}^{n}a_{i}^{2}$$
+
+We conclude:
+$$Var(W) \geq \sigma^2 \frac{1}{n}(\sum_{i=1}^{n}a_i)^2$$
+When W is unbiased, we know that:
+$$\sum_{i=1}^{n}a_{i} = 1$$
+Thus:
+$$Var(W) \geq \frac{\sigma^2}{n}$$
+and 
+$$\mathbf{Var(W) \geq \bar{Y}}$$
+
+Question 9
+==========
+W$_{1}$ = ($\frac{n-1}{n}$)$\bar{Y}$\newline
+W$_{2}$ = k$\bar{Y}$
+
+1)\newline
+$$bias(W_{1}) = E((\frac{n-1}{n})\bar{Y})$$
+$$bias(W_{1}) = \frac{n-1}{n}E(\bar{Y}) - \mu$$
+$$bias(W_{1}) = \frac{n-1}{n} \mu - \mu$$
+$$\mathbf{bias(W_{1}) = \frac{\mu}{n}}$$
+
+Similarly:
+$$bias(W2) = E(k\bar{Y}) - \mu$$
+$$bias(W2) = k E(\bar{Y}) - \mu$$
+$$bias(W2) = k \mu - \mu$$
+$$\mathbf{bias(W2) = \mu(k - 1)}$$
+
+2)\newline
+$$Var(W_{1}) = Var((\frac{n-1}{n}) \bar{Y})$$
+$$Var(W_{1}) = \frac{(n-1)^2}{n^2} Var(\bar{Y})$$
+$$Var(W_{1}) = \frac{(n-1)^2}{n^2} \frac{\sigma^{2}}{n}$$
+$$\mathbf{Var(W_{1}) = \frac{(n-1)^2 \sigma^{2}}{n^{3}}}$$
+
+Similarly:
+$$Var(W_{2}) = Var(k \bar{Y})$$
+$$Var(W_{2}) = k^{2} Var(\bar{Y})$$
+$$Var(W_{2}) = k^{2} \frac{\sigma^{2}}{n}$$
+$$\mathbf{Var(W_{2}) = k^{2} \frac{\sigma^{2}}{n}}$$
+
+Question 10
+===========
+$\widehat{\sigma^{2}}$ = $\frac{1}{n}$$\sum_{i=1}^{n}$(Y_{i} - $\bar{Y})^{2}$
+
+1)\newline
+$$E(\bar{Y}) = E[\frac{\sum_{i=1}^{n}Y_{i}}{n}]$$
+We know that E(X) is a linear function, thus:
+$$E(\bar{Y}) = \frac{1}{n} \sum_{i=1}^{n} E[Y_{i}]$$
+$$E(\bar{Y}) = \frac{1}{n} (n\mu)$$
+$$\mathbf{\Rightarrow E(\bar{Y}) = \mu = E[Y_{i}], y = 1,\cdots,n}$$
+
+2)\newline
+$$Var(\bar{Y}) = Var[\frac{\sum_{i=1}^{n}Y_{i}}{n}]]$$
+We know that Var[$\sum_{i=1}^{n}$a$_{i}$$X_{i}$] = $\sum_{i=1}^{n}$$a_{i}^{2}$Var($X_{i}$), thus:
+$$Var(\bar{Y}) = \frac{1}{n^{2}}\sum_{i=1}{n}(Var[Y_{i}])$$
+$$\mathbf{\Rightarrow Var(\bar{Y}) = \frac{1}{n^{2}} n \sigma^{2} = \frac{1}{n}Var[Y_{i}], y = 1,\cdots,n}$$
+
+3)\newline
+$$\widehat{\sigma^{2}} = E[\frac{1}{n} \sum_{i=1}^{n} (Y_{i} - \bar{Y})^{2}]$$
+$$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} E[(Y_{i} - \bar{Y})^{2}]$$
+$$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} E(Y_{i}^2 - 2Y_{i} \bar{Y} + \bar{Y}^{2})$$
+$$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} E(Y_{i}^2) - 2E(Y_{i}) E(\bar{Y}) + \bar{Y}^{2})$$
+$$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} E(Y_{i}^2) - E(\bar{Y_{i}})^2 + E(\bar{Y}^{2}) - E(\bar{Y}^2)$$
+$$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} Var(Y_{i}) + Var(\bar{Y})$$
+$$\widehat{\sigma^{2}} = \frac{1}{n} (n \sigma^2 + n \frac{\sigma^2}{n})$$
+$$\mathbf{\widehat{\sigma^{2}} = \frac{n+1}{n} \sigma^2}$$
+
+4)\newline
+We have shown that E($\widehat{\sigma^2}$) != $\sigma^{2}$ and we conclude that $\widehat{\sigma^2}$ is a biased estimator for $\sigma^{2}$.
+
+5)\newline
+We know that:
+$$\widehat{\sigma^{2}} = \frac{n+1}{n} \sigma^2 $$
+is a biased estimator. Thus:
+$$\frac{n}{n+1} \widehat{\sigma^{2}}$$ is an unbiased estimator of $\sigma^{2}$
+
+Question 11
+===========
+X, Y positive random variables.
+E(Y|X) = $\theta$ X
+
+i)\newline
+We know that Z = $\frac{Y}{X}$\newline
+We first compute E(Z|X)
+$$E(Z|X) = E(\frac{X}{Y}|X)$$
+Using E(a(X) Y + b(X))|X) = a(X)E(Y|X) + bX, we derive:
+$$E(Z|X) = = \frac{1}{X}E(Y|X) = \frac{\theta X}{X} = \theta$$
+Then, we knwo that E[E(Z|X)] = E(Z). Thus:
+$$E(\theta) = E(Z)$$
+$\Theta$ being a constant:
+$$E(\theta) = \theta$$ 
+and 
+$$\mathbf{E(Z) = \theta}$$
+
+ii)\newline
+$W_{1} = n^{-1} \sum_{i=1}^{n} \frac{Y_{i}}{X_{i}} {(X_{i},Y_{i}): i = 1,2,\cdots,n}$ is the estimator.\newline
+We compute E(W_{1}):
+$$E(W_{1}) = n^{-1}E[\sum_{i=1}^{n}(\frac{Y_{i}}{X_{i}})]$$
+$$E(W_{1}) = n^{-1} \sum_{i=1}^{n} E(Y_{i}/X_{i})$$
+$$\mathbf{E(W_{1}) = n^{-1} [n E(Z)] = E(Z) = \theta}$$
+$We conclude that W_{1} is unbiased for \theta$
+
+iii)\newline
+$W_{2} = \frac{\bar{Y}}{\bar{X}}$
+$$W_{2} = \frac{n^{-1} \sum_{i=1}^{n} Y_{i}}{n^{-1} \sum_{i=1}^{n} X_{i}}$$
+$$\Rightarrow W_{2} = \frac{Y_{1} + Y_{2} + Y_{3} + \cdots + Y_{n}}{X_{1} + X_{2} + X_{3} + \cdots + X_{n}}$$
+whereas:
+$$W_{1} = \frac{Y_{1}}{X_{1}} + \frac{Y_{2}}{X_{2}} + \frac{Y_{3}}{X_{3}} + \cdots \frac{Y_{n}}{X_{n}}$$
+
+$W_{2} and W_{1}$ are thus different estimators\newline
+$$E(W_{2}) = E[\frac{\bar{Y}}{\bar{X}}]$$
+We know that\newline
+$$E(Y) = E(\bar{Y}) = E[E(Y|X)] = E[\theta X] = \theta E(X)$$
+$$\Rightarrow E(W_{2}) = E[\frac{\theta E(X)}{E(X)}] = E(\theta)$$
+$$\mathbf{\Rightarrow E(W_{2}) = \theta}$$
+
+Question 12
+===========
+i)\newline
+The null hypothesis is that $\mu = 0$\newline
+ii)\newline
+The alternative hypothesis hypothesis is that $\mu < 0$\newline
+iii)\newline
+$$n = 900$$
+$$\bar{Y} = -32.8$$
+$$s = 466.4$$
+$$t = \frac{\bar{Y}}{\frac{s}{\sqrt{n}}} = -2.150538$$
+$$p(z \leq t) = 0.0158$$
+Thus, we reject the null hypothesis at the 5% significance level as $p(z \leq t) \leq 0.05$
+We cannot reject the null hypothesis at the 1% significance level as $p(z \leq t) \geq 0.01$\newline
+iv)\newline
+The effect size is inferior to 10% of the variance of the State Liquor Consumption variable. That's an indication of a small practical effect.
+We also compute the correlation coefficient as\newline
+$$r = \sqrt{\frac{t^{2}}{t^{2} + DF}} = 0.07$$
+The value of R also confirms the small practical effect despite the test being statistically significant because of the high sample size.
+
+Question 13
+===========
+$Y_{i} = 1$ Shot made. $Y_{i} = 0$ Shot missed. 
+$\theta = Pr(Making a 3 pt shot)$ Bernouilli distribution.
+$\bar{Y} = \frac{FGM}{FGA}$ estimator of $\theta$
+
+i)\newline
+$$\theta = \frac{188}{429} = .4382284$$\newline
+ii)\newline
+Because Y has a Bernouilli distribution: $E(Y) = \theta$
+Let $Y_{i} i \in {1, \cdots, n}$ be an occurance of a free throw. We know that each $Y_{i}$ is a Bernouilli variable.
+We can define:\newline
+$$\bar{Y} = \frac{\sum_{i=1}^{n} Y_{i}}{n}$$
+Thus:\newline
+$$Var(\bar{Y}) = (\frac{1}{n})^{2} Var(\sum_{i=1}^{n}Y_{i})$$
+$$Var(\bar{Y}) = (\frac{1}{n})^{2} \sum_{i=1}^{n }Var(Y_{i})$$
+Thus:\newline
+$$Var(\bar{Y}) = (\frac{1}{n})^{2} n \theta (1 - \theta)$$
+$$\Rightarrow Var(\bar{Y}) = \frac{\theta (1 - \theta)}{n}$$
+And:\newline
+$$sd(Y) = \sqrt{Var(\bar{Y})}$$
+$$\mathbf \Rightarrow sd(Y) = \sqrt{\frac{\theta (1 - \theta)}{n}}$$
+iii)\newline
+We know $se(\bar{\gamma}) = \sqrt{\frac{\bar{\gamma} (1 - \bar{\gamma})}{n}}$
+And $\frac{\bar{\gamma} - \theta}{se(\bar{Y})} \equiv Normal(0, 1)$
+We compute:\newline
+$$z_{Y} = \frac{\frac{188}{429} - .5}{se(\bar{Y})} = -2.57861$$
+$$\Rightarrow p(z) = 0.0058$$
+The p-value is significant at the 1% significance level and we reject the null hypothesis.
