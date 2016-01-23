@@ -351,7 +351,7 @@ $$\widehat{\sigma^{2}} = E[\frac{1}{n} \sum_{i=1}^{n} (Y_{i} - \bar{Y})^{2}]$$
 $$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} E[(Y_{i} - \bar{Y})^{2}]$$
 $$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} E(Y_{i}^2 - 2Y_{i} \bar{Y} + \bar{Y}^{2})$$
 $$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} E(Y_{i}^2) - 2E(Y_{i}) E(\bar{Y}) + \bar{Y}^{2})$$
-$$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} E(Y_{i}^2) - E(\bar{Y_{i}})^2 + E(\bar{Y}^{2}) - E(\bar{Y}^2)$$
+$$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} E(Y_{i}^2) - E(Y_{i})^2 + E(\bar{Y}^{2}) - E(\bar{Y})^2$$
 $$\widehat{\sigma^{2}} = \frac{1}{n} \sum_{i=1}^{n} Var(Y_{i}) + Var(\bar{Y})$$
 $$\widehat{\sigma^{2}} = \frac{1}{n} (n \sigma^2 + n \frac{\sigma^2}{n})$$
 $$\mathbf{\widehat{\sigma^{2}} = \frac{n+1}{n} \sigma^2}$$
@@ -373,9 +373,9 @@ E(Y|X) = $\theta$ X
 i)\newline
 We know that Z = $\frac{Y}{X}$\newline
 We first compute E(Z|X)
-$$E(Z|X) = E(\frac{X}{Y}|X)$$
+$$E(Z|X) = E(\frac{Y}{X}|X)$$
 Using E(a(X) Y + b(X))|X) = a(X)E(Y|X) + bX, we derive:
-$$E(Z|X) = = \frac{1}{X}E(Y|X) = \frac{\theta X}{X} = \theta$$
+$$E(Z|X) = \frac{1}{X}E(Y|X) = \frac{\theta X}{X} = \theta$$
 Then, we knwo that E[E(Z|X)] = E(Z). Thus:
 $$E(\theta) = E(Z)$$
 $\Theta$ being a constant:
@@ -385,11 +385,11 @@ $$\mathbf{E(Z) = \theta}$$
 
 ii)\newline
 $W_{1} = n^{-1} \sum_{i=1}^{n} \frac{Y_{i}}{X_{i}} {(X_{i},Y_{i}): i = 1,2,\cdots,n}$ is the estimator.\newline
-We compute E(W_{1}):
+We compute $E(W_{1})$:
 $$E(W_{1}) = n^{-1}E[\sum_{i=1}^{n}(\frac{Y_{i}}{X_{i}})]$$
 $$E(W_{1}) = n^{-1} \sum_{i=1}^{n} E(Y_{i}/X_{i})$$
 $$\mathbf{E(W_{1}) = n^{-1} [n E(Z)] = E(Z) = \theta}$$
-$We conclude that W_{1} is unbiased for \theta$
+We conclude that $W_{1}$ is unbiased for $\theta$
 
 iii)\newline
 $W_{2} = \frac{\bar{Y}}{\bar{X}}$
@@ -451,6 +451,16 @@ iii)\newline
 We know $se(\bar{\gamma}) = \sqrt{\frac{\bar{\gamma} (1 - \bar{\gamma})}{n}}$
 And $\frac{\bar{\gamma} - \theta}{se(\bar{Y})} \equiv Normal(0, 1)$
 We compute:\newline
-$$z_{Y} = \frac{\frac{188}{429} - .5}{se(\bar{Y})} = -2.57861$$
-$$\Rightarrow p(z) = 0.0058$$
+$$z_{Y} = \frac{\frac{188}{429} - .5}{se(\bar{Y})} = -2.588303$$
+$$\Rightarrow p(z) = 0.0048$$
 The p-value is significant at the 1% significance level and we reject the null hypothesis.
+iv)\newline
+Type I error is the probability of a false positive or the probability that the null hypothesis was  rejected but it should not have been.  It's the probability of saying there is a result when there is not one.
+v)\newline
+The probablity of the type error is the significance level and is 1%.
+vi)\newline
+Type II error is the probability of a false negative, or the probablity of failing to reject the null hypothesis when it should be rejected.
+vii)\newline
+viii)\newline
+The power of the test is the probabilty of rejecting the null hypothesis when its is actually false.
+ix)\newline
