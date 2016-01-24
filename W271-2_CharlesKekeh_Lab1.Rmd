@@ -38,20 +38,36 @@ $$\mathbf{Pr(ML \cup Stat|Awesome) = \frac{12 + 9 - 9}{48} = \frac{12}{48} = \fr
 
 Question 2
 ===========
-$$Pr(A)=p \leq \frac{1}{2}, Pr(B)=q where \frac{1}{4}<q<\frac{1}{2}$$
+$$Pr(A)=p \leq \frac{1}{2}, Pr(B)=q, where \frac{1}{4}<q<\frac{1}{2}$$
 
 1)\newline
-We know that:
-$$Pr(A \cup B) = Pr(A) + Pr(B) - Pr(A \cap\ B)$$
-Pr(A $\cup$ B) is maximized when Pr(A $\cap$ B) is minimized (A and B are independent and Pr(A $\cap$ B) = 0). The maximum value is in the range: $$\mathbf{\frac{1}{4} < Max(Pr(A \cup B)) < 1}$$
 
-From there, we also know that Pr(A $\cup$ B) is minimized when Pr(A $\cap$\ B) is maximized and A and B are completely overlapping random events and Pr(A $\cap$ B) = Min (Pr(A), Pr(B)). In these conditions $$\mathbf{\frac{1}{4} < Min(Pr(A \cup B) < \frac{1}{2}}$$
+$$Pr(A \cup B) = Pr(A) + Pr(B) - Pr(A \cap\ B)$$
+Pr(A $\cup$ B) is maximized when Pr(A $\cap$ B) is minimized and P(A) and P(B) are maximized.  In this case that would be:
+
+$$min(Pr(A \cap B)) = 0, (A\ and\ B\ are\ independent)$$
+$$max(Pr(A)) = 1/2$$
+$$max(Pr(B)) = 1/2 - \epsilon, where\ \epsilon\ approaches\ 0$$
+
+$$\mathbf{max(Pr(A \cup B)) = 1 - \epsilon, where\ \epsilon\ approaches\ 0}$$
+
+Alternately, Pr(A $\cup$ B) is minimized when A and B are completely overlapping, A = B.  In this case
+
+$$min(Pr(A \cup B) = max(min(Pr(A), Pr(B))) = 1/4 + \epsilon, where\ \epsilon\ approaches\ 0$$
+
+$$\mathbf{min(Pr(A \cup B)) = 1/4 + \epsilon, where\ \epsilon\ approaches\ 0}$$
 
 2)\newline
-We know that:
+
 $$Pr(A|B) = \frac{Pr(A \cap B)}{Pr(B)}$$
-Thus Pr(A|B) is minimized when Pr(A $\cap$ B) = 0. And $$\mathbf{Min(Pr(A \cup B)) = 0}$$
-Similarly, Pr(A|B) is maximized when the random event B is completely overlapped by the  random event A. In such cases $$\mathbf{Max(Pr(A|B)) = 1}$$
+
+Pr(A|B) is maximized when A is completely contained in B. In this case, Pr(A|B) = 1.
+
+$$\mathbf{max(Pr(A|B)) = 1}$$
+
+Pr(A|B) is minimized when Pr(A $\cap$ B) = 0 (A and B are independent).  When Pr(A $\cap$ B) = 0, then Pr(A $\cup$ B) = 0.
+
+$$\mathbf{min(Pr(A|B)) = 0}$$
 
 Question 3
 ==========
@@ -76,6 +92,31 @@ $$E[(g(x)^{2}] = \int_{0}^{1}\frac{\theta^{2}}{k}dt + \int_{1}^{k/2}\frac{A^{2} 
 $$\mathbf{E[(g(x)^{2}] = \frac{\theta^{2}}{k} - \frac{\theta^2}{400} - \frac{A^{2}(3k^{2} - 8k +4)}{8k}}$$
 
 We substract $E(g(x))^{2}$ as previously computed to obtain the variance
+
+__Megan's Question 2 and 3 answers\newline__
+2. Compute the expected payout from the contract, E(x).\newline
+$$E(g(x)) = \int_{x=0}^{\infty}g(x)f_{x}(x)dx$$
+
+Considering g to be our refund function over time t:
+$$E(g(t)) = \int_{t=0}^{1}\frac{\theta}{k}dt + \int_{t=1}^{k/2}\frac{2(k-t)^{\frac{1}{2}}}{k}dt + \int_{t=k/2}^{\frac{3k}{4}}\frac{\theta}{10 k}dt + \int_{t=\frac{3k}{4}}^{\infty}0dt$$
+
+$$E(g(t)) = \frac{\theta}{k}[t]_{0}^{1} + \frac{-4}{3k} (k - t)^{\frac{3}{2}}[t]_{1}^{k/2} + \frac{\theta}{10k}[t]_{\frac{k}{2}}^{\frac{3k}{4}} + 0$$
+
+$$\mathbf{E(g(t)) = \frac{\theta}{k}  + \frac{4}{3k}(k-1)^\frac{3}{2} - \frac{4}{3k}(\frac{k}{2})^{\frac{3}{2}} + \frac{\theta}{40}}$$
+
+3.  Compute the variance of the payout from the contract.\newline
+We know that Var(X) = E[$X^{2}$] -$\mu^{2}$
+Thus Var(g(x)) = E[(g(x)$^{2}$] - $[E[g(X)]^{2}$]
+We previously computed E(g(x)). We now compute E[(g(x)$^{2}$]
+
+$$E[(g(x)^{2}] = \int_{t=0}^{1}\frac{\theta^2}{k^2}dt + \int_{t=1}^{k/2}\frac{4 (k-t)}{k^2} dt + \int_{t=\frac{k}{2}}^{\frac{3k}{4}} \frac{\theta^2}{100 k^2} dt + \int_{t=\frac{3k}{4}}^{\infty}0dt$$
+
+$$E(g(t)) = \frac{\theta^2}{k^2}[t]_{0}^{1} + \frac{-2t(2k-t)}{k^2}[t]]_{1}^{k/2} + \frac{\theta^2}{400k}[t]_{\frac{k}{2}}^{\frac{3k}{4}} + 0$$
+
+$$\mathbf{E[(g(x)^{2}] = \frac{\theta^{2}}{k^2} + \frac{3}{2} + \frac{4k-2}{k^2} + \frac{\theta^2}{400k}}$$
+
+We substract $E(g(x))^{2}$ as previously computed to obtain the variance
+
 
 Question 4
 ==========
@@ -269,9 +310,10 @@ $$Pr(Y = 1) = Pr(Player wins in one)$$
 Question 8
 ==========
 E(Y$_{1}$) = E(Y$_{2}$) = ... = E(Y$_{n}$) = $\mu$\newline
-Var(Y$_{1}$) = Var(Y$_{2}$) = ... = Var(Y$_{n}$) = $\sigma^{2}$
+Var(Y$_{1}$) = Var(Y$_{2}$) = ... = Var(Y$_{n}$) = $\sigma^{2}$\newline
 
 1)\newline
+$$W = \sum_{i=1}^{n}a_{i}Y_{i}$$
 For W to be un unbiased estimator of $\mu$:
 $$E(W) = \mu$$
 $$\Rightarrow E(\sum_{i=1}^{n}a_{i}Y_{i}) = \mu$$
@@ -287,35 +329,42 @@ $$\mathbf{Var(W) = \sigma^{2} \sum_{i=1}^{n}a_{i}^{2}}$$
 
 3)\newline
 We know that:
-$$\frac{1}{n}(\sum_{i=1}{n}a_i)^{2} \leq \sum_{i=1}^{n}a_i^{2}$$
-Knowing also that:
-$$Var(W) = \sigma^{2} \sum_{i=1}^{n}a_{i}^{2}$$
+$$\frac{1}{n}(\sum_{i=1}^{n}a_i)^{2} \leq \sum_{i=1}^{n}a_i^{2}$$
+Multiply each side of the equation by $\sigma^2$ and rewrite the inequality by swapping which terms are on each side.  It does not change the value of the inequality by multiplying each side by a positive number and $\sigma^2$ is a positive number.
+$$\sigma^2 \sum_{i=1}^{n}a_i^{2} \geq \sigma^2 \frac{1}{n}(\sum_{i=1}^{n}a_i)^{2}$$
 
-We conclude:
+Substitute the variance found in part 2 on the left-hand side:
 $$Var(W) \geq \sigma^2 \frac{1}{n}(\sum_{i=1}^{n}a_i)^2$$
 When W is unbiased, we know that:
 $$\sum_{i=1}^{n}a_{i} = 1$$
-Thus:
+Substitute the above value in to the right-hand side:
 $$Var(W) \geq \frac{\sigma^2}{n}$$
-and 
-$$\mathbf{Var(W) \geq \bar{Y}}$$
+We know that:
+$$Var(\bar{Y}) = \frac{\sigma^2}{n}$$
+Substitute this value in to the right-hand side of the equation and the proof is complete.
+$$\mathbf{Var(W) \geq Var(\bar{Y})}$$
 
 Question 9
 ==========
 W$_{1}$ = ($\frac{n-1}{n}$)$\bar{Y}$\newline
+\newline
 W$_{2}$ = k$\bar{Y}$
 
 1)\newline
-$$bias(W_{1}) = E((\frac{n-1}{n})\bar{Y})$$
+$$bias(W_{1}) = E((\frac{n-1}{n})\bar{Y}) - \mu$$
 $$bias(W_{1}) = \frac{n-1}{n}E(\bar{Y}) - \mu$$
 $$bias(W_{1}) = \frac{n-1}{n} \mu - \mu$$
-$$\mathbf{bias(W_{1}) = \frac{\mu}{n}}$$
+$$bias(W_{1}) = \mu(\frac{n-1}{n} - 1)$$
+$$\mathbf{bias(W_{1}) = \frac{-\mu}{n}}$$
 
 Similarly:
-$$bias(W2) = E(k\bar{Y}) - \mu$$
-$$bias(W2) = k E(\bar{Y}) - \mu$$
-$$bias(W2) = k \mu - \mu$$
-$$\mathbf{bias(W2) = \mu(k - 1)}$$
+$$bias(W_{2}) = E(k\bar{Y}) - \mu$$
+$$bias(W_{2}) = k E(\bar{Y}) - \mu$$
+$$bias(W_{2}) = k \mu - \mu$$
+$$\mathbf{bias(W_{2}) = \mu(k - 1)}$$
+
+Which is a consistent estimator?\newline
+__W$_{1}$ is a consistent estimator of $\mu$ because as n goes to $\infty$, the difference between W$_{1}$ and $\mu$ goes to 0.__
 
 2)\newline
 $$Var(W_{1}) = Var((\frac{n-1}{n}) \bar{Y})$$
@@ -328,6 +377,14 @@ $$Var(W_{2}) = Var(k \bar{Y})$$
 $$Var(W_{2}) = k^{2} Var(\bar{Y})$$
 $$Var(W_{2}) = k^{2} \frac{\sigma^{2}}{n}$$
 $$\mathbf{Var(W_{2}) = k^{2} \frac{\sigma^{2}}{n}}$$
+
+Which estimator has lower variance?\newline
+__The estimator that has lower variance depends on the values of n and k as follows:\newline
+For n = 1, k > 0, Var(W$_{1}$) is lower\newline
+For n > 1 and k = $\frac{n-1}{n}$, Var(W$_{1}$) = Var(W$_{2}$)\newline
+For n > 1 and k > $\frac{n-1}{n}$, Var(W$_{1}$) is lower\newline
+For n > 1 and k < $\frac{n-1}{n}$, Var(W$_{2}$) is lower__
+
 
 Question 10
 ===========
@@ -412,18 +469,22 @@ The null hypothesis is that $\mu = 0$\newline
 ii)\newline
 The alternative hypothesis hypothesis is that $\mu < 0$\newline
 iii)\newline
+$$\mu = 0, when\ the\ null\ hypothesis\ is\ true$$
 $$n = 900$$
 $$\bar{Y} = -32.8$$
 $$s = 466.4$$
-$$t = \frac{\bar{Y}}{\frac{s}{\sqrt{n}}} = -2.150538$$
-$$p(z \leq t) = 0.0158$$
+$$t = \frac{\bar{Y}-\mu}{\frac{s}{\sqrt{n}}} = -2.109777$$
+$$p(z \leq t) = 0.0174$$
 Thus, we reject the null hypothesis at the 5% significance level as $p(z \leq t) \leq 0.05$
 We cannot reject the null hypothesis at the 1% significance level as $p(z \leq t) \geq 0.01$\newline
 iv)\newline
 The effect size is inferior to 10% of the variance of the State Liquor Consumption variable. That's an indication of a small practical effect.
 We also compute the correlation coefficient as\newline
-$$r = \sqrt{\frac{t^{2}}{t^{2} + DF}} = 0.07$$
-The value of R also confirms the small practical effect despite the test being statistically significant because of the high sample size.
+$$r = \sqrt{\frac{t^{2}}{t^{2} + DF}}$$
+$$r = \sqrt{\frac{-2.11^{2}}{-2.11^{2} + 899}} = 0.07$$
+The value of R also confirms the small practical effect despite the test being statistically significant because of the high sample size.\newline
+v)\newline
+What has been assumed is that the other determinates of liquor consumption have had no net effect over the two-year period that was analyzed.
 
 Question 13
 ===========
