@@ -222,91 +222,107 @@ $$\mathbf{f(z) = \frac{d}{dz} \frac{z^{2}}{2} = z}$$
 For 1 < z <= 2:
 $$\mathbf{f(z) = \frac{d}{dz} 1 - \frac{(2 - z)^{2}}{2} = 2 - z}$$
 
+
+
 Question 7
 ==========
 
 1)\newline
-$$
-\begin{tabular}{||l|r|l|r||}    \hline
-Event Class & Sum of Dices  & Events in Class   & Pr(Sum of Dices)  \\ \cline{1-4}
-House wins  & 2             & (1,1)             & $\frac{1}{36}$    \\
-            & 3             & (1,2)(2,1)        & $\frac{1}{18}$    \\
-            & 12            & (6,6)             & $\frac{1}{36}$    \\ \cline{1-4}
-You win     & 7             & (3,4)(4,3)(5,2)(2,5)(1,6)(6,1)    & $\frac{1}{6}$  \\
-            & 11            & (5,6)(6,5)        & $\frac{1}{18}$     \\ \cline{1-4}
-X           & 4             & (2,2)(3,1)(1,3)   & $\frac{1}{12}$     \\
-            & 5             & (2,3)(3,2)(1,4)(4,1)  & $\frac{1}{9}$  \\
-            & 6             & (3,3)(4,2)(2,4)(5,1)(1,5) & $\frac{5}{36}$  \\
-            & 8             & (4,4)(6,2)(2,6)(3,5)(5,3) & $\frac{5}{36}$ \\
-            & 9             & (3,6)(6,3)(5,4)(4,5)  & $\frac{1}{9}$  \\
-            & 10            & (5,5)(6,4)(4,6) & $\frac{1}{12}$  \\ \hline
-\end{tabular}
-$$
+In order to compute the expected number of dice rolls for both scenarios (player wins or house wins), we must first compute the probability of the player rolling an x in subsequent rounds if the game does not end with the first roll of the dice.
 
-We can now define
-$$
-\begin{aligned}
-E(Y_{Player wins}) = Pr(Player wins in one) * 1 + \\
-\sum_{n=0}^{\infty}(Pr(4))^{2}(1-(Pr(4)+Pr(7)))^{n}(n+2) + \\
-\sum_{n=0}^{\infty}(Pr(5))^{2}(1-(Pr(5)+Pr(7)))^{n}(n+2) + \\
-\sum_{n=0}^{\infty}(Pr(6))^{2}(1-(Pr(6)+Pr(7)))^{n}(n+2) + \\
-\sum_{n=0}^{\infty}(Pr(8))^{2}(1-(Pr(8)+Pr(7)))^{n}(n+2) + \\
-\sum_{n=0}^{\infty}(Pr(9))^{2}(1-(Pr(9)+Pr(7)))^{n}(n+2) + \\
-\sum_{n=0}^{\infty}(Pr(10))^{2}(1-(Pr(10)+Pr(7)))^{n}(n+2)
-\end{aligned}
-$$
+In the scenario, that the game goes beyond the first round, let us assume that the player needs p successes out of 36 in order to successfully roll x.
 
-$$
-E(Y_{House wins}) = Pr(House wins in one) * 1 + 
-\sum_{n=0}^{\infty}Pr(X)Pr(7)(1 - Pr(7))^{n}(n+2)
-$$
+Therefore, if x has value 4 or 10, p = 3 successes. 
+If x has value 5 or 9, p = 4 successes.
+if x has value 6 or 8, p = 5 successes.
 
-We know:
-$$\frac{1}{(1-x)^{2}} = 1 + 2x + 3x^{2} + 4x^{3} + \cdots$$
-$$\frac{1}{(1-x)^{2}} - 1 = 2x + 3x^{2} + 4x^{3} + \cdots$$
-$$\frac{1}{x(1-x)^{2}} - \frac{1}{x} = 2 + 3x + 4x^{2} + 5x^{3} \cdots$$
-$$\frac{1 - (1-x)^{2}}{x(1-x)^{2}} = 2 + 3x + 4x^{2} + 5x^{3} \cdots$$
+Calculating the expected value of p:
 
-Thus:
-$$
-\begin{aligned}
-E(Y_{Player Wins}) = Pr(Player win) * 1 + 
-\Pr(4)^2 \frac{1 - (Pr(4)+Pr(7))^{2}}{(Pr(4)+Pr(7))^2(1-(Pr(4)+Pr(7)))} + \\
-\Pr(5)^2 \frac{1 - (Pr(5)+Pr(7))^{2}}{(Pr(5)+Pr(7))^2(1-(Pr(5)+Pr(7)))} + \\
-\Pr(6)^2 \frac{1 - (Pr(6)+Pr(7))^{2}}{(Pr(6)+Pr(7))^2(1-(Pr(6)+Pr(7)))} + \\
-\Pr(8)^2 \frac{1 - (Pr(8)+Pr(7))^{2}}{(Pr(8)+Pr(7))^2(1-(Pr(8)+Pr(7)))} + \\
-\Pr(9)^2 \frac{1 - (Pr(9)+Pr(7))^{2}}{(Pr(9)+Pr(7))^2(1-(Pr(9)+Pr(7)))} + \\
-\Pr(10)^2 \frac{1 - (Pr(10)+Pr(7))^{2}}{(Pr(10)+Pr(7))^2(1-(Pr(10)+Pr(7)))} + \\ 
-\end{aligned}
-$$
-
-$$
-\begin{aligned}
-E(Y_{House Wins}) = Pr(House win) * 1 + 
-\Pr(X)Pr(7) \frac{1 - (Pr(7)+Pr(X))^{2}}{(1-(Pr(7)+Pr(X)))(Pr(7)+Pr(X))^2}
-\end{aligned}
-$$
+$$E(p) = 3 * Pr(Player\ rolls\ 4\ or\ 10) + 4 * Pr(Player\ rolls\ 5\ or\ 9) + \\
+5 * Pr(Player\ rolls\ 6\ or\ 8) $$
+$$E(p) = 3 * \frac{6}{36} + 4 * \frac{8}{36} + 5 * \frac{10}{36} $$
 
 ```{r}
-pr.house.wins.in.one <- 4/36
-pr.player.wins.in.one <- 8/36
-pr.seven <- 6/36
-pr.x.events <- c(3/36, 4/36, 5/36/ 5/36, 4/36, 3/36)
-pr.x.plus.seven.events <- pr.x.events + pr.seven
-exp.y.player.wins <- pr.player.wins.in.one + 
-    sum((pr.x.events)^2 * (1 - pr.x.plus.seven.events^2)/((1- pr.x.plus.seven.events)*pr.x.plus.seven.events^2))
-
-exp.y.house.wins <- pr.house.wins.in.one + 
-    pr.seven*sum(pr.x.events)*(1 - (pr.seven + sum(pr.x.events))^2)/
-    ((1 - (pr.seven + sum(pr.x.events)))*(pr.seven + sum(pr.x.events))^2)
-
-print(sprintf("E(Y_Player_Wins) = %f", exp.y.player.wins))
-print(sprintf("E(Y_House_Wins) = %f", exp.y.house.wins))
+library(MASS)
+value = 3*6/36 + 4*8/36 + 5*10/36
+print(fractions(value))
 ```
 
+Therefore, we expect to get 25/9 (2.78) successes out of 36 for the player after the first roll. Therefore the expected probability of success is:
+
+$$Pr(p\ successes) = \frac{25}{9} * \frac{1}{36}$$
+```{r}
+library(MASS)
+value = 25/(9*36)
+print(fractions(value))
+```
+
+Now, in order to compute the expected number of dice rolls given the player wins, we need the following values:
+$$Pr(House\ wins\ in\ 1\ roll) = Pr(2,\ 3\ or\ 12) = \frac{4}{36}$$
+$$Pr(Player\ wins\ in\ 1\ roll) = Pr(7\ or\ 11) = \frac{8}{36}$$
+Therefore, $$Pr(Game\ proceeds\ to\ second\ roll) = 1 - (\frac{4}{36} + \frac{8}{36}) = \frac{24}{36}$$
+$$Pr(House\ wins\ on\ second\ roll) = Pr(7) = \frac{6}{36}$$
+$$Pr(Player\ wins\ on\ second\ roll) = Pr(x) = \frac{25}{324}$$
+$$Pr(Game\ proceeds\ to\ third\ roll) = 1 - (\frac{6}{36} + \frac{25}{324}) = \frac{245}{324}$$
+
+In every subsequent round, the house wins with probability 6/36, the player wins with probability 25/324 and the game continues with probability 245/324.
+
+Now, computing expected number of dice rolls given the player wins:
+
+$$
+\begin{aligned}
+E(Y|Player\ Wins) = 1 * Pr(Player\ wins\ in\ 1\ roll) \\
+\ + 2 * Pr(Game\ proceeds\ to\ second\ roll) * Pr(Player\ wins\ on\ second\ roll) + \\
+\ 3 * Pr(Game\ proceeds\ to\ third\ roll) * Pr(Player\ wins\ on\ third\ roll) + \cdots
+\end{aligned}
+$$  
+
+Computing for first 10 rolls
+```{r, tidy=TRUE}
+value = 1 * 8/36 + 2 * 24/36 * 25/324 + 3 * 24/36 * 245/324 * 25/324 + 4*24/36*((245/325)^2)*25/324 + 5*24/36*((245/325)^3)*25/324 + 6*24/36*((245/325)^4)*25/324 + 7*24/36*((245/325)^5)*25/324 + 8*24/36*((245/325)^6)*25/324 + 9*24/36*((245/325)^7)*25/324 + 10*24/36*((245/325)^8)*25/324
+print(round(value,4))
+```
+
+Now, computing expected number of dice rolls given the house wins:
+
+$$
+\begin{aligned}
+E(Y|House\ Wins) = 1 * Pr(House\ wins\ in\ 1\ roll) + \\
+\ 2 * Pr(Game\ proceeds\ to\ second\ roll) * Pr(House\ wins\ on\ second\ roll) + \\
+\ 3 * Pr(Game\ proceeds\ to\ third\ roll) * Pr(House\ wins\ on\ third\ roll) + \cdots
+\end{aligned}
+$$  
+
+Computing for first 10 rolls
+```{r, tidy=TRUE}
+value = 1 * 4/36 + 2 * 24/36 * 6/36 + 3 * 24/36 * 245/324 * 6/36 + 4*24/36*((245/325)^2)*6/36 + 5*24/36*((245/325)^3)*6/36 + 6*24/36*((245/325)^4)*6/36 + 7*24/36*((245/325)^5)*6/36 + 8*24/36*((245/325)^6)*6/36 + 9*24/36*((245/325)^7)*6/36 + 10*24/36*((245/325)^8)*6/36
+print(round(value,4))
+```
+
+**Final answer: Since the probability of winning for the house is greater than that of the player for every round after round 10, and we know that the expected number of rolls given the player wins is less than the expected number of rolls given the house wins for 10 dice rolls, we know that expected number of rolls given the player wins is less than the expected number of rolls given the house wins for infinite rolls**\newline
+
 2)\newline
-$$E(Payoff) = 100 * Pr(Y = 1) + 80 * Pr(Y = 2) + 60 * Pr(Y = 3) + 40 * Pr(Y = 4) + 0 * Pr(Y = 5)$$
-$$Pr(Y = 1) = Pr(Player wins in one)$$
+$$
+\begin{aligned}
+E(payoff) =  100 * Pr(Player\ wins\ in\ 1\ roll) + \\
+\ 80 * Pr(Game\ proceeds\ to\ second\ roll) * Pr(Player\ wins\ on\ second\ roll) + \\
+\ 60 * Pr(Game\ proceeds\ to\ third\ roll) * Pr(Player\ wins\ on\ third\ roll) + \\
+\ 40 * Pr(Game\ proceeds\ to\ fourth\ roll) * Pr(Player\ wins\ on\ fourth\ roll) + \\
+\ 0 * Pr(Game\ proceeds\ to\ fifth\ roll) * Pr(Player\ wins\ on\ fifth\ roll)
+\end{aligned}
+$$
+
+Computing result:
+```{r, tidy=TRUE}
+value = 100 * 8/36 + 80 * 24/36 * 25/324 + 60 * 24/36 * 245/324 * 25/324 + 40*24/36*((245/325)^2)*25/324 + 0*24/36*((245/325)^3)*25/324
+print(round(value,2))
+```
+
+Now, computing expected net profit:
+
+$$E(Net\ profit) = E(Payoff\ -\ Cost) = E(payoff) - E(Cost) = 29.84 - 20 = 9.84$$
+
+**Final answer: The expected net profit of the game is $9.84**
 
 Question 8
 ==========
@@ -461,11 +477,21 @@ whereas:
 $$W_{1} = \frac{Y_{1}}{X_{1}} + \frac{Y_{2}}{X_{2}} + \frac{Y_{3}}{X_{3}} + \cdots \frac{Y_{n}}{X_{n}}$$
 
 $W_{2} and W_{1}$ are thus different estimators\newline
+
+Now, showing that $$E(\bar{Y}) = E(Y)$$\newline
+$$E(\bar{Y}) = E(n^{-1}*[Y_{1} + Y_{2} + \cdots + Y_{n}])$$
+$$\Rightarrow E(\bar{Y}) = n^{-1}*E(Y_{1} + Y_{2} + \cdots + Y_{n})$$
+$$\Rightarrow E(\bar{Y}) = n^{-1}*[E(Y_{1}) + E(Y_{2}) + \cdots + E(Y_{n})]$$
+$$\Rightarrow E(\bar{Y}) = n^{-1}*n*\theta X$$
+$$\Rightarrow E(\bar{Y}) = \theta E(X)$$
+
+Similarly, $$E(\bar{X}) = E(X)$$
+
+Therefore,\newline
 $$E(W_{2}) = E[\frac{\bar{Y}}{\bar{X}}]$$
-We know that\newline
-$$E(Y) = E(\bar{Y}) = E[E(Y|X)] = E[\theta X] = \theta E(X)$$
 $$\Rightarrow E(W_{2}) = E[\frac{\theta E(X)}{E(X)}] = E(\theta)$$
 $$\mathbf{\Rightarrow E(W_{2}) = \theta}$$
+
 
 Question 12
 ===========
@@ -519,14 +545,44 @@ And $\frac{\bar{\gamma} - \theta}{se(\bar{Y})} \equiv Normal(0, 1)$
 We compute:\newline
 $$z_{Y} = \frac{\frac{188}{429} - .5}{se(\bar{Y})} = -2.588303$$
 $$\Rightarrow p(z) = 0.0048$$
-The p-value is significant at the 1% significance level and we reject the null hypothesis.
-iv)\newline
+The p-value is significant at the 1% significance level and we reject the null hypothesis.\newline
+
+**Additional Questions**
+
+1)\newline
 Type I error is the probability of a false positive or the probability that the null hypothesis was  rejected but it should not have been.  It's the probability of saying there is a result when there is not one.
-v)\newline
-The probablity of the type error is the significance level and is 1%.
-vi)\newline
+
+2)\newline
+The probablity of the type I error is the significance level and is 1%.
+
+3)\newline
 Type II error is the probability of a false negative, or the probablity of failing to reject the null hypothesis when it should be rejected.
-vii)\newline
-viii)\newline
+
+4)\newline
+We know that this is a one-tailed test and that the null is rejected if z is above -2.33.
+
+Finding the critical value of Y which makes the null get rejected:
+$$-2.33=Z_{critical}=\frac{\bar{Y}_{critical} - 0.5}{se(\bar{Y})}$$
+
+```{r, tidy=TRUE}
+value = qnorm(0.01)*sqrt(188/429*(1-188/429)/429) + 0.5
+print(round(value,2))
+```
+
+Now, probability of a type II error is the probability of getting a Y value greater than 0.44
+$$Pr(Z>\frac{0.44 - 0.45}{se(\bar{Y})}) $$
+Computing this, we get:
+```{r, tidy=TRUE}
+value2 =1 - pnorm((value-0.45)/sqrt(188/429*(1-188/429)/429))
+print(round(value2,2))
+```
+
+**Therefore, the probability of Type II error of this test is 0.59**
+
+5)\newline
 The power of the test is the probabilty of rejecting the null hypothesis when its is actually false.
-ix)\newline
+
+6)\newline
+$$Power = 1 - Pr(Type\ II\ Error)$$
+$$Power = 1 - 0.59$$
+$$Power = 0.41$$
