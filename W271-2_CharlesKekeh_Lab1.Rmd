@@ -89,10 +89,10 @@ We previously computed E(g(x)). We now compute E[g(x)]$^{2}$
 
 $$E[(g(x)^{2}] = \int_{0}^{1}\frac{\theta^{2}}{k}dt + \int_{1}^{k/2}\frac{A^{2} (k-t)}{k} dt + \int_{\frac{k}{2}}^{\frac{3k}{2}} \frac{\theta^{2}}{100 k} dt$$
 
-$$\mathbf{E[(g(x)^{2}] = \frac{\theta^{2}}{k} - \frac{\theta^2}{400} - \frac{A^{2}(3k^{2} - 8k +4)}{8k}}$$
+$$\mathbf{E[(g(x)^{2}] = \frac{\theta^{2}}{k} + \frac{\theta^2}{400} - \frac{A^{2}(3k^{2} - 8k +4)}{8k}}$$
 
 We substract $E(g(x))^{2}$ as previously computed to obtain the variance, and
-$$\mathbf{Var(g(x)) = \frac{\theta^{2}}{k} - \frac{\theta^2}{400} - \frac{A^{2}(3k^{2} - 8k +4)}{8k} - [\frac{\theta}{k} + \frac{\theta}{40}  + \frac{2A}{3k}[(k-1)^\frac{3}{2} - \frac{k}{2}^{\frac{3}{2}}]]^{2}}$$
+$$\mathbf{Var(g(x)) = \frac{\theta^{2}}{k} + \frac{\theta^2}{400} - \frac{A^{2}(3k^{2} - 8k +4)}{8k} - [\frac{\theta}{k} + \frac{\theta}{40}  + \frac{2A}{3k}[(k-1)^\frac{3}{2} - \frac{k}{2}^{\frac{3}{2}}]]^{2}}$$
 
 __Megan's Question 2 and 3 answers\newline__
 2. Compute the expected payout from the contract, E(x).\newline
