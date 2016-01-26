@@ -35,7 +35,7 @@ $$\mathbf{Pr(!Awesome|ML) = 1- Pr(Awesome|ML) = 1 - \frac{12}{36} = 1 - \frac{1}
 $$Pr(ML \cup Stat|Awesome) = \frac{Pr((ML \cup Stat) \cap Awesome)}{Pr(Awesome)}$$
 $$Pr(ML \cup Stat|Awesome) = \frac{Pr(ML \cap Awesome) + Pr(Stat \cap Awesome) - Pr(Stat \cap ML \cap Awesome)}{Pr(Awesome)}$$
 $$\mathbf{Pr(ML \cup Stat|Awesome) = \frac{12 + 9 - 9}{18} = \frac{12}{18} = \frac{1}{4}}$$
-Note that this answer assumes that the question requests an answer for the data scientist being an expert in machine learning OR statistics and not an exclusive a machine learning expert or a scientis.
+Note that this answer assumes that the question requests an answer for the data scientist being an expert in machine learning OR statistics and not exclusively an expert in machine learning or  scientistics.
 If an Exclusive OR is desired, then we need to substract the number of data scientists at the intersection of Awesome, Machine Learning and Statistics from our anwwer, giving a result of $\frac{3}{18}$, or $\mathbf{\frac{1}{6}}$ 
 
 Question 2
