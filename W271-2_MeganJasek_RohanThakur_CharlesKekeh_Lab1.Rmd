@@ -408,21 +408,40 @@ $$\mathbf{\Rightarrow Var(\bar{Y}) = \frac{1}{n^{2}} n \sigma^{2} = \frac{1}{n}V
 $$E[\widehat{\sigma^{2}}] = E[\frac{1}{n} \sum_{i=1}^{n} (Y_{i} - \bar{Y})^{2}]$$
 $$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n} E[(Y_{i} - \bar{Y})^{2}]$$
 $$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n} E(Y_{i}^2 - 2Y_{i} \bar{Y} + \bar{Y}^{2})$$
-Using the linearity of the expectation function and the indepedence of identically distributed variables:
-$$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n} E(Y_{i}^2) - 2E(Y_{i}) E(\bar{Y}) + \bar{Y}^{2})$$
-$$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n} E(Y_{i}^2) - E(Y_{i})^2 + E(\bar{Y}^{2}) - E(\bar{Y})^2$$
-$$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n} Var(Y_{i}) + Var(\bar{Y})$$
-$$E[\widehat{\sigma^{2}}] = \frac{1}{n} (n \sigma^2 + n \frac{\sigma^2}{n})$$
-$$\mathbf{E[\widehat{\sigma^{2}]} = \frac{n+1}{n} \sigma^2}$$
+$$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n} [E(Y_{i}^2) - 2E(Y_{i} \bar{Y}) + E(\bar{Y}^{2})]$$
+$$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n} [E(Y_{i}^2) - \frac{2}{n} E(Y_{i} \sum_{j=1}^{n} \frac{Y_{i}}{n}) + E(\bar{Y}^{2})]$$
+$$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n} [E(Y_{i}^2) - \frac{2}{n} E(Y_{i} \sum_{j =0, j \neq i}^{n} Y_{j} + Y_{i} Y_{i}) + E(\bar{Y}^{2})]$$
+$$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n} [E(Y_{i}^2) - \frac{2}{n} (E(Y_{i} \sum_{j =0, j \neq i}^{n} Y_{j}) + E(Y_{i}^{2})) + E(\bar{Y}^{2})]$$
+
+We know that:
+$$Cov(X,Y) = E(XY) - \mu_{X} \mu_{Y}$$
+$$\Rightarrow E(XY) = Cov(X,Y) + \mu_{X} \mu_{Y}$$
+We also know that:
+$$Cov(X,Y) = E[(X - \mu_{X})(Y -\mu_{Y})]$$
+$$\Rightarrow Cov(X,X) = E[(X - \mu_{X})^{2}] = Var(X)$$
+And\
+$$E(XX) = E(X^{2}) = Var(X) + \mu_{X}^{2}$$
+
+Going back to $E[\widehat{\sigma^{2}}]$, we use the iid property to reduce $E(Y_{i} \sum_{j =0, j \neq i}^{n} Y_{j}) + E(Y_{i}^2)$ since $Y_{i}$ and $Y_{j}$ are identical and independent varaibles. Thus:
+$$E(Y_{i} \sum_{j =0, j \neq i}^{n} Y_{j}) = \sum_{j=0, j \neq i}^{n} E(Y_{i}Y_{j}) = \sum_{j=0, j \neq i}^{n} E(Y_{i})E(Y_{j}) = (n-1)\mu^{2}$$
+
+And, using our finding above about $E(X^{2})$, we have:
+$$E(Y_{i}^{2}) = \sigma^2 - \mu^2$$
+And
+$$E(\bar{Y}^{2}) = \frac{\sigma^{2}}{n} + \mu^{2} = \frac{\sigma^{2} + n \mu^{2}}{n}$$
+
+Thus:
+$$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n}[\sigma^{2} + \mu^{2} - \frac{2}{n}[(n-1) \mu^{2} + \sigma^{2} + \mu^{2}] + \frac{\sigma^{2} + n \mu^{2}}{n}]$$
+$$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n}[\sigma^{2} + \mu^{2} - \frac{2}{n}[n \mu^{2} + \sigma^{2}] + \frac{\sigma^{2} + n \mu^{2}}{n}]$$
+$$E[\widehat{\sigma^{2}}] = \frac{1}{n} \sum_{i=1}^{n}[\frac{(n-1) \sigma^{2}}{n}]$$
+$$\mathbf{E[\widehat{\sigma^{2}}] = \frac{(n-1) \sigma^{2}}{n}}$$
 
 4)\newline
-We have shown that E($\widehat{\sigma^2}$) != $\sigma^{2}$ and we conclude that $\widehat{\sigma^2}$ is a biased estimator for $\sigma^{2}$.
+We have shown that $E(\widehat{\sigma^2}) \neq \sigma^{2}$ and we conclude that $\widehat{\sigma^2}$ is a biased estimator for $\sigma^{2}$.
 
 5)\newline
-We know that:
-$$\widehat{\sigma^{2}} = \frac{n+1}{n} \sigma^2 $$
-is a biased estimator. Thus:
-$$\frac{n}{n+1} \widehat{\sigma^{2}}$$ is an unbiased estimator of $\sigma^{2}$
+We know that: $\widehat{\sigma^{2}} = \frac{1}{n}\sum_{i=1}^{n}(Y_{i} - \bar{Y})^{2}$ is a biased estimator of $\sigma^{2}$. Thus:
+$$\frac{n}{n-1} \widehat{\sigma^{2}} = \frac{1}{n-1}\sum_{i=1}^{n}(Y_{i} - \bar{Y})^{2}$$ is an unbiased estimator of $\sigma^{2}$
 
 Question 11
 ===========
