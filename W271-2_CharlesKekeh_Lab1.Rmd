@@ -33,7 +33,7 @@ $$\mathbf{Pr(!Awesome|ML) = 1- Pr(Awesome|ML) = 1 - \frac{12}{36} = 1 - \frac{1}
 
 3)\newline
 $$Pr(ML \cup Stat|Awesome) = \frac{Pr((ML \cup Stat) \cap Awesome)}{Pr(Awesome)}$$
-$$Pr(ML \cup Stat|Awesome) = \frac{Pr(ML \cup Awesome) + Pr(Stat \cup Awesome) - Pr(Stat \cap ML \cap Awesome)}{Pr(Awesome)}$$
+$$Pr(ML \cup Stat|Awesome) = \frac{Pr(ML \cap Awesome) + Pr(Stat \cap Awesome) - Pr(Stat \cap ML \cap Awesome)}{Pr(Awesome)}$$
 $$\mathbf{Pr(ML \cup Stat|Awesome) = \frac{12 + 9 - 9}{48} = \frac{12}{48} = \frac{1}{4}}$$
 
 Question 2
