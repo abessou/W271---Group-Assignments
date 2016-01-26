@@ -1,6 +1,6 @@
 ---
 title: "W271-Lab1 Spring 2016"
-author: "Charles Kekeh"
+author: "Megan Jasek, Charles Kekeh and Rohan Thakur"
 date: "Thursday, January 14, 2016"
 output: pdf_document
 ---
@@ -34,7 +34,9 @@ $$\mathbf{Pr(!Awesome|ML) = 1- Pr(Awesome|ML) = 1 - \frac{12}{36} = 1 - \frac{1}
 3)\newline
 $$Pr(ML \cup Stat|Awesome) = \frac{Pr((ML \cup Stat) \cap Awesome)}{Pr(Awesome)}$$
 $$Pr(ML \cup Stat|Awesome) = \frac{Pr(ML \cap Awesome) + Pr(Stat \cap Awesome) - Pr(Stat \cap ML \cap Awesome)}{Pr(Awesome)}$$
-$$\mathbf{Pr(ML \cup Stat|Awesome) = \frac{12 + 9 - 9}{48} = \frac{12}{48} = \frac{1}{4}}$$
+$$\mathbf{Pr(ML \cup Stat|Awesome) = \frac{12 + 9 - 9}{18} = \frac{12}{18} = \frac{1}{4}}$$
+Note that this answer assumes that the question requests an answer for the data scientist being an expert in machine learning OR statistics and not an exclusive a machine learning expert or a scientis.
+If an Exclusive OR is desired, then we need to substract the number of data scientists at the intersection of Awesome, Machine Learning and Statistics from our anwwer, giving a result of $\frac{3}{18}$, or $\mathbf{\frac{1}{6}}$ 
 
 Question 2
 ===========
@@ -76,26 +78,6 @@ Given that the server's lifespan is a randon uniform distribution over the range
 
 2)\newline
 We know that: 
-$$E(g(x)) = \int_{x=0}^{k}g(x)f_{x}(x)dx$$
-Considering g to be our refund function over time t:
-$$E(g(t)) = \int_{t=0}^{1}\frac{\theta}{k}dt + \int_{t=1}^{k/2}\frac{A(k-t)^{\frac{1}{2}}}{k}dt + \int_{t=k/2}^{\frac{3k}{4}}\frac{\theta}{10 k}dt$$
-$$E(g(t)) = \frac{\theta}{k}[t]_{0}^{1} + [\frac{-2 A}{3 k} (k - t)^{\frac{3}{2}}]_{1}^{k/2} + [\frac{\theta}{10k} t]_{\frac{k}{2}}^{\frac{3k}{4}}$$
-$$\mathbf{E(g(t)) = \frac{\theta}{k} + \frac{\theta}{40}  + \frac{2A}{3k}[(k-1)^\frac{3}{2} - \frac{k}{2}^{\frac{3}{2}}]}$$
-
-3)\newline
-We know that Var(X) = E[$X^{2}$] -$E[X]^{2}$\newline
-Thus Var(g(x)) = E[(g(x)$^{2}$] - $[E[g(X)]]^{2}$\newline
-We previously computed E(g(x)). We now compute E[g(x)]$^{2}$
-
-$$E[(g(x)^{2}] = \int_{0}^{1}\frac{\theta^{2}}{k}dt + \int_{1}^{k/2}\frac{A^{2} (k-t)}{k} dt + \int_{\frac{k}{2}}^{\frac{3k}{2}} \frac{\theta^{2}}{100 k} dt$$
-
-$$\mathbf{E[(g(x)^{2}] = \frac{\theta^{2}}{k} + \frac{\theta^2}{400} - \frac{A^{2}(3k^{2} - 8k +4)}{8k}}$$
-
-We substract $E(g(x))^{2}$ as previously computed to obtain the variance, and
-$$\mathbf{Var(g(x)) = \frac{\theta^{2}}{k} + \frac{\theta^2}{400} - \frac{A^{2}(3k^{2} - 8k +4)}{8k} - [\frac{\theta}{k} + \frac{\theta}{40}  + \frac{2A}{3k}[(k-1)^\frac{3}{2} - \frac{k}{2}^{\frac{3}{2}}]]^{2}}$$
-
-__Megan's Question 2 and 3 answers\newline__
-2. Compute the expected payout from the contract, E(x).\newline
 $$E(g(x)) = \int_{x=0}^{\infty}g(x)f_{x}(x)dx$$
 
 Considering g to be our refund function over time t:
@@ -105,18 +87,17 @@ $$E(g(t)) = \frac{\theta}{k}[t]_{0}^{1} + \frac{-4}{3k} (k - t)^{\frac{3}{2}}[t]
 
 $$\mathbf{E(g(t)) = \frac{\theta}{k}  + \frac{4}{3k}(k-1)^\frac{3}{2} - \frac{4}{3k}(\frac{k}{2})^{\frac{3}{2}} + \frac{\theta}{40}}$$
 
-3.  Compute the variance of the payout from the contract.\newline
-We know that Var(X) = E[$X^{2}$] -$\mu^{2}$
-Thus Var(g(x)) = E[(g(x)$^{2}$] - $[E[g(X)]^{2}$]
-We previously computed E(g(x)). We now compute E[(g(x)$^{2}$]
+3)\newline
+We know that Var(X) = E[$X^{2}$] -$E[X]^{2}$\newline
+Thus Var(g(x)) = E[(g(x)$^{2}$] - $[E[g(X)]]^{2}$\newline
+We previously computed E(g(x)). We now compute E[g(x)]$^{2}$
 
-$$E[(g(x)^{2}] = \int_{t=0}^{1}\frac{\theta^2}{k^2}dt + \int_{t=1}^{k/2}\frac{4 (k-t)}{k^2} dt + \int_{t=\frac{k}{2}}^{\frac{3k}{4}} \frac{\theta^2}{100 k^2} dt + \int_{t=\frac{3k}{4}}^{\infty}0dt$$
+$$E[(g(x)^{2}] = \int_{0}^{1}\frac{\theta^{2}}{k}dt + \int_{1}^{k/2}\frac{A^{2} (k-t)}{k} dt + \int_{\frac{k}{2}}^{\frac{3k}{4}} \frac{\theta^{2}}{100 k} dt$$
 
-$$E(g(t)) = \frac{\theta^2}{k^2}[t]_{0}^{1} + \frac{-2t(2k-t)}{k^2}[t]]_{1}^{k/2} + \frac{\theta^2}{400k}[t]_{\frac{k}{2}}^{\frac{3k}{4}} + 0$$
+$$\mathbf{E[(g(x)^{2}] = \frac{\theta^{2}}{k} + \frac{\theta^2}{400} - \frac{3k^{2} - 8k +4}{2k}}$$
 
-$$\mathbf{E[(g(x)^{2}] = \frac{\theta^{2}}{k^2} + \frac{3}{2} + \frac{4k-2}{k^2} + \frac{\theta^2}{400k}}$$
-
-We substract $E(g(x))^{2}$ as previously computed to obtain the variance
+We substract $E(g(x))^{2}$ as previously computed to obtain the variance, and
+$$\mathbf{Var(g(x)) = \frac{\theta^{2}}{k} + \frac{\theta^2}{400} - \frac{3k^{2} - 8k +4}{2k} - [\frac{\theta}{k}  + \frac{4}{3k}(k-1)^\frac{3}{2} - \frac{4}{3k}(\frac{k}{2})^{\frac{3}{2}} + \frac{\theta}{40}]^{2}}$$
 
 
 Question 4
