@@ -32,11 +32,21 @@ $$Pr(Awesome|ML) = \frac{12}{36} = \frac{1}{3}$$
 $$\mathbf{Pr(!Awesome|ML) = 1- Pr(Awesome|ML) = 1 - \frac{12}{36} = 1 - \frac{1}{3} = \frac{2}{3}}$$
 
 3)\newline
-$$Pr(ML \cup Stat|Awesome) = \frac{Pr((ML \cup Stat) \cap Awesome)}{Pr(Awesome)}$$
-$$Pr(ML \cup Stat|Awesome) = \frac{Pr(ML \cap Awesome) + Pr(Stat \cap Awesome) - Pr(Stat \cap ML \cap Awesome)}{Pr(Awesome)}$$
-$$\mathbf{Pr(ML \cup Stat|Awesome) = \frac{12 + 9 - 9}{18} = \frac{12}{18} = \frac{1}{4}}$$
-Note that this answer assumes that the question requests an answer for the data scientist being an expert in machine learning OR statistics and not exclusively an expert in machine learning or  scientistics.
-If an Exclusive OR is desired, then we need to substract the number of data scientists at the intersection of Awesome, Machine Learning and Statistics from our anwwer, giving a result of $\frac{3}{18}$, or $\mathbf{\frac{1}{6}}$ 
+Please note that this answer assumes that the question requests an answer for the data scientist being an expert in either machine learning OR statistics (Exclusive OR) and excludes experts in both fields.
+
+$$
+\begin{aligned}
+&=Pr((ML \cap Stat')\cup(ML' \cap Stat)|Awesome) \\
+\ &=\frac{Pr((ML \cap Awesome - ML \cap Awesome \cap Stat) \cup (Stat \cap Awesome - ML \cap Awesome \cap Stat)}{Pr(Awesome)} \\
+\ &=\frac{(12 - 9) + (9 - 9)}{18} \\
+\ &=\frac{3}{18} \\
+\ &= \frac{1}{6}
+\end{aligned}
+$$
+
+**Final answer: $\mathbf{\frac{1}{6}}$**
+
+However, if a non-exclusive OR is desired, then we need to add the number of data scientists at the intersection of Awesome, Machine Learning and Statistics to our numerator, giving a result of $\frac{12}{18}$, or $\mathbf{\frac{2}{3}}$ \newline
 
 Question 2
 ===========
@@ -550,13 +560,13 @@ The p-value is significant at the 1% significance level and we reject the null h
 **Additional Questions**
 
 1)\newline
-Type I error is the probability of a false positive or the probability that the null hypothesis was  rejected but it should not have been.  It's the probability of saying there is a result when there is not one.
+Type I error is the probability of a false positive or the probability of rejecting the null hypothesis when it is true.  It's the probability of saying there is a result when there is not one.
 
 2)\newline
 The probablity of the type I error is the significance level and is 1%.
 
 3)\newline
-Type II error is the probability of a false negative, or the probablity of failing to reject the null hypothesis when it should be rejected.
+Type II error is the probability of a false negative, or the probablity of failing to reject the null hypothesis when it is false.
 
 4)\newline
 We know that this is a one-tailed test and that the null is rejected if z is above -2.33.
@@ -580,7 +590,7 @@ print(round(value2,2))
 **Therefore, the probability of Type II error of this test is 0.59**
 
 5)\newline
-The power of the test is the probabilty of rejecting the null hypothesis when its is actually false.
+The power of the test is the probabilty of rejecting the null hypothesis when it is actually false.
 
 6)\newline
 $$Power = 1 - Pr(Type\ II\ Error)$$
