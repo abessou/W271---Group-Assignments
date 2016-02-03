@@ -17,7 +17,7 @@ load.data <- function(){
 data <- load.data()
 
 ############
-# Question 2
+# Question 
 ############
 # Display summary information about the dataframe
 print(str(data))

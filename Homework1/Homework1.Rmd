@@ -71,7 +71,7 @@ plot(bwght.hist)
 
 Data observations:
 ------------------
-These are the outlier observations. There are babies with birthweights of 0 and over 200 ounces.
+Below are the outlier observations. There are babies with birthweights of 0 and over 200 ounces.
 ```{r}
 print(sum(data$bwght == 0))
 print(data$bwght[data$bwght > 200])
@@ -115,8 +115,7 @@ plot(cigs.hist)
 Data observations:
 ------------------
 
-The histogram for the number of cigarettes smoked is positively skewed with a very high proportion of
-individuals smoking zero cigarettes per day during heir pregnancy.
+The histogram for the number of cigarettes smoked is positively skewed with a very high proportion of individuals smoking zero cigarettes per day during heir pregnancy.
 There are no other visible signs of anomalies in the data.
 
 Question 5:
@@ -131,7 +130,7 @@ scatter.bwght.cigs <- ggplot(data, aes(cigs, bwght)) +
          title = "Cigarettes Smoked Per Day Vs Infant Birthweight")
 plot(scatter.bwght.cigs)
 ```
-Based on the scatterplot and the fitted lm curve on it, it appears that only a very small amount of the variation of bwght will be explained by cigs. That's because the variation explained in the graph appears to be much lower than the variation of birthweights at any level of daily cigarette consumption
+Based on the scatterplot and the fitted lm curve on it, it appears that only a very small amount of the variation of bwght will be explained by cigs. That's because the variation explained in the graph appears to be much lower than the variation of birthweights at any level of daily cigarette consumption in the scatterplot.
 
 Question 6:
 ===========
@@ -147,13 +146,11 @@ plot(simple.ols.cigs.bwght)
 
 Our null hypothesis is that there is no relationship between the cigs variable and the bwght variable.
 The p-value of the f-statistic of the model is significant at 1.711e-08, indicating that we should reject the null hypothesis.
-The model accounts for 2.28% of the variability in the variable bwght
-That value is givent by a R^2 value of 0.2285 and a R value of 0.151 indicating a relatively small effect size
-
-The model shows a negative coefficient for the variable cigs with a value of -0.5147.
-The coefficents of the model are statistically significant.
-
-Each cigarette smoked corresponds to a 0.5 ounce weight reduction. Std error of .0889. Coefficient is significant.# R sq indicates 2% of variation in birth weight explained by cigs
+The model accounts for 2.32% of the variability in the variable bwght
+That value is givent by a R^2 value of 0.02322 and a R value of 0.152 indicating a relatively small effect size
+The model shows a negative coefficient for the variable cigs with a value of -0.508.
+The Intercept and slope coefficent of the model are statistically significant.
+Each cigarette smoked corresponds to a 0.5 ounce weight reduction. The standard error of the slope coefficient for the cigs variable is .0889.
 
 Question 7
 ==========
@@ -176,7 +173,7 @@ plot(faminc.hist)
 scatterplotMatrix(~ bwght + cigs + faminc, data = data)
 ```
 
-In the famiily income variable, it seems that the while all values below 20 were collected as exact values,values above may have been collected as ranges. For example, respondents may have ticked boxes such as 20-25, 25-20, 30-35, etc.,and in the final variable it seems the data is represented as the mean of the range.  It also seems strange that 65 is so far above the rest of the values. It seemsthat values above a certain number have been denoted as 65. While this is not ideal,we continue with these values as our observations.
+In the famiily income variable, it seems that the while all values below 20 were collected as exact values, values above may have been collected as ranges. For example, respondents may have ticked boxes such as 20-25, 25-20, 30-35, etc.,and in the final variable it seems the data is represented as the mean of the range.  It also seems strange that 65 is so far above the rest of the values. It seems that values above a certain number have been denoted as 65. While this is not ideal, we will proceed with these values as our observations.
 
 Question 8:
 ==========
@@ -200,7 +197,7 @@ Question 9
 ==========
 The coefficient on cigs in the multiple regression means that for every additional
 cigarette smoked per day by the pregnant mother during their maternity, and leaving
-the income variable constant, the body weight of the infant children decreases by 0.460 pound.
+the income variable constant, the body weight of the infant children decreases by 0.460 onces.
 
 In the simple regression, we saw that this coefficient was also negative and had a value of -0.508.
 
@@ -211,13 +208,11 @@ weight of the infant was educed by -0.508 ounces.
 In the multiple regression, the variance explained by the famic variable was captured in the residuals of the simple model and partially also in the coefficent of the cigs 
 variable as we can suspect there is some correlation between the two variables.
 
-Therefore the introduction of the additional variable faminc has reduced the contribution of the cigs variable to the infant body weight. We can hypothesis that there is some 
-correlation between the numberof cigarettes smoked per day and the family income, where
-mothers at higher family income have better health habits and therefore smoke less.
+Therefore the introduction of the additional variable faminc has reduced the contribution of the cigs variable to the infant body weight. We can hypothesise that there is some correlation between the numberof cigarettes smoked per day and the family income, where mothers at higher family income have better health habits and therefore smoke less.
 And introducing the family income variable thus takes away some of the variance
 explanation previously captured by the cigs variable.
 
 Question 10
 ===========
 The more negative cigs coefficient is that of the simpel model. It's value is -0.508 compared to the -0.46 value for the multiple regression model.
-Our explaination for the difference as stated in Question 9 is that there is a correlation bewtween the cigs variable and the faminc variable.
+Our explaination for the difference as stated in Question 9 is that there is a correlation between the cigs variable and the faminc variable.
