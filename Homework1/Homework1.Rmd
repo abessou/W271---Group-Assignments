@@ -156,8 +156,8 @@ The intercept and slope coefficents of the model are statistically significant.
 Interpret the Results:
 ----------------------
 
-1.  Our null hypothesis is that there is no relationship between the cigs variable and the bwght variable. (The coefficient for the cigs variable is 0).
-2.  We are able to reject the null hypothesis since our p-value of the t-statistic of the cigs variable is significant at 1.32e-08.
+1.  Our model null hypothesis is that there is no relationship between the bwght variable and the cigs variable.  We are able to reject the null hypothesis since our p-value of the f-statistic of the model is significant at 1.711e-08.
+2.  Our coefficient null hypothesis is that the coefficient for the cigs variable is 0.  We are able to reject the null hypothesis since our p-value of the t-statistic of the cigs variable is significant at 1.32e-08.
 3.  A change of 1 unit in cigs corresponds to a 0.51 reduction in birthweight.  (The model shows a negative coefficient for the variable cigs with a value of -0.508).
 4.  Practical significance:  we have an R-squared value of 0.02322, indicating that 2.32% of the variation in bwght is explained by our model.  An R value of 0.152 indicates a relatively small effect size.
 
@@ -206,10 +206,10 @@ The intercept and slope coefficents of the model are statistically significant.
 
 Interpret the Results:
 ----------------------
-1.  Our null hypothesis is that there is no relationship between the bwght variable and the cigs and faminc variables. (The coefficients for the cigs variable and faminc variable are 0).
-2.  We are able to reject the null hypothesis since our p-value of the t-statistic of the cigs variable is significant at 3.67e-07 and our p-value of the t-statistic of the faminc variable is significant at 0.00192.
-3.  A change of 1 unit in cigs corresponds to a 0.46 reduction in birthweight.  (The model shows a negative coefficient for the variable cigs with a value of -0.45981).  A change of 1 unit in faminc corresponds to a 0.09 increase in birthweight.  (The model shows a positive coefficient for the variable faminc with a value of 0.08921).
-4.  Practical significance:  we have an R-squared value of 0.03004, indicating that 3.00% of the variation in bwght is explained by our model.  An R value of 0.173 indicates a relatively small effect size.
+1.  Our model null hypothesis is that there is no relationship between the bwght variable and the cigs and faminc variables.  We are able to reject the null hypothesis since our p-value of the f-statistic of the model is significant at 7.916e-10.
+2.  Our coefficient null hypothesis is that the coefficients for the cigs variable and faminc variable are 0.  We are able to reject the null hypothesis since our p-value of the t-statistic of the cigs variable is significant at 3.67e-07 and our p-value of the t-statistic of the faminc variable is significant at 0.00192.
+4.  A change of 1 unit in cigs corresponds to a 0.46 reduction in birthweight.  (The model shows a negative coefficient for the variable cigs with a value of -0.45981).  A change of 1 unit in faminc corresponds to a 0.09 increase in birthweight.  (The model shows a positive coefficient for the variable faminc with a value of 0.08921).
+5.  Practical significance:  we have an R-squared value of 0.03004, indicating that 3.00% of the variation in bwght is explained by our model.  An R value of 0.173 indicates a relatively small effect size.
 
 Question 9
 ==========
