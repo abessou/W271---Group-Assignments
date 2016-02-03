@@ -11,8 +11,9 @@ library(car)
 library(boot)
 library(pastecs)
 library(car)
+library(knitr)
+opts_chunk$set(tidy.opts=list(width.cutoff=50))
 ```
-
 Question 1
 ==========
 ```{r}
@@ -22,7 +23,7 @@ load(file.path("./data", "birthweight_w271.rdata"))
 
 Question 2
 ==========
-```{r, tidy=TRUE}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
 # Display summary information about the dataframe
 print(desc)
 print(str(data))
@@ -33,7 +34,7 @@ There are 1388 obs. of 14 variables in the data.
 
 Question 3
 ==========
-```{r, tidy=TRUE}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
 # Get summary statistics about the birthweight variable.
 print(summary(data$bwght))
 print(sum(is.nan(data$bwght)))
@@ -80,7 +81,7 @@ We should also remove the single 271 ounces baby observation in the data set. Fo
 
 Question 4
 ==========
-```{r, tidy=TRUE}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
 # Get summary statistics about the cigarettes smoked variable.
 print(summary(data$cigs))
 print(sum(is.nan(data$cigs)))
@@ -123,7 +124,7 @@ There are no other visible signs of anomalies in the data.
 
 Question 5:
 ===========
-```{r, tidy=TRUE}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
 # Create a scatterplot of cigarettes smoked per day vs baby birthweight
 scatter.bwght.cigs <- ggplot(data, aes(cigs, bwght)) +
     geom_point(colour = "Blue", position = "jitter") +
@@ -137,7 +138,7 @@ Based on the scatterplot and the fitted lm curve on it, it appears that only a v
 
 Question 6:
 ===========
-```{r, tidy=TRUE}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
 # Clean up the data based on previous observations
 data <- data[data$bwght != 0 & data$bwght < 200, ]
 
@@ -163,7 +164,7 @@ Interpret the Results:
 
 Question 7
 ==========
-```{r, tidy=TRUE}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
 # Obtain descriptive statistics for the new variable
 print(summary(data$faminc))
 print(sum(is.nan(data$faminc)))
@@ -189,7 +190,7 @@ In the famiily income variable, it seems that while all values below 20 were col
 
 Question 8:
 ==========
-```{r, tidy=TRUE}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
 #Introduce a new independent variable to the model
 multiple.ols.cigs.faminc.bwght <- lm(bwght ~ cigs + faminc, data = data)
 print(summary.lm(multiple.ols.cigs.faminc.bwght))

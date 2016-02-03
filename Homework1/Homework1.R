@@ -1,9 +1,11 @@
 install.packages("pastecs")
+install.packages("knitr")
 library(ggplot2)
 library(car)
 library(boot)
 library(pastecs)
 library(car)
+library(knitr)
 
 
 ############
