@@ -1,6 +1,6 @@
 ---
 title: "Homework1"
-author: "Charles Kekeh"
+author: "Megan Jasek, Charles Kekeh, Rohan, Thakur"
 date: "Sunday, January 31, 2016"
 output: pdf_document
 ---
@@ -12,24 +12,19 @@ library(boot)
 library(pastecs)
 library(car)
 ```
-```{r}
-load.data <- function(){
-    load(file.path("./data", "birthweight_w271.rdata"))
-    return (data)
-}
-```
 
 Question 1
 ==========
 ```{r}
 # Load the dataframe
-data <- load.data()
+load(file.path("./data", "birthweight_w271.rdata"))
 ```
 
 Question 2
 ==========
-```{r}
+```{r, tidy=TRUE}
 # Display summary information about the dataframe
+print(desc)
 print(str(data))
 print(summary(data))
 print(stat.desc(data))
@@ -38,11 +33,11 @@ There are 1388 obs. of 14 variables in the data.
 
 Question 3
 ==========
-```{r}
+```{r, tidy=TRUE}
 # Get summary statistics about the birthweight variable.
 print(summary(data$bwght))
 print(sum(is.nan(data$bwght)))
-print(quantile(data$bwght, probs = c(.1, .5, .10, .25, .50, .75, .90, .95, .99, 1)))
+print(quantile(data$bwght, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
 
 # Plot the histogram of bwght at 15 bins
 bwght.hist <- ggplot(data, aes(bwght)) + 
@@ -69,6 +64,10 @@ bwght.hist <- ggplot(data, aes(bwght)) +
 plot(bwght.hist)
 ```
 
+Comments on shape of distributions:
+-----------------------------------
+As more and more bins are added the shape of the distribution gets smoother.  
+
 Data observations:
 ------------------
 Below are the outlier observations. There are babies with birthweights of 0 and over 200 ounces.
@@ -81,17 +80,17 @@ We should also remove the single 271 ounces baby observation in the data set. Fo
 
 Question 4
 ==========
-```{r}
+```{r, tidy=TRUE}
 # Get summary statistics about the cigarettes smoked variable.
 print(summary(data$cigs))
 print(sum(is.nan(data$cigs)))
-print(quantile(data$cigs, probs = c(.1, .5, .10, .25, .50, .75, .90, .95, .99, 1)))
+print(quantile(data$cigs, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
 
 # Plot the histogram of cigs at 15 bins
 cigs.hist <- ggplot(data, aes(cigs)) + 
     theme(legend.position = "none") + 
     geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(data$cigs)[2] - range(data$cigs)[1])/15) +
-    labs(title = "Distribution of daily cigarette consumption", x = "Birth Weight", y = "Fequency")
+    labs(title = "Distribution of daily cigarette consumption", x = "Daily cigarette consumption", y = "Fequency")
 
 plot(cigs.hist)
 
@@ -99,7 +98,7 @@ plot(cigs.hist)
 cigs.hist <- ggplot(data, aes(cigs)) + 
     theme(legend.position = "none") + 
     geom_histogram(fill = "Blue", colour = "Black") +
-    labs(title = "Distribution of daily cigarette consumption", x = "Birth Weight", y = "Fequency")
+    labs(title = "Distribution of daily cigarette consumption", x = "Daily cigarette consumption", y = "Fequency")
 
 plot(cigs.hist)
 
@@ -107,20 +106,24 @@ plot(cigs.hist)
 cigs.hist <- ggplot(data, aes(cigs)) + 
     theme(legend.position = "none") + 
     geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(data$cigs)[2] - range(data$cigs)[1])/60) +
-    labs(title = "Distribution of daily cigarette consumption", x = "Birth Weight", y = "Fequency")
+    labs(title = "Distribution of daily cigarette consumption", x = "Daily cigarette consumption", y = "Fequency")
 
 plot(cigs.hist)
 ```
 
+Comments on shape of distributions:
+-----------------------------------
+As more and more bins are added, more granularity of the data can be seen.  
+
 Data observations:
 ------------------
 
-The histogram for the number of cigarettes smoked is positively skewed with a very high proportion of individuals smoking zero cigarettes per day during heir pregnancy.
+The histogram for the number of cigarettes smoked is positively skewed with a very high proportion of individuals smoking zero cigarettes per day during their pregnancy.
 There are no other visible signs of anomalies in the data.
 
 Question 5:
 ===========
-```{r}
+```{r, tidy=TRUE}
 # Create a scatterplot of cigarettes smoked per day vs baby birthweight
 scatter.bwght.cigs <- ggplot(data, aes(cigs, bwght)) +
     geom_point(colour = "Blue", position = "jitter") +
@@ -134,7 +137,7 @@ Based on the scatterplot and the fitted lm curve on it, it appears that only a v
 
 Question 6:
 ===========
-```{r}
+```{r, tidy=TRUE}
 # Clean up the data based on previous observations
 data <- data[data$bwght != 0 & data$bwght < 200, ]
 
@@ -144,21 +147,27 @@ print(summary.lm(simple.ols.cigs.bwght))
 plot(simple.ols.cigs.bwght)
 ```
 
-Our null hypothesis is that there is no relationship between the cigs variable and the bwght variable.
-The p-value of the f-statistic of the model is significant at 1.711e-08, indicating that we should reject the null hypothesis.
-The model accounts for 2.32% of the variability in the variable bwght
-That value is givent by a R^2 value of 0.02322 and a R value of 0.152 indicating a relatively small effect size
-The model shows a negative coefficient for the variable cigs with a value of -0.508.
-The Intercept and slope coefficent of the model are statistically significant.
-Each cigarette smoked corresponds to a 0.5 ounce weight reduction. The standard error of the slope coefficient for the cigs variable is .0889.
+Coefficients:
+-------------
+__Intercept:__ estimate = 119.6663, standard error = 0.5645\newline
+__cigs:__ estimate = -0.5083, standard error = 0.0889\newline
+The intercept and slope coefficents of the model are statistically significant.
+
+Interpret the Results:
+----------------------
+
+1.  Our null hypothesis is that there is no relationship between the cigs variable and the bwght variable. (The coefficient for the cigs variable is 0).
+2.  We are able to reject the null hypothesis since our p-value of the t-statistic of the cigs variable is significant at 1.32e-08.
+3.  A change of 1 unit in cigs corresponds to a 0.51 reduction in birthweight.  (The model shows a negative coefficient for the variable cigs with a value of -0.508).
+4.  Practical significance:  we have an R-squared value of 0.02322, indicating that 2.32% of the variation in bwght is explained by our model.  An R value of 0.152 indicates a relatively small effect size.
 
 Question 7
 ==========
-```{r}
+```{r, tidy=TRUE}
 # Obtain descriptive statistics for the new variable
 print(summary(data$faminc))
 print(sum(is.nan(data$faminc)))
-print(quantile(data$faminc, probs = c(.1, .5, .10, .25, .50, .75, .90, .95, .99, 1)))
+print(quantile(data$faminc, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
 print(stat.desc(data$faminc, basic=FALSE, norm = TRUE))
 
 # Plot the histogram of faminc at 30 bins
@@ -173,46 +182,54 @@ plot(faminc.hist)
 scatterplotMatrix(~ bwght + cigs + faminc, data = data)
 ```
 
-In the famiily income variable, it seems that the while all values below 20 were collected as exact values, values above may have been collected as ranges. For example, respondents may have ticked boxes such as 20-25, 25-20, 30-35, etc.,and in the final variable it seems the data is represented as the mean of the range.  It also seems strange that 65 is so far above the rest of the values. It seems that values above a certain number have been denoted as 65. While this is not ideal, we will proceed with these values as our observations.
+Data observations:
+------------------
+
+In the famiily income variable, it seems that while all values below 20 were collected as exact values, values above may have been collected as ranges. For example, respondents may have ticked boxes such as 20-25, 25-20, 30-35, etc., and in the final variable it seems the data is represented as the mean of the range.  It also seems strange that 65 is so far above the rest of the values. It seems that values above a certain number have been denoted as 65. While this is not ideal, we will proceed with these values as our observations.
 
 Question 8:
 ==========
-```{r}
+```{r, tidy=TRUE}
 #Introduce a new independent variable to the model
 multiple.ols.cigs.faminc.bwght <- lm(bwght ~ cigs + faminc, data = data)
 print(summary.lm(multiple.ols.cigs.faminc.bwght))
 plot(multiple.ols.cigs.faminc.bwght)
 ```
 
-Our null hypothesis is that there is no relationship between the cigs variable and the bwght and faminc variables.
-The p-value of the f-statistic of the model is significant at 7.916e-10, indicating that we should reject the null hypothesis.
-The model accounts for 3.00% of the variability in the variable bwght
-That value is given by a R^2 value of 0.0300 and a R value of 0.173 indicating a relatively small effect size
+Coefficients:
+-------------
+__Intercept:__  estimate = 116.97540, standard error = 1.03242\newline
+__cigs:__  estimate = -0.45981, standard error = 0.08998\newline
+__faminc:__  estimate = 0.08921, standard error = 0.02870\newline
+The intercept and slope coefficents of the model are statistically significant.
 
-The model shows a negative coefficient for the variable cigs with a value of -0.46.
-It shows a positive coefficient for the variable faminc of 0.089.
-The coefficents of the model are statistically significant.
+
+Interpret the Results:
+----------------------
+1.  Our null hypothesis is that there is no relationship between the bwght variable and the cigs and faminc variables. (The coefficients for the cigs variable and faminc variable are 0).
+2.  We are able to reject the null hypothesis since our p-value of the t-statistic of the cigs variable is significant at 3.67e-07 and our p-value of the t-statistic of the faminc variable is significant at 0.00192.
+3.  A change of 1 unit in cigs corresponds to a 0.46 reduction in birthweight.  (The model shows a negative coefficient for the variable cigs with a value of -0.45981).  A change of 1 unit in faminc corresponds to a 0.09 increase in birthweight.  (The model shows a positive coefficient for the variable faminc with a value of 0.08921).
+4.  Practical significance:  we have an R-squared value of 0.03004, indicating that 3.00% of the variation in bwght is explained by our model.  An R value of 0.173 indicates a relatively small effect size.
 
 Question 9
 ==========
-The coefficient on cigs in the multiple regression means that for every additional
-cigarette smoked per day by the pregnant mother during their maternity, and leaving
-the income variable constant, the body weight of the infant children decreases by 0.460 onces.
+In multiple regression, the coefficient on cigs means that for every additional
+cigarette smoked per day by the pregnant mother, leaving the income variable constant,
+the birth weight decreases by 0.460 ounces.
 
-In the simple regression, we saw that this coefficient was also negative and had a value of -0.508.
-
-In the simple regression case, the coefficient on cigs meant that for every additional
+In simple regression, we saw that this coefficient was also negative and had a value of -0.508.
+In this case, the coefficient on cigs meant that for every additional
 cigarette smoked per day, indepedent of any other condition of the mother, the birth
-weight of the infant was educed by -0.508 ounces.
+weight was reduced by 0.508 ounces.
 
-In the multiple regression, the variance explained by the famic variable was captured in the residuals of the simple model and partially also in the coefficent of the cigs 
+In the multiple regression, the variance explained by the faminc variable was captured in the residuals
+of the simple model and partially also in the coefficent of the cigs 
 variable as we can suspect there is some correlation between the two variables.
 
-Therefore the introduction of the additional variable faminc has reduced the contribution of the cigs variable to the infant body weight. We can hypothesise that there is some correlation between the numberof cigarettes smoked per day and the family income, where mothers at higher family income have better health habits and therefore smoke less.
-And introducing the family income variable thus takes away some of the variance
-explanation previously captured by the cigs variable.
+Therefore, the introduction of the additional variable faminc has reduced the contribution of the cigs variable to the birth weight. We can hypothesise that there is some correlation between the number of cigarettes smoked per day and the family income, where mothers with higher family income have better health habits and therefore smoke less.
+And introducing the family income variable thus takes away some of the variance explanation previously captured
+by the cigs variable.
 
 Question 10
 ===========
-The more negative cigs coefficient is that of the simpel model. It's value is -0.508 compared to the -0.46 value for the multiple regression model.
-Our explaination for the difference as stated in Question 9 is that there is a correlation between the cigs variable and the faminc variable.
+The more negative cigs coefficient is that of the simpel model. It's value is -0.508 compared to the -0.46 value for the multiple regression model.  Our explaination for the difference as stated in Question 9 is that there is a correlation between the cigs variable and the faminc variable.
