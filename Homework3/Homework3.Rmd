@@ -1,7 +1,7 @@
 ---
-title: "Homework 2"
+title: "Homework 3"
 author: "Rohan Thakur, Charles Kekeh and Megan Jasek"
-date: "February 7, 2016"
+date: "February 13, 2016"
 output: pdf_document
 ---
 
@@ -18,168 +18,193 @@ opts_chunk$set(tidy.opts=list(width.cutoff=50))
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
 # Load the dataframe
-load("401k_w271.RData")
+load("twoyear.RData")
 desc
 ```
 
 Question 1
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-summary(data$prate)
-print(quantile(data$prate, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+summary(data$lwage)
+print(quantile(data$lwage, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+hist(data$lwage, 50, ylim=c(0,350))
 
-# Plot the histogram of prate at 15 bins
-prate.hist <- ggplot(data, aes(prate)) + 
-  theme(legend.position = "none") + 
-  geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(data$prate)[2] - range(data$prate)[1])/15) +
-  labs(title = "Distribution of prate", x = "Participation Rate", y = "Frequency")
+summary(data$jc)
+print(quantile(data$jc, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+hist(data$jc, 50)
 
-plot(prate.hist)
+summary(data$univ)
+print(quantile(data$univ, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+hist(data$univ, 50, xlim=c(0,8))
 
-# Plot the histogram of prate at 30 bins
-prate.hist <- ggplot(data, aes(prate)) + 
-  theme(legend.position = "none") + 
-  geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(data$prate)[2] - range(data$prate)[1])/30) +
-  labs(title = "Distribution of prate", x = "Participation Rate", y = "Frequency")
+summary(data$exper)
+print(quantile(data$exper, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+hist(data$exper, 50, xlim=c(0,200))
 
-plot(prate.hist)
+summary(data$black)
+print(quantile(data$black, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+hist(data$black, 50)
 
-# Plot the histogram of prate at 60 bins
-prate.hist <- ggplot(data, aes(prate)) + 
-  theme(legend.position = "none") + 
-  geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(data$prate)[2] - range(data$prate)[1])/60) +
-  labs(title = "Distribution of prate", x = "Participation Rate", y = "Frequency")
+summary(data$hispanic)
+print(quantile(data$hispanic, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+hist(data$hispanic, 50)
 
-plot(prate.hist)
+summary(data$AA)
+print(quantile(data$AA, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+hist(data$AA, 50)
+
+summary(data$BA)
+print(quantile(data$BA, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+hist(data$BA, 50, ylim=c(0,5000))
 ```
 
-The variable has higher frequency at higher values of participation rates with a particularly large spike at 100% participation, indicating that most companies have all employees participating in the 401k. There also seem to be erroneous values greater than 100% which we will code as NA.
-
-
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-#Creating a clean version of the variable
-data$prate.clean = data$prate
-data$prate.clean[data$prate.clean>100]=NA
-summary(data$prate.clean)
-```
+Basic structure of the data
+---------------------------
+There are no missing values in the data.\newline
+__lwage__ variable has a normal-like distribution.\newline
+__jc__ variable has values from 0 to about 4 and is heavily positively skewed with a
+majority of values at or near 0.\newline
+__univ__ variable has values from 0 to 7.5 and is heavily positively skewed with a majority of values at or near 0.\newline
+__exper__ variable has values from 0 to 166 and is negatively skewed with a hill-climb distribution from 0 to about 500.\newline
+__black, hispanic, AA, BA__ variables are binary with values of 0 or 1.\newline
 
 Question 2
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-summary(data$mrate)
-print(quantile(data$mrate, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+# Create the experXblack variable by multiplying the exper and black variables.
+data$experXblack = data$exper*data$black
 
-# Plot the histogram of mrate at 15 bins
-mrate.hist <- ggplot(data, aes(mrate)) + 
-  theme(legend.position = "none") + 
-  geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(data$mrate)[2] - range(data$mrate)[1])/15) +
-  labs(title = "Distribution of mrate", x = "Matching Rate", y = "Frequency")
+# Run the requested OLS regression.
+ols.lwage.8ind = lm(lwage~jc+univ+exper+black+hispanic+AA+BA+experXblack, data=data)
+summary(ols.lwage.8ind)
+# Print the diagnostic plots
+plot(ols.lwage.8ind)
 
-plot(mrate.hist)
-
-# Plot the histogram of mrate at 30 bins
-mrate.hist <- ggplot(data, aes(mrate)) + 
-  theme(legend.position = "none") + 
-  geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(data$mrate)[2] - range(data$mrate)[1])/30) +
-  labs(title = "Distribution of mrate", x = "Matching Rate", y = "Frequency")
-
-plot(mrate.hist)
-
-# Plot the histogram of mrate at 60 bins
-mrate.hist <- ggplot(data, aes(mrate)) + 
-  theme(legend.position = "none") + 
-  geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(data$mrate)[2] - range(data$mrate)[1])/60) +
-  labs(title = "Distribution of mrate", x = "Matching Rate", y = "Frequency")
-
-plot(mrate.hist)
-```
-mrate is heavily positively skewed, with most companies matching between 30% and 83%. Though the variable has a mean of 73%, the median here - 46% - is a better measure of central tendency due to some large outliers.
-
-We will do an arithmetic transformation and multiply the values of mrate by 100 in order to keep it consistent in format with the prate variable.
-
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-#Creating a transformed version of the variable
-data$mrate.clean = data$mrate*100
-summary(data$mrate.clean)
+#Print the B_hat4 and B_hat8 coefficients
+print(ols.lwage.8ind$coefficients[5])
+print(ols.lwage.8ind$coefficients[9])
 ```
 
+Interpret the coefficients $\hat{\beta}4$ and $\hat{\beta}8$
+------------------------------------------------
+$\hat{\beta}4$ is the estimate for the black variable coefficient.\newline
+$\hat{\beta}8$ is the estimate for the experXblack variable.\newline
+<finish analysis>
+Do we talk about:  
+zero-conditional mean seems to be met\newline
+homoskedasticity seems to be met\newline
+assuming random sample\newline
+assuming linear relationship\newline
 
 Question 3
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-# Create a scatterplot of prate vs mrate
-scatter.prate.mrate <- ggplot(data, aes(mrate.clean, prate.clean)) +
-  geom_point(colour = "Blue", position = "jitter") +
-  geom_smooth(method = "lm", colour = "Red") +
-  labs(y = "401k Participation Rate", 
-       x = "Employer Matching Rate", 
-       title = "Participation Rate vs Matching Rate")
-plot(scatter.prate.mrate)
+# Show the summary of the model again
+summary(ols.lwage.8ind)
 
-#Running linear regression
-model = lm(prate.clean~mrate.clean, data = data)
-summary(model)
+#Print the univ coefficient
+print(ols.lwage.8ind$coefficients[3])
 
-#Print the coefficient
-print(model$coefficients[2])
-
+(.0733 - .07) / (.0031)
+2*(1-.8554)
 ```
 
-We get a slope coefficient of 0.06. Based on the t statistic, the coefficient is significant at the 0.05 significance level.
-
+Test that the return to university education is 7%.
+---------------------------------------------------
+Null Hypothesis: H0:  $\beta2=0.07$.\newline
+Alternate Hypothesis: H1:  $\beta2\neq0.07$.\newline
+Formula for t-statistic = $(\beta2-H0)/(se) = (.0733 - .07) / (.0031) = 1.064516$\newline
+p-value = $2*(1-.8554) = 0.2892$\newline
+Based on the p-value, the test is not significant at the 0.05% significance level.  Therefore, we can't reject the null hypothesis that the return to university education is 7%.
 
 Question 4
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-# Printing the diagnostic plots
-plot(model)
 ```
 
-From residuals vs fitted values graph, we can see that there is a violation of zero-conditional mean, as we see the smoothing curve slope go up and then follow a downward trend. Nonetheless, since we have a large sample size, we do not need this assumption since we can use the assumption of exogeneity. Therefore, this has very little impact on our regression model.
+Test that the return to junior college education is equal for black and non-black
+---------------------------------------------------------------------------------
+<type answer here>
 
 Question 5
 ==========
-There seems to be a violation of homoskedasticity:\newline
-1 - We can see from the residuals vs fitted plot that the variance narrows as we move to higher fitted values.\newline
-2 - The same story is told by the scale-location plot where we see that the graph is nowhere close to a horizontal band, which is what we would get if homoskedasticity was met.\newline
+To answer this question, two new variables need to be created.  Since the question asks about the return from 1 year of working experience and the current experience variable (exper) is in months a new variable called experYr was created that converted the current exper variable to years by dividing it by 12.  Also, to do this problem a variable that represents the sum of the univ and experYr variables needs to be created.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+# Convert the exper variable from months to years by dividing it by 12.
+data$experYr = data$exper/12
+# Create a variable that is the sum of the univ and experYr variables
+data$univ_plus_experYr = data$univ + data$experYr
+# Analyze the new variable with the summary and hist commands
+summary(data$univ_plus_experYr)
+hist(data$univ_plus_experYr, breaks=50)
+# Rerun the regression by taking out the exper variable and replacing it with the univ_plus_experYr variable.
+ols.lwage.univ.experYr = lm(lwage~jc+univ+univ_plus_experYr+black+hispanic+AA+BA+experXblack, data=data)
+# Display a summary of the new model
+summary(ols.lwage.univ.experYr)
+```
 
-We do not look at the Breusch Pagan test since we have a large number of observations, therefore we know almost certainly that we will obtain significance.  The implication of heteroskedasticity in the data is that it might cause the standard error of our $b_{j}$ coefficients to become biased. This may lead to our estimators of those coefficients not being BLUE.  Biased standard errors will impact the outcomes of statistical tests.  Depending on the direction of the bias, biased standard errors will make it easier or harder to pass statistical tests.  To correct for this, we will have to use robust standard errors.
+Test whether the return to university education is equal to the return to 1 year of working experience.
+-----------------------------------------------------------------------------------
+By replacing the exper variable in the model with the univ_plus_experYr, now the univ variable represents the difference between the univ and experYr variables and to answer the question we want to know if that difference is 0, so we run the following test.
 
+$$lwage = \beta0 + \beta1jc+\beta2univ+\beta3univPlusexperYr+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack$$
+
+Null Hypothesis: H0:  $\beta2=0$.\newline
+Alternate Hypothesis: H1:  $\beta2\neq0$.\newline
+Based on the very low p-value for $\beta2$, the test is significant at the 0.05% significance level.  And even though the value of $\beta2$ is close to 0 at 0.0129997, we can reject the null hypothesis that $\beta2=0$.
 
 Question 6
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-#Plotting Histogram of errors
-errors.hist <- ggplot(model, aes(model$residuals)) + 
-  theme(legend.position = "none") + 
-  geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(model$residuals)[2] - range(model$residuals)[1])/60) +
-  labs(title = "Distribution of Errors", x = "Errors", y = "Frequency")
-plot(errors.hist)
+print(sqrt(0.2282))
 ```
 
-From inspection of plots, we can see a violation of normality:\newline
-1 - When we plot the histogram of errors, we see the negative skew.\newline
-2 - The negative skew is also apparent in the Q-Q plot of the standardized residuals.\newline
-We do not conduct the Shapiro Wilk test because knowing that we have a very large sample size, we know almost certainly that we will obtain significance.
+Test the overall signiffcance of this regression.
+-------------------------------------------------
+Here is the output from the summary of our model.\newline
+Residual standard error: 0.4287 on 6754 degrees of freedom\newline
+Multiple R-squared:  0.2282,	Adjusted R-squared:  0.2272\newline
+F-statistic: 249.6 on 8 and 6754 DF,  p-value: < 2.2e-16\newline
 
-In terms of implications, despite non-normality from the plots, we can use OLS asymptotics.
-Since there is a version of the central limit theorem that tells us that the sampling distribution of coefficient estimates approaches normality with large sample sizes, we do not need the normality assumption of our error. Therefore, the finding that our errors do not follow a normal distribution does not have much of an impact on our regression.
-
+1. Our model null hypothesis is that there is no relationship among any of the independent variables and lwage variable. We are able to reject the null hypothesis since our p-value of the f-statistic of the model is significant at < 2.2e-16.
+2. Practical significance: we have an R-squared value of 0.2282, indicating that 22.82% of the variation in lwage is explained by our model. An R value of 0.478 indicates a ?? effect size.
+\newline
+??which regression model are we supposed to be using here, the one with univPlusexperYr or the first one??
 
 Question 7
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-#Based on the violation of homoskedasticity, we must run robust standard errors.
-coeftest(model, vcov=vcovHC)
+data$experXexper = data$exper*data$exper
+ols.lwage.9ind = lm(lwage~jc+univ+exper+black+hispanic+AA+BA+experXblack+experXexper, data=data)
+summary(ols.lwage.9ind)
 ```
-After running the linear model with robust standard errors, we get 0.0047 as the standard error for the mrate coefficient.  This is lower than the 0.0053 without the robust standard errors.
 
+Estimated return to work experience in this model
+-------------------------------------------------
+$$lwage = \beta0 + \beta1jc+\beta2univ+\beta3exper+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\beta9experXexper$$
+
+$$\bigtriangleup lwage / \bigtriangleup exper = \beta3 + \beta8black + 2\beta9exper$$
+
+$$ = (.004301 - .001239*black + 2*.000003379*exper)$$
+Now convert the log wage back to wage by exponentiating.  This gives us a return to work experience:
+$$ = e^{(.004301 - .001239*black + 2*.000003379*exper)}$$
 
 Question 8
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-waldtest(model, vcov=vcovHC)
+#Based on the violation of homoskedasticity, we must run robust standard errors.
+#coeftest(model, vcov=vcovHC)
+#waldtest(model, vcov=vcovHC)
+plot(ols.lwage.9ind)
 ```
-The model is highly statistically significant.
-It shows small practical significance, implying that a change of 1% in the matching rate by an employer corresponds to a change of 0.06% in participation in 401k plans by employees. Therefore, it would take a 17% increase in matching rate for a corresponding 1% increase in participation.
-That interpretation is also somewhat supported by the $R^{2}$ statistic of our original linear regression of prate on mrate. In that regression, the $R^{2}$ statistic has a value of 0.075, impyining that less than 8% of the variance of the participation rate (prate) is explained by the model.
+
+Homoskedasticity analysis:
+--------------------------
+
+The assumption of homoskedasticity holds:\newline
+1 - We can see from the residuals vs fitted plot that the variance band is about the same as we move to higher fitted values.\newline
+2 - The same story is told by the scale-location plot where we see that the smoothing line is almost completely horizontal, which is what we get if homoskedasticity is met.\newline
+3 - We do not look at the Breusch Pagan test since we have a large number of observations, therefore we know almost certainly that we will obtain significance.
+
+The implication of homoskedasticity in the data is that the standard error of the univ coefficient ($\beta2$) is unbiased. Unbiased standard errors will not impact the outcomes of statistical tests.  Therefore, it does not affect the testing of no effect of university education on salary change.
+
