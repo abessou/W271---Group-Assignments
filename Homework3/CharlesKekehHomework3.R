@@ -163,19 +163,24 @@ summary(lwage.model)
 # We note that the coeffcient is significant from the t-statistic, indicating that we
 # must reject the null hypothesis that $\beta_{1} is zero.
 
+# We perform a t-test for the mean of teh return to university education with the null
+# hypothesis that the mean is .007
+# Our p value is:
+print (2* (1- pt ((lwage.exper.squared.model$coefficients["univ"] - 0.07)/
+        coef(summary(lwage.exper.squared.model))[, "Std. Error"]["univ"], 
+        df = summary(lwage.exper.squared.model)$df[1])))
+# Can't reject the null at 0.05% level
+
 #Question4
-# To test this assumption, we need to test the null hypothesis that the coefficient $\beta_{1}
-# is null. That would indicate a zero effect of the years of junior college is null. 
-summary(lwage.model)
-
-
-# The null hypothesis for the test we run is that the restricted model and the
-# unrestricted one have the same effect on the outcome variable. The alternative
-# hypothesis is that they do not.
-# Running the model comparisons indicates that the F statistic for the comparison of the
-# restricted model versus the unrestricted one has a significant p value of 2.2e-16. We
-# therefore reject the null hypothesis that the return to junior college 
-# education is the same for blacks and non-blacks.
+# Holding university years and experience equal (dropping them from the model), the 
+# model becomes: 
+# $log(wage) = \beta_{0} + \beta_{1}*jc + \beta_{4}*black + \beta_{5}*hispanic + \beta_{6}*AA + \beta_{7}*BA + \epsilon$
+# From the linear model, we derive:
+# $\frac{\delta log(wage)}{\delta jc} = \beta_{1}$
+# The model is specified in a way that the return to junior college education, 
+# is $\beta_{1}$, and is independent of ethnicity.
+# Therefore without additional computation, we can immediately answer that the return
+# on junior college education is the same for all ethinicities, 
 
 #Question5
 data$BA.minus.year.exper = data$BA - data$exper
@@ -200,7 +205,7 @@ summary(lwage.BA.minus.year.exper.model)
 # model is explained by this regression. However, the practical significance of this 
 # regression is not intuitive. The regression was used as a tool to test a condition 
 # about the coefficients of a previous regression and cannot necessarily be interpreted
-# practically beyond teh hypothesis testing that it allowed.
+# practically beyond the hypothesis testing that it allowed.
 
 #Question7
 data$exper.squared = data$exper^2
