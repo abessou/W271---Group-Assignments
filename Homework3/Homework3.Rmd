@@ -128,30 +128,36 @@ Test that the return to junior college education is equal for black and non-blac
 
 Question 5
 ==========
-To answer this question, two new variables need to be created.  Since the question asks about the return from 1 year of working experience and the current experience variable (exper) is in months a new variable called experYr was created that converted the current exper variable to years by dividing it by 12.  Also, to do this problem a variable that represents the sum of the univ and experYr variables needs to be created.
+
+Test whether the return to university education is equal to the return to 1 year of working experience.
+-----------------------------------------------------------------------------------
+Original model:
+$$lwage = \beta0 + \beta1jc+\beta2univ+\beta3exper+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\epsilon$$
+
+Convert the experience variable from months to years by creating a new variable experYr that divides the original variable exper by 12.  Replace the exper variable in the original model with this variable.
+$$lwage = \beta0 + \beta1jc+\beta2univ+\beta3experYr+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\epsilon$$
+
+We would like to know if the $\beta2$ and $\beta3$ coefficients are the same or, equivalently, if their difference is 0.  We can define a variable $\theta$ such that $\theta = \beta2 - \beta3$ and rewrite our model like this:
+$$lwage = \beta0 + \beta1jc+(\theta+\beta3)univ+\beta3experYr+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\epsilon$$
+
+Rewrite the model to get $\theta$ by itself as a coefficient:
+$$lwage = \beta0 + \beta1jc+\theta{univ}+\beta3(univ+experYr)+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\epsilon$$
+
+Now our null hypothesis is $H0: \theta = 0$.\newline
+Alternate Hypothesis: H1:  $\theta\neq0$.\newline
+
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
 # Convert the exper variable from months to years by dividing it by 12.
 data$experYr = data$exper/12
 # Create a variable that is the sum of the univ and experYr variables
 data$univ_plus_experYr = data$univ + data$experYr
-# Analyze the new variable with the summary and hist commands
-summary(data$univ_plus_experYr)
-hist(data$univ_plus_experYr, breaks=50)
-# Rerun the regression by taking out the exper variable and replacing it with the univ_plus_experYr variable.
+# Rerun the regression with the new variables.
 ols.lwage.univ.experYr = lm(lwage~jc+univ+univ_plus_experYr+black+hispanic+AA+BA+experXblack, data=data)
 # Display a summary of the new model
 summary(ols.lwage.univ.experYr)
 ```
 
-Test whether the return to university education is equal to the return to 1 year of working experience.
------------------------------------------------------------------------------------
-By replacing the exper variable in the model with the univ_plus_experYr, now the univ variable represents the difference between the univ and experYr variables and to answer the question we want to know if that difference is 0, so we run the following test.
-
-$$lwage = \beta0 + \beta1jc+\beta2univ+\beta3univPlusexperYr+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack$$
-
-Null Hypothesis: H0:  $\beta2=0$.\newline
-Alternate Hypothesis: H1:  $\beta2\neq0$.\newline
-Based on the very low p-value for $\beta2$, the test is significant at the 0.05% significance level.  And even though the value of $\beta2$ is close to 0 at 0.0129997, we can reject the null hypothesis that $\beta2=0$.
+Based on the very low p-value (0.000276) for $\theta$, the test is significant at the 0.05% significance level.  And even though the value of $\theta$ is close to 0 at 0.0129997, we can reject the null hypothesis that $\theta=0$.
 
 Question 6
 ==========
