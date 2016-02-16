@@ -105,6 +105,7 @@ R
 #model is significant at < 2.2e-16.
 #2. Practical significance: we have an R-squared value of 0.2282, indicating that 22.82% of the variation in
 #lwage is explained by our model. An R value of 0.478 indicates a ?? effect size.
+summary(ols.lwage.8ind)
 
 #Question 7
 #Including a square term of working experience to the regression model built above,

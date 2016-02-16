@@ -111,11 +111,12 @@ summary(ols.lwage.9ind)
 #Provide the diagnosis of the homoskedasticity assumption. Does this assumption
 #hold? If so, how does it affect the testing of no effect of university education on
 #salary change? If not, what potential remedies are available?
-plot(ols.lwage.9ind)
+plot(ols.lwage.8ind)
 
 #Beush-Pagan test is not run because of large sample size
 #Based on the violation of homoskedasticity, we must run robus standard errors.
-coeftest(ols.lwage.9ind, vcov=vcovHC)
+coeftest(ols.lwage.8ind, vcov=vcovHC)
+summary(ols.lwage.8ind)
 
 #??not sure if we need to run this
-waldtest(ols.lwage.9ind, vcov=vcovHC)
+#waldtest(ols.lwage.9ind, vcov=vcovHC)

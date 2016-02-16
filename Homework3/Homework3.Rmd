@@ -162,26 +162,31 @@ Based on the very low p-value (0.000276) for $\theta$, the test is significant a
 Question 6
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-print(sqrt(0.2282))
+# Show the summary of the model again
+summary(ols.lwage.8ind)
 ```
 
-Test the overall signiffcance of this regression.
+Test the overall significance of this regression.
 -------------------------------------------------
-Here is the output from the summary of our model.\newline
+We are testing the overall significance of the original model as stated below:
+$$lwage = \beta0 + \beta1jc+\beta2univ+\beta3exper+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\epsilon$$
+
+Here is the output from the summary of the original model.\newline
 Residual standard error: 0.4287 on 6754 degrees of freedom\newline
 Multiple R-squared:  0.2282,	Adjusted R-squared:  0.2272\newline
 F-statistic: 249.6 on 8 and 6754 DF,  p-value: < 2.2e-16\newline
 
 1. Our model null hypothesis is that there is no relationship among any of the independent variables and lwage variable. We are able to reject the null hypothesis since our p-value of the f-statistic of the model is significant at < 2.2e-16.
-2. Practical significance: we have an R-squared value of 0.2282, indicating that 22.82% of the variation in lwage is explained by our model. An R value of 0.478 indicates a ?? effect size.
-\newline
-??which regression model are we supposed to be using here, the one with univPlusexperYr or the first one??
+2. Practical significance: we have an R-squared value of 0.2282, indicating that 22.82% of the variation in lwage is explained by our model.\newline
 
 Question 7
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+# Define a square term for the exper variable
 data$experXexper = data$exper*data$exper
+# Add the new variable to the regression
 ols.lwage.9ind = lm(lwage~jc+univ+exper+black+hispanic+AA+BA+experXblack+experXexper, data=data)
+# Show the summary of the model
 summary(ols.lwage.9ind)
 ```
 
@@ -189,23 +194,30 @@ Estimated return to work experience in this model
 -------------------------------------------------
 $$lwage = \beta0 + \beta1jc+\beta2univ+\beta3exper+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\beta9experXexper$$
 
-$$\bigtriangleup lwage / \bigtriangleup exper = \beta3 + \beta8black + 2\beta9exper$$
-
-$$ = (.004301 - .001239*black + 2*.000003379*exper)$$
+$$\frac{\delta lwage}{exper} = \beta3 + \beta8black + 2*\beta9exper$$
+$\beta3 = 4.301e-03= .004301$, $\beta8 = .001239$, $\beta9 = 000003379$\newline
+Substituting these values in the the equation above we get:
+$$\frac{\delta lwage}{exper} = (.004301 - .001239*black + .000006758*exper)$$
 Now convert the log wage back to wage by exponentiating.  This gives us a return to work experience:
-$$ = e^{(.004301 - .001239*black + 2*.000003379*exper)}$$
+$$ = e^{(.004301 - .001239*black + .000006758*exper)}$$
+??is the correct or do we need to multiply it by something else
 
 Question 8
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-#Based on the violation of homoskedasticity, we must run robust standard errors.
-#coeftest(model, vcov=vcovHC)
-#waldtest(model, vcov=vcovHC)
-plot(ols.lwage.9ind)
+# Plot the graphs from the model
+plot(ols.lwage.8ind)
+# Just as a precaution, use the robust standard errors
+coeftest(ols.lwage.8ind, vcov=vcovHC)
+# Show the summary of the model
+summary(ols.lwage.8ind)
 ```
 
 Homoskedasticity analysis:
 --------------------------
+We are testing homoskedasticity of the original model as stated below:
+$$lwage = \beta0 + \beta1jc+\beta2univ+\beta3exper+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\epsilon$$
+
 
 The assumption of homoskedasticity holds:\newline
 1 - We can see from the residuals vs fitted plot that the variance band is about the same as we move to higher fitted values.\newline
@@ -214,3 +226,4 @@ The assumption of homoskedasticity holds:\newline
 
 The implication of homoskedasticity in the data is that the standard error of the univ coefficient ($\beta2$) is unbiased. Unbiased standard errors will not impact the outcomes of statistical tests.  Therefore, it does not affect the testing of no effect of university education on salary change.
 
+Just as a precaution the model was rerun using robust standard errors.  The $\beta2$ coefficient was essentially unchanged.  In the original model $\beta2 = 0.0732806$ and in the model with robust standard errors $\beta2 = 0.07328063$.
