@@ -150,7 +150,7 @@ Null Hypothesis: H0:  $\beta5=0$.\newline
 Alternate Hypothesis: H1:  $\beta5\neq0$.\newline
 Based on the p-value of 0.243 for $\beta5$, the test is not significant at the 0.05% significance level.  Therefore, we can't reject the null hypothesis that $\beta5=0$.  Said another way we cannot reject the null hypothesis that the return to junior college education is equal for black and non-black.\newline
 \newline
-Or alternatively, intuitively, we can see from the linear model, we derive:
+Or alternatively, intuitively, we can see from the population model, we derive:
 $\frac{\delta log(wage)}{\delta jc} = \beta_{1}$\newline 
 The model is specified in a way that the return to junior college education, 
 is $\beta_{1}$, and is independent of ethnicity.
