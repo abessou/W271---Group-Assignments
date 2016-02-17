@@ -70,6 +70,7 @@ plot(ols.lwage.8ind)
 data$jcXblack = data$jc*data$black
 ols.lwage.jcblack.diff = lm(lwage~jc+univ+exper+black+jcXblack+hispanic+AA+BA+experXblack, data=data)
 summary(ols.lwage.jcblack.diff)
+
 ols.lwage.black0 = lm(lwage~jc+univ+exper+hispanic+AA+BA, data=data)
 summary(ols.lwage.black0)
 # jc slope when black = 0 is 0.0661197,  H0:  b1=0.0661197

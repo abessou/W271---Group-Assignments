@@ -91,14 +91,14 @@ $\hat{\beta}4$ is the estimate for the black variable coefficient.\newline
 $\hat{\beta}8$ is the estimate for the experXblack variable.\newline
 
 The $\beta_{4}$ coefficient captures the effect of being black on the log of wage, 
-holding all other variables in the model fix and assuming zero-employment experience. It provides an indication of how much percentage point change to expect in the wage of an individual when they move from the baseline (white) to being black. Hence the coefficient captures the difference at the intercept of the log(wage) vs experience plot between black and white respondants.
+holding all other variables in the model fix and assuming zero-employment experience. It provides an indication of how much percentage point change to expect in the wage of an individual when they move from the baseline (non-black) to being black. Hence the coefficient captures the difference at the intercept of the log(wage) vs experience plot between black and white respondants.
 
 The $\beta_{8}$ coefficient captures the effect of being black on the impact of 
 experience over the years on wage. It is better explained in terms of derivatives with:
 $$\frac{\delta log(wage)}{\delta exper} = \beta_{3} + \beta_{8}*black$$
 In the previous formulation, we can see that the $\beta_{8}$ coefficient captures the
 impact of being back on the slope of the log(wage) vs experience curve. In other words, the coefficient describes how much more or less experience impacts the log of wage for
-back people over the years, vs the baseline (while people).
+black people over the years, vs the baseline (non-black people).
 And because the outcome variable is the log of wage, the impact above can actually be  formulated in terms of impact of ethnicity on percentage changes on the actual 
 wage of individuals.
 
@@ -129,12 +129,28 @@ Based on the p-value, the test is not significant at the 0.05% significance leve
 
 Question 4
 ==========
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
-```
 
 Test that the return to junior college education is equal for black and non-black
 ---------------------------------------------------------------------------------
-From the linear model, we derive:
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+# Create the jc times black interaction variable
+data$jcXblack = data$jc*data$black
+# Re-run the regression with the new interaction variable added
+ols.lwage.jcblack.diff = lm(lwage~jc+univ+exper+black+jcXblack+hispanic+AA+BA+experXblack, data=data)
+# Show the summary of the model
+summary(ols.lwage.jcblack.diff)
+```
+
+Create the interaction variable jcXblack and add it to the model as follows:
+$$lwage = \beta0 + \beta1jc+\beta2univ+\beta3exper+\beta4black+\beta5jcXblack+\beta6hispanic+\beta7AA+\beta8BA+\beta9experXblack+\epsilon$$
+
+The coefficient for the jcXblack interaction variable ($\beta5$) now represents the difference in return to junior college between black and non-black, so we can set up our test as follows:\newline
+Null Hypothesis: H0:  $\beta5=0$.\newline
+Alternate Hypothesis: H1:  $\beta5\neq0$.\newline
+Based on the p-value of 0.243 for $\beta5$, the test is not significant at the 0.05% significance level.  Therefore, we can't reject the null hypothesis that $\beta5=0$.  Said another way we cannot reject the null hypothesis that the return to junior college education is equal for black and non-black.\newline
+\newline
+Or alternatively, intuitively, we can see from the linear model, we derive:
 $\frac{\delta log(wage)}{\delta jc} = \beta_{1}$\newline 
 The model is specified in a way that the return to junior college education, 
 is $\beta_{1}$, and is independent of ethnicity.
@@ -210,11 +226,11 @@ Estimated return to work experience in this model
 $$lwage = \beta0 + \beta1jc+\beta2univ+\beta3exper+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\beta9experXexper$$
 
 We obtain the return on a year of experience by evaluating:\newline
-$$\frac{\delta lwage}{exper} = \beta3 + \beta8black + 2*\beta9exper$$
+$$\frac{\delta lwage}{\delta exper} = \beta3 + \beta8black + 2*\beta9exper$$
 
 $\beta3 = 4.301e-03= .004301$, $\beta8 = .001239$, $\beta9 = 000003379$\newline
 Substituting these values in the the equation above we get:
-$$\frac{\delta lwage}{exper} = (.004301 - .001239*black + .000006758*exper)$$
+$$\frac{\delta lwage}{\delta exper} = (.004301 - .001239*black + .000006758*exper)$$
 
 Thus for blacks, the return to one year of working experience is:\newline
 ```{r}
@@ -222,7 +238,7 @@ Thus for blacks, the return to one year of working experience is:\newline
 ```
 We interpret is as 3/10th of a percent of increase in wage per year of experience.
 
-And for whites, that return is:
+And for non-blacks, that return is:
 ```{r}
 .004301 + .000006758
 ```
