@@ -81,20 +81,26 @@ summary(ols.lwage.8ind)
 plot(ols.lwage.8ind)
 
 #Print the B_hat4 and B_hat8 coefficients
-print(ols.lwage.8ind$coefficients[5])
-print(ols.lwage.8ind$coefficients[9])
+print(ols.lwage.8ind$coefficients["black"])
+print(ols.lwage.8ind$coefficients["experXblack"])
 ```
 
 Interpret the coefficients $\hat{\beta}4$ and $\hat{\beta}8$
 ------------------------------------------------
 $\hat{\beta}4$ is the estimate for the black variable coefficient.\newline
 $\hat{\beta}8$ is the estimate for the experXblack variable.\newline
-<finish analysis>
-Do we talk about:  
-zero-conditional mean seems to be met\newline
-homoskedasticity seems to be met\newline
-assuming random sample\newline
-assuming linear relationship\newline
+
+The $\beta_{4}$ coefficient captures the effect of being black on the log of wage, 
+holding all other variables in the model fix and assuming zero-employment experience. It provides an indication of how much percentage point change to expect in the wage of an individual when they move from the baseline (white) to being black. Hence the coefficient captures the difference at the intercept of the log(wage) vs experience plot between black and white respondants.
+
+The $\beta_{8}$ coefficient captures the effect of being black on the impact of 
+experience over the years on wage. It is better explained in terms of derivatives with:
+$$\frac{\delta log(wage)}{\delta exper} = \beta_{3} + \beta_{8}*black$$
+In the previous formulation, we can see that the $\beta_{8}$ coefficient captures the
+impact of being back on the slope of the log(wage) vs experience curve. In other words, the coefficient describes how much more or less experience impacts the log of wage for
+back people over the years, vs the baseline (while people).
+And because the outcome variable is the log of wage, the impact above can actually be  formulated in terms of impact of ethnicity on percentage changes on the actual 
+wage of individuals.
 
 Question 3
 ==========
@@ -103,18 +109,22 @@ Question 3
 summary(ols.lwage.8ind)
 
 #Print the univ coefficient
-print(ols.lwage.8ind$coefficients[3])
-
-(.0733 - .07) / (.0031)
-2*(1-.8554)
+print(ols.lwage.8ind$coefficients["univ"])
 ```
 
 Test that the return to university education is 7%.
 ---------------------------------------------------
 Null Hypothesis: H0:  $\beta2=0.07$.\newline
 Alternate Hypothesis: H1:  $\beta2\neq0.07$.\newline
-Formula for t-statistic = $(\beta2-H0)/(se) = (.0733 - .07) / (.0031) = 1.064516$\newline
-p-value = $2*(1-.8554) = 0.2892$\newline
+Using the linear model and summary statistics, we compute the pvalue for the test above as:
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
+pvalue = 2* (1- pt ((ols.lwage.8ind$coefficients["univ"] - 0.07)/
+        coef(summary(ols.lwage.8ind))[, "Std. Error"]["univ"], 
+        df = summary(ols.lwage.8ind)$df[1]))
+pvalue
+```
+
 Based on the p-value, the test is not significant at the 0.05% significance level.  Therefore, we can't reject the null hypothesis that the return to university education is 7%.
 
 Question 4
@@ -124,7 +134,12 @@ Question 4
 
 Test that the return to junior college education is equal for black and non-black
 ---------------------------------------------------------------------------------
-<type answer here>
+From the linear model, we derive:
+$\frac{\delta log(wage)}{\delta jc} = \beta_{1}$\newline 
+The model is specified in a way that the return to junior college education, 
+is $\beta_{1}$, and is independent of ethnicity.
+Therefore without additional computation, we can immediately answer that the return
+on junior college education is the same for all ethnicities.
 
 Question 5
 ==========
@@ -194,36 +209,49 @@ Estimated return to work experience in this model
 -------------------------------------------------
 $$lwage = \beta0 + \beta1jc+\beta2univ+\beta3exper+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\beta9experXexper$$
 
+We obtain the return on a year of experience by evaluating:\newline
 $$\frac{\delta lwage}{exper} = \beta3 + \beta8black + 2*\beta9exper$$
+
 $\beta3 = 4.301e-03= .004301$, $\beta8 = .001239$, $\beta9 = 000003379$\newline
 Substituting these values in the the equation above we get:
 $$\frac{\delta lwage}{exper} = (.004301 - .001239*black + .000006758*exper)$$
-Now convert the log wage back to wage by exponentiating.  This gives us a return to work experience:
-$$ = e^{(.004301 - .001239*black + .000006758*exper)}$$
-??is the correct or do we need to multiply it by something else
+
+Thus for blacks, the return to one year of working experience is:\newline
+```{r}
+.004301 - .001239 + .000006758
+```
+We interpret is as 3/10th of a percent of increase in wage per year of experience.
+
+And for whites, that return is:
+```{r}
+.004301 + .000006758
+```
+We interpret is as 4.3/10th of a percent of increase in wage per year of experience.
 
 Question 8
 ==========
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=50)}
 # Plot the graphs from the model
-plot(ols.lwage.8ind)
-# Just as a precaution, use the robust standard errors
-coeftest(ols.lwage.8ind, vcov=vcovHC)
+plot(ols.lwage.9ind)
 # Show the summary of the model
-summary(ols.lwage.8ind)
+summary(ols.lwage.9ind)
+# Use the robust standard errors
+coeftest(ols.lwage.9ind, vcov=vcovHC)
 ```
 
 Homoskedasticity analysis:
 --------------------------
-We are testing homoskedasticity of the original model as stated below:
-$$lwage = \beta0 + \beta1jc+\beta2univ+\beta3exper+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\epsilon$$
+We are testing homoskedasticity of the model with the quadratic experience term, expressed as:
+$$lwage = \beta0 + \beta1jc+\beta2univ+\beta3exper+\beta4black+\beta5hispanic+\beta6AA+\beta7BA+\beta8experXblack+\beta9experXexper+\epsilon$$
 
 
-The assumption of homoskedasticity holds:\newline
-1 - We can see from the residuals vs fitted plot that the variance band is about the same as we move to higher fitted values.\newline
-2 - The same story is told by the scale-location plot where we see that the smoothing line is almost completely horizontal, which is what we get if homoskedasticity is met.\newline
+We observe a small amount of heteroskedasticity from the plot:\newline
+1 - We can see from the residuals vs fitted plot that the variance band changes very slightly as we move to higher fitted values.\newline
+2 - The same story is told by the scale-location plot where we see that the smoothing line is not quite completely horizontal. Therefore we conclude a very small amount of heteroskedasticity and decide to use heteroskedasticity-robust methods for coefficient estimation.\newline
 3 - We do not look at the Breusch Pagan test since we have a large number of observations, therefore we know almost certainly that we will obtain significance.
 
-The implication of homoskedasticity in the data is that the standard error of the univ coefficient ($\beta2$) is unbiased. Unbiased standard errors will not impact the outcomes of statistical tests.  Therefore, it does not affect the testing of no effect of university education on salary change.
+The implication of heteroskedastcity (even small) in the data is that the standard error of the univ coefficient ($\beta2$) may be biased. Biased standard errors can impact the outcomes of statistical tests.  Therefore, it can affect the testing of no effect of university education on salary, which is the t-test on the coefficient $\beta_{2}$
 
-Just as a precaution the model was rerun using robust standard errors.  The $\beta2$ coefficient was essentially unchanged.  In the original model $\beta2 = 0.0732806$ and in the model with robust standard errors $\beta2 = 0.07328063$.
+The $\beta2$ coefficient from the robust method was essentially unchanged, going from a value of $\beta2 = 7.382e-02$ using the non-robust estimation to $\beta2 = 7.3819e-02$ with robust estimation.
+The standard error of the $\beta2$ coefficient was changed, going from 3.211e-03 using the non-robust estimation to 3.4501e-03 using the robust estimation.
+However, even using the robust estimation, the p-value for our $\beta2$ coefficient remains significant at the 0.05, and we confirm that we must reject the null hypothesis that the coefficient value is null, with the meaning of that null hypothesis being that there is no relationship between time at university and wages.
