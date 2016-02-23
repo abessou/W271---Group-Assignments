@@ -180,14 +180,20 @@ $$lapps_{i}=\gamma_{0} + \beta_{0}I_{1993} + \beta_{1}bowl_{i} + \beta_{2}btitle
 Exogeneity of the variables in the model can be formulated as:
 $$Cov(bowl_{i}, u_{i})=Cov(btitle_{i}, u_{i})=Cov(finfour_{i}, u_{i})=0$$
 
+Another assumption that is needed for the model to be causal is the ability to manipulate one of the x's without that manipulation impacting the exogeneity with the error term.  This assumption is not very plausible.  It's hard to think of a situation where we can make a school appear in the final four / win a title / be champions in the previous year without affecting other variables (the error term).
+
 b.  Additional assumption needed for OLS to consistently estimate the first-difference model
 --------------------------------------------------------------------------------------------
-For OLS to consistently estimate the first difference model, we need to assume that assumptions MLR1-MLR4' hold. We also need to assume that the model isn't affected by omitted variable bias, meaning that all the explanatory variables are included in the model. The presence of omitted variables that are correlated with any of the variables in the model creates a bias in
+For OLS to consistently estimate the first difference model, we need to assume that assumptions MLR1-MLR4' hold. We also need to assume that the model isn't affected by omitted-variable bias, meaning that all the explanatory variables are included in the model. The presence of omitted variables that are correlated with any of the variables in the model creates a bias in
 the estimation of the coefficients of the variables selected in the model.
 
-In the  abscence of a guarantee that we have not left unmeasured effect in the model, we must make the assumption that we have the ability to make manipulations to the x terms in order to observe changes in the y term, without affecting the error term, so that we can estalish that the bias introduced by any unmeasured variables is null.
+MJ:  I think we should remove this paragraph\newline
+In the abscence of a guarantee that we have not left unmeasured effect in the model, we must make the assumption that we have the ability to make manipulations to the x terms in order to observe changes in the y term, without affecting the error term, so that we can estalish that the bias introduced by any unmeasured variables is null.
 
-This assumption is not very plausible.  It's hard to think of a situation where we can make a school appear in the final four / win a title / be champions in the previous year without affecting other variables (the error term).
+MJ:  and replace it with this one\newline
+As long as the effects of the omitted variables from the populatoin model are constant, they don't affect the differences between the variables from time 1 to time 2, so they will not affect the coefficients in the difference model.  If the effects of the omitted variables are not constant, then there will still be omitted-variable bias in the difference model.  So the assumption that we have to make for the difference model is that the effects of the omitted variables are constant over time.
+
+??need to also write this in mathematical form?
 
 Question5
 ===========
