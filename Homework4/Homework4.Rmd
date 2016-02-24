@@ -174,26 +174,23 @@ Question4
 ==========
 a. Additional assumptions needed for the population model to be causal
 ----------------------------------------------------------------------
-One important assumption needed for the model to be causal is the exogeneity of the dependent variables in the model with the error term in the model. Exogeneity can be defined as the requirement that the dependent variables are not related to the error term.
+One important assumption needed for the model to be causal is the exogeneity of the dependent variables in the model with the error term in the model. Exogeneity can be defined as the requirement that the dependent variables are not related to the error term. The presence of omitted variables that are correlated with any of the variables in the model creates a bias in the estimation of the coefficients of the variables selected in the model, hence this assumption is important.
+
 Assuming the population model presented:
 $$lapps_{i}=\gamma_{0} + \beta_{0}I_{1993} + \beta_{1}bowl_{i} + \beta_{2}btitle_{i} + \beta_{3}finfour_{i} + a_{i} + u_{i}$$
 Exogeneity of the variables in the model can be formulated as:
-$$Cov(bowl_{i}, u_{i})=Cov(btitle_{i}, u_{i})=Cov(finfour_{i}, u_{i})=0$$
-
-Another assumption that is needed for the model to be causal is the ability to manipulate one of the x's without that manipulation impacting the exogeneity with the error term.  This assumption is not very plausible.  It's hard to think of a situation where we can make a school appear in the final four / win a title / be champions in the previous year without affecting other variables (the error term).
+$$Cov(bowl_{i}, a_{i}+u_{i})=Cov(btitle_{i}, a_{i}+u_{i})=Cov(finfour_{i}, a_{i}+u_{i})=0$$
 
 b.  Additional assumption needed for OLS to consistently estimate the first-difference model
 --------------------------------------------------------------------------------------------
-For OLS to consistently estimate the first difference model, we need to assume that assumptions MLR1-MLR4' hold. We also need to assume that the model isn't affected by omitted-variable bias, meaning that all the explanatory variables are included in the model. The presence of omitted variables that are correlated with any of the variables in the model creates a bias in
-the estimation of the coefficients of the variables selected in the model.
+For OLS to consistently estimate the first difference model, apart from assuming exogeneity and MLR1-MLR4', we must make the assumption that we have the ability to make manipulations to the x terms in order to observe changes in the y term, without affecting the error term, so that we can estalish that the bias introduced by any unmeasured variables is null. Additionally, we can assume that all ommitted variables having some correlation with our x variables are time constant, therefore cancelling out in the final difference model. 
 
-MJ:  I think we should remove this paragraph\newline
-In the abscence of a guarantee that we have not left unmeasured effect in the model, we must make the assumption that we have the ability to make manipulations to the x terms in order to observe changes in the y term, without affecting the error term, so that we can estalish that the bias introduced by any unmeasured variables is null.
+The assumption regarding manipulaation does not seem plausible as it is hard to think of a situation where we can make a school appear in the final four / win a title / be champions in the previous year without affecting other variables included in the error term.
 
-MJ:  and replace it with this one\newline
-As long as the effects of the omitted variables from the populatoin model are constant, they don't affect the differences between the variables from time 1 to time 2, so they will not affect the coefficients in the difference model.  If the effects of the omitted variables are not constant, then there will still be omitted-variable bias in the difference model.  So the assumption that we have to make for the difference model is that the effects of the omitted variables are constant over time.
+We can make the assumption about time-constant variable 'a', as that is stated in the question:
+$$a_{i t} = a_{i t+1} $$
 
-??need to also write this in mathematical form?
+
 
 Question5
 ===========
@@ -202,8 +199,8 @@ Model Analysis
 - __F-statistic__ - The F-statistic for the model has a p-value of 0.03855, which is significant at the 0.05 level.
 - __intercept__ - The coefficient for the intercept is 0.01684 indicating that the year over year incease in application is 1.6% from 1992 to 1993.  However, the t-statistic for that coefficient has a value of 0.1932 and is not significant at the 0.05 level.
 - __cbowl__ - The coefficient for the cbowl variable is .057, indicating that a win in a bowl the year prior, contributes to a 5.7% increase in applications the subsequent year.  The t-statistic for the coefficient is significant at the 0.05 level, with a value of 0.0236.
-- __cbtitle__ - The coefficient for the cbtitle variable is .041, indicating that a win in the men's conference championship in the previous year, translates into an increase of 4.1% year over year from 1992 to 1993.  The t-statistic for the coefficient is 0.1950 and is not significant at the 0.05 level.
-- __cfinfour__ - The coefficient for the cfinfour variable is -0.06961 and seems to indicate that an appearance in the men's final four the year prior is related to a decrease of 6.9% of applications.
+- __cbtitle__ - The coefficient for the cbtitle variable is .041, indicating that a win in the men's conference championship in the previous year, translates into an increase of 4.1% year over year from 1992 to 1993, however we cannot be sure of this relationship given the lack of statistical significance.  The t-statistic for the coefficient is 0.1950 and is not significant at the 0.05 level.
+- __cfinfour__ - The coefficient for the cfinfour variable is -0.06961 and seems to indicate that an appearance in the men's final four the year prior is related to a decrease of 6.9% of applications, however we cannot be sure of this relationship given the lack of statistical significance. The t-statistic for the coefficient is 0.1348 and is not significant at the 0.05 level.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 #Create the model.
@@ -216,7 +213,10 @@ Question6
 ==============
 The F-statistic obtained from the model is the test of overall significance of the model. We have already establish that it has a p-value of 0.03855, which is significant at the 0.05 level.  We can obtain the same statistic with the linearHypothesis function.
 
-Because the model is significant, we do not want to read too much into the t-statistics of each of the coefficients of the model. We had noted that 3 out of 4 coefficients had p-values that were not significant at the 0.05 level.  It appears that the combined explanatory power of the model is still relevant, as evidenced by the F-statistic.
+Though the model is significant, we do not want to read too much into the t-statistics of each of the coefficients of the model. We had noted that 3 out of 4 coefficients had p-values that were not significant at the 0.05 level.  It appears that the combined explanatory power of the model is still relevant, as evidenced by the F-statistic.
+
+Alternate second para (Rohan): RT: Since the model is significant, with an R squared value of 14%, we can infer that the independent variables do have some explanatory power over the dependent variable. However, we cannot be confident of relationships between the variables due to high standard errors and a lack of statistical significance of the coefficients.
+
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 linearHypothesis(change.lapps.model, c("cbowl", "cbtitle", "cfinfour"))
