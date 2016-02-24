@@ -174,23 +174,32 @@ Question4
 ==========
 a. Additional assumptions needed for the population model to be causal
 ----------------------------------------------------------------------
-One important assumption needed for the model to be causal is the exogeneity of the dependent variables in the model with the error term in the model. Exogeneity can be defined as the requirement that the dependent variables are not related to the error term. The presence of omitted variables that are correlated with any of the variables in the model creates a bias in the estimation of the coefficients of the variables selected in the model, hence this assumption is important.
+There are 2 additional assumptions that are needed for the proposed population model to be causal:\newline
+\newline
+__Assumption 1:__  Exogeneity of the dependent variables in the model with the error term in the model. Exogeneity can be defined as the requirement that the dependent variables are not related to the error term. The presence of omitted variables that are correlated with any of the variables in the model creates a bias in the estimation of the coefficients of the variables selected in the model, hence this assumption is important.
 
 Assuming the population model presented:
-$$lapps_{i}=\gamma_{0} + \beta_{0}I_{1993} + \beta_{1}bowl_{i} + \beta_{2}btitle_{i} + \beta_{3}finfour_{i} + a_{i} + u_{i}$$
+$$lapps_{i}=\gamma_{0} + \beta_{0}I_{1993} + \beta_{1}bowl_{it} + \beta_{2}btitle_{it} + \beta_{3}finfour_{it} + a_{i} + u_{it}$$
 Exogeneity of the variables in the model can be formulated as:
-$$Cov(bowl_{i}, a_{i}+u_{i})=Cov(btitle_{i}, a_{i}+u_{i})=Cov(finfour_{i}, a_{i}+u_{i})=0$$
+$$Cov(bowl_{it}, a_{i}+u_{it})=Cov(btitle_{it}, a_{i}+u_{it})=Cov(finfour_{it}, a_{i}+u_{it})=0$$
+
+__Assumption 2:__ Manipulation.  We must assume that we have the ability to make manipulations to at least one of the x terms (the independent variables, but only one at a time) in order to observe changes in the y term (the dependent variable), without affecting the error term, so that we can estalish that there is no bias introduced.  In mathematical terms we can say that if we define our changes in x as $\delta x$ and our error term as $\epsilon$, then we have:
+$$\delta x = f(x), and\ Cov(\delta x, \epsilon) = 0$$
+
+Without this assumption, then we are talking about correlation and not causality.  However, the assumption regarding manipulaation does not seem plausible as it is hard to think of a situation where we can make a school appear in the final four / win a title / be champions in the previous year without affecting other variables included in the error term.
 
 b.  Additional assumption needed for OLS to consistently estimate the first-difference model
 --------------------------------------------------------------------------------------------
-For OLS to consistently estimate the first difference model, apart from assuming exogeneity and MLR1-MLR4', we must make the assumption that we have the ability to make manipulations to the x terms in order to observe changes in the y term, without affecting the error term, so that we can estalish that the bias introduced by any unmeasured variables is null. Additionally, we can assume that all ommitted variables having some correlation with our x variables are time constant, therefore cancelling out in the final difference model. 
+For OLS to consistently estimate the first difference model, we need to make two additonal assumptions:\newline
+\newline
+__Assumption 1:__  Exogeneity as explained in part a.
 
-The assumption regarding manipulaation does not seem plausible as it is hard to think of a situation where we can make a school appear in the final four / win a title / be champions in the previous year without affecting other variables included in the error term.
+Assuming the difference model presented:
+$$clapps_{i}=\beta_{0} + \beta_{1}cbowl_{i} + \beta_{2}cbtitle_{i} + \beta_{3}cfinfour_{i} + a_{i} + u_{i}$$
+Exogeneity of the variables in the model can be formulated as:
+$$Cov(cbowl_{i}, a_{i}+u_{i})=Cov(cbtitle_{i}, a_{i}+u_{i})=Cov(cfinfour_{i}, a_{i}+u_{i})=0$$
 
-We can make the assumption about time-constant variable 'a', as that is stated in the question:
-$$a_{i t} = a_{i t+1} $$
-
-
+__Assumption 2:__ As long as the effects of the omitted variables from the population model are constant, they don't affect the differences between the independent x variables from time 1 to time 2, so they will not affect the coefficients in the difference model.  If the effects of the omitted variables are not constant, then there will still be omitted-variable bias in the difference model.  So the assumption that we have to make for the difference model is that the effects of the omitted variables are constant over time.
 
 Question5
 ===========
