@@ -1,0 +1,21 @@
+---
+title: "Lab2"
+author: "Megan Jasek, Rohan Thakur, Charles Kekeh"
+date: "Friday, March 04, 2016"
+output: pdf_document
+---
+
+Question 1
+===========
+
+
+Question 2
+===========
+
+
+Question 3
+===========
+
+
+Question 4
+==========
