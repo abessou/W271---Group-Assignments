@@ -75,8 +75,8 @@ $$L(\theta) = \left\{ \begin{array}{ll}
 Part 2 - MLE
 ----------------------------
 Based on $L(\theta)$ The MLE of $\theta$ is a value of $\theta$ for which $\theta \geq y_{i} for i \in{1,\cdots,n}$ and which maximizes $1/\theta^{n}$.
-$MLE(\theta)$ is the smallest of such values of $\theta$ such that $\theta \geq y_{i} for i \in {1,\cdots,n}$. Therefore:
-$$MLE(\theta) = \hat{\theta} = max(y_{1},\cdots,y_{n})$$
+$MLE(\theta)$ is the smallest of such values of $\theta$ such that $\theta \geq y_{i}$ for $i \in {1,\cdots,n}$. Therefore:
+$$\mathbf{MLE(\theta) = \hat{\theta} = max(y_{1},\cdots,y_{n})}$$
 
 Part 3 - Expectation n=1
 ------------------------
@@ -84,17 +84,37 @@ Taking $\hat{\theta} = max(y_{1},\cdots,n)$ and n=1\newline
 We have
 $$\hat{\theta} = y_{1}$$
 And
-$$E[\hat{\theta}] =  E[y_{1}] = \frac{\theta}{2}$$
+$$\mathbf{E[\hat{\theta}] =  E[y_{1}] = \frac{\theta}{2}}$$
 Knowing that $y_{i}$ is from a random uniform distribution over $[0,\theta]$
 
 Part 4 - Bias
 -------------
-Yes, from the above, $\hat{\theta}$ is biased. For any ${y_{1},\cdots,y_{n}}$, we expect $max{y_{1},\cdots,n} < \theta$ with probability 1. Hence $\hat{\theta}$ underestimates $\theta$ and we have just proven that for n=1, $E(\hat{\theta}) \neq \theta$
+Yes, from the above, $\hat{\theta}$ is biased. For any ${y_{1},\cdots,y_{n}}$, we expect $max{y_{1},\cdots,n} < \theta$ with probability 1. Hence $\hat{\theta}$ underestimates $\theta$ and we have just proven that for n=1, $E(\hat{\theta}) \neq \theta$.
 
 Part 5 - Expectation general case
 ---------------------------------
 Taking $\hat{\theta}=max(y_{1},\cdots,y_{n})$ and assuming $n \geq 1$.
-$$E(\hat{\theta}) = E[max(y_{1},\cdots),y_{n}]$$
+$$E(\hat{\theta}) = E[max(y_{1},\cdots,y_{n})]$$
+
+Let's define $x = max(y_{i}), i \in {1,\cdots,n}$.
+$$CDF(x) = P(max(y_{i},\cdots,y_{n}) < x), i \in {1,\cdots,n}$$
+$$CDF(x) = P(y_{1} < x, y_{2} < x, \cdots, y_{n} < x)$$
+$$CDF(x) = \prod{P(y_{i}<x)}, i \in {1,\cdots,n}$$
+$$CDF(x) = (\frac{x}{\theta})^{n}$$
+
+From CDF(x), which is the cumulative distribution of x, we deterne the desnsity probability as
+$$PDF(x) = \frac{\delta}{\delta x} (\frac{\theta}{x})^{n}$$
+$$PDF(x) = \frac{n x^{n-1}}{\theta^n}$$
+From PDF(x), we can now compute E(x) as:
+$$E(x) = \int_{x=0}^{\theta} \frac{n (x^{n-1})}{\theta} xdx$$
+and
+$$\mathbf{E(x) = \hat{\theta} = \frac{n}{n+1}\theta}$$
+
+Part 6 - Expectation general case
+---------------------------------
+From the previous compututation of the general case of $n \geq 1$, we can state that
+$$\mathbf{\lim_{n \rightarrow \infty} \hat{\theta} = \theta}$$
+and $\hat{\theta}$ is a consistent estimator of $\theta$.
 
 Question 4
 ==========
