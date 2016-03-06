@@ -47,7 +47,17 @@ $$\mathbf{E(X|Y=\frac{1}{2})=1}$$
 
 Question 2
 ===========
+$$Payoff\ function = aA + bB + cC$$
+Let us calculate the variance of the payoff.
 
+$$Var(Payoff) = Var(aA + bB + cC)$$
+$$={a}^{2}Var(A) + {b}^{2}Var(B) + {c}^{2}Var(C)$$ 
+Since A, B an C are independent, all covariance terms are 0. \newline
+Now, using the relation Var(A)=2Var(B)=3Var(C): 
+$$=6{a}^{2}Var(C) + \frac{3}{2}{b}^{2}Var(C) + {c}^{2}Var(C)$$
+
+We can clearly see from this equation, that in order to minimize variance, all the allocation must be in asset C, since any allocation in A or B, leads to a higher variance than the same allocation in C.\newline
+**Final answer: (a,b,c) = (0,0,1)**
 
 Question 3
 ===========
@@ -143,6 +153,7 @@ library(lmtest)
 library(pastecs)
 library(ivpack)
 library(knitr)
+library(psych)
 opts_chunk$set(tidy.opts=list(width.cutoff=70))
 ```
 
@@ -657,27 +668,27 @@ Question 4.5
 ------------
 Part 1
 ------
-The number of observations used in this regression 723 (out of 1,000).  The participants with missing mom_education or dad_education (mdMiss) values compare to participants that have both a mom_education and a dad_education (mdHave) value as follows.\newline
-- __wage__ - The mdMiss participants have lower wages than the mdHave participants.  The minimum value for wage for mdMiss is $127 vs. $136 for mdHave.  The median and mean for values for mdMiss are lower at $481 vs. $570 and $531 vs. $597, respectively.  The maximum values are also lower at $2,083 vs. $2,404.\newline
-- __education__ - The mdMiss participants have less education than the mdHave participants.  This could indicate that they stopped education sooner and went to work earlier than the mdHave participants.  The mean value for mdMiss is 12.09 vs. 13.65 for mdHave, a difference of 1.56 years or a 11.4% decrease.\newline
-- __experience__ - The mdMiss participants have more experience than the mdHave participants.  This is further evidence that they stopped education sooner and went to work earlier than the mdHave participants. The mean value for mdMiss is 10.47 vs. 8.145 for mdHave, a difference of 2.32 years or a 28.5% increase.   \newline
-- __raceColor__ - The mdMiss participants have a much higher percentage of people with the raceColor variable set to 1 than mdHave.  44.77% (124 people) with 1's for mdMiss vs. 15.77% (114 people) with 1's for mdHave.\newline
+The number of observations used in this regression 723 (out of 1,000).  The participants with missing mom_education or dad_education values (Group 1) compare to participants that have both a mom_education and a dad_education value (Group 2) as follows.\newline
+- __wage__ - Group 1 participants have lower median and mean wages than the Group 2 participants.  The median and mean for values for Group 1 are $481 and $570 respectively vs. $531 and $597 respectively for Group 2.  The standard deviation of Group 1 wages is lower, at 256.9 vs. 268.1 for Group 2. The T-test for difference of means between the 2 groups is significant at the 1% level.\newline
+- __education__ - Group 1 participants have lower median and mean education than the Group 2 participants.  The median and mean for values for Group 1 are 12 and 12.1 respectively vs. 13.7 and 13.7 respectively for Group 2.  The standard deviation of Group 1 education is higher, at 2.7 vs. 2.6 for Group 2. The T-test for difference of means between the 2 groups is significant at the 1% level.\newline
+- __experience__ - Group 1 participants have higher median and mean experience than the Group 2 participants.  The median and mean for values for Group 1 are 10 and 10.5 respectively vs. 8 and 8.2 respectively for Group 2.  The standard deviation of Group 1 experience is higher, at 4.3 vs. 4.0 for Group 2. The T-test for difference of means between the 2 groups is significant at the 1% level.   \newline
+- __raceColor__ - Group 1 participants have a disproportianately larger number of participants with raceColor=1, at 45%, vs. 16% for Group 2. The T-test for difference of means between the 2 groups is significant at the 1% level.\newline
 
 Part 2
 ------
-We do not think we can just throw away the participants with the missing values.  They are important to the analysis since they represent a disproportional amount of people with lower wages, less education, more experience and more raceColor variables equal to 1 than participants without missing values.
+We do not think we can just throw away the participants with the missing values.  They are important to the analysis since they represent a disproportional amount of people with lower wages, less education, more experience and higher proportion of raceColor variables equal to 1 than participants without missing values. These differences are statistically significant.
 
 Part 3
 ------
-Blindly replace all of the missing values with the average of the observed values of the corresponding variable. See the re-run of the original regression using all of the observations below.
+This is not a good idea, because averages can be skewed by outliers. Since neither dad_education nor mom_education are evenly distributed, they will inevitably be skewed, hence interfering with our regression, letting outliers have even more influence than they already have on regressions.
 
 Part 4
 ------
-Regress the variable(s) with missing values on education, experience, and raceColor, and use this regression(s) to predict (i.e. "impute") the missing values.  See the re-run of the original regression using all of the observations below.
+This is a bad idea because we are introducing multicollinearity into the regression and losing precision of our coefficients.
 
 Part 5
 ------
-We would not use any of the previous 3 models that included the mom_education and dad_education variables.  The mom_education and dad_education are not significant to even the 10% significance level in the models.   We would take them out and use a 6 variable model without them.  The Adjusted R-squared goes up slightly when we do this from 0.2925 to 0.2935 even though we are using fewer variables.
+We certainly cannot use the regression models with missing values replaced. Both these techniques lead to highly non-significant coefficients for mom_education and dad_education, meaning that coefficients obtained for these variables cannot be trusted. At the same time, having 277 values missing is not acceptable since our original regression misses a lot of important data for variables for which we do have information. Therefore, we would not elect to go with any of the models from the given choices.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 # Part 1
@@ -686,29 +697,24 @@ OLS.logWage.8var = lm(logWage ~ education + experience + experienceSquare + race
 # Print the model
 summary(OLS.logWage.8var)
 
-# Create 2 temporary datasets.  mdMiss contains all of the rows with either mom_education
-# or dad_education equal to NA.  mdHave contains all of the rows with both mom_education and
-# dad_education equal to a non-NA value.
-mdMiss = data[(is.na(data$mom_education) | is.na(data$dad_education)),]
-mdHave = data[(!is.na(data$mom_education) & !is.na(data$dad_education)),]
-# Use summary to confirm that mdMiss has the correct number of NA's for mom_education and
-# dad_education
-summary(mdMiss)
-summary(mdHave)
-# Use str to confirm that the datasets have the appropriate number of observations
-str(mdMiss)
-str(mdHave)
+# Creating a dummy variable for rows with missing values
+data$missingval = is.na(data$mom_education) | is.na(data$dad_education)
+summary(data$missingval)
 
-# Compare the summaries of the mdMiss and mdHave datasets to see the differences in 
-# wage, eduction, experience and raceColor
-summary(mdMiss$wage)
-summary(mdHave$wage)
-summary(mdMiss$education)
-summary(mdHave$education)
-summary(mdMiss$experience)
-summary(mdHave$experience)
-summary(mdMiss$raceColor)
-summary(mdHave$raceColor)
+#Now, we check the variables by the missing value dummy variable.
+#Additionally, we check whether there is difference in the two groups by running a t-test
+#We do this for wage, education, experience and raceColor
+by(data$wage, data$missingval, describe)
+t.test(data[data$missingval,c("wage")], data[!data$missingval,c("wage")])
+
+by(data$education, data$missingval, describe)
+t.test(data[data$missingval,c("education")], data[!data$missingval,c("education")])
+
+by(data$experience, data$missingval, describe)
+t.test(data[data$missingval,c("experience")], data[!data$missingval,c("experience")])
+
+by(data$raceColor, data$missingval, describe)
+t.test(data[data$missingval,c("raceColor")], data[!data$missingval,c("raceColor")])
 
 # Part 3
 # Copy the dataset to a new variable
@@ -746,10 +752,6 @@ OLS.logWage.8var.regressNA = lm(logWage ~ education + experience + experienceSqu
 # Print the summaries of the 2 new models
 summary(OLS.logWage.8var.avgNA)
 summary(OLS.logWage.8var.regressNA)
-# Run a 6-variable model without dad_education and mom_education
-OLS.logWage.6var = lm(logWage ~ education + experience + experienceSquare + raceColor + rural + city, data=data)
-# Print the summary of the new model
-summary(OLS.logWage.6var)
 ```
 
 Question 4.6
@@ -778,13 +780,96 @@ TSLS.logWage.8var = ivreg(logWage ~ education + experience + experienceSquare + 
 summary(TSLS.logWage.8var)
 # Print the summary of the original model
 summary(OLS.logWage.8var)
-
-# Run the IV TSLS regression with z1 and z2 with only 6 variables, removing mom_education
-# and dad_education.
-TSLS.logWage.6var = ivreg(logWage ~ education + experience + experienceSquare + raceColor + rural + city | z1*z2 + experience + experienceSquare + raceColor + rural + city, data=data)
-# Print the summary of the 6 variable TSLS model
-summary(TSLS.logWage.6var)
-# Print the summary of the original 6 variable model
-summary(OLS.logWage.6var)
 ```
+
+Question 5
+==========
+
+Part 1
+------
+In order to come up with our parsimonious model, we first examined the dataset. We found high correlation between urb and lit, and therefore chose not to use those in order to prevent the negative effects of multicollinearity in our results. Since the research question is concerned with voteshare and absolute_wealth, we choose a simple univariate model with the dependent variable as voteshare and the dependent variable as absolute wealth. However, from examining this variable, it is clear that it is heavily positively skewed, and therefore requires a log transformation. Additionally, some cleanup is required, removing coded values.
+
+Final Parsimonious Model: y = voteshare, x = absolute_wealth
+
+Results from regression: Our model is statistically significant at the 1% level. We can interpret the coefficient as saying a 1% increase in absolute wealth corresponds to a 0.005% increase in votes
+Answering Research Question: Wealthy candidates fare very slightly better in elections. There is a linear relationship, but with a very small slope, such that it is almost flat.
+
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+dataset=read.csv('wealthy_candidates.csv')
+#Exploring dataset
+describe(dataset$absolute_wealth)
+cor(dataset[,c("urb", "lit", "voteshare", "absolute_wealth")], use ="pairwise.complete.obs")
+
+#Now, examining abs wealth variable
+summary(dataset$absolute_wealth)
+print(quantile(dataset$absolute_wealth, probs = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9,0.95, 0.99, 1), na.rm=TRUE))
+hist(dataset$absolute_wealth, breaks = 60)
+
+head(dataset[order(dataset$absolute_wealth, decreasing = TRUE), c("absolute_wealth")])
+#We can see that this variable is highly skewed. In order continue using the variable,
+#we must remove coded values like 2, and transform the variable to log.
+dataset$absolute_wealth_clean = log(dataset$absolute_wealth) 
+dataset$absolute_wealth_clean[dataset$absolute_wealth_clean==log(2)] = NA 
+print(quantile(dataset$absolute_wealth_clean, probs = c(0.01, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9,0.95, 0.99, 1), na.rm=TRUE))
+summary(dataset$absolute_wealth_clean)
+hist(dataset$absolute_wealth_clean, breaks = 60)
+
+#Now, to start building the regression model
+votes.plot = ggplot(dataset, aes(x = absolute_wealth_clean, y = voteshare)) + theme(legend.position = "none") +
+  geom_point(colour = "Blue") + geom_smooth(colour = "red", method = "lm") + labs(title = "Voteshare vs. Log(Absolute Wealth)", x = "log Absolute Wealth ($)", y = "Vote Share")
+plot(votes.plot)
+
+#Does not seem like much of a relation, but we continue on to run the regression.
+model = lm(voteshare~absolute_wealth_clean,data=dataset)
+summary(model)
+```
+
+
+Part 2
+------
+An addition of a quadratic term is absolutely unwarranted, and would only skew the original absolute wealth variable further.
+For comparison purposes, we will create a new model with the wealth variable without the log, and with the square.
+
+Result: Highly non-significant model and coefficients, cannot reject the null.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+#Creating a clean variable without the log
+dataset$absolute_wealth_clean2 = dataset$absolute_wealth 
+dataset$absolute_wealth_clean2[dataset$absolute_wealth_clean2==2] = NA 
+dataset$absolute_wealth_clean2Square = dataset$absolute_wealth_clean2^2 
+model2=lm(voteshare~absolute_wealth_clean2+absolute_wealth_clean2Square, data=dataset)
+summary(model2)
+```
+
+Part 3
+------
+We run a new model with dummy variables for region 2 and region 3. With this model, we obtain statistical and practical significance of the dummy coefficients, as well as a substantial increase in the R squared value from the original parsimonious model.
+
+Ater testing the difference in models, we obtain a significant wald test as well, showing that the region variables are clearly a good addition to the model.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+model3 = lm(voteshare~absolute_wealth_clean+region,data=dataset)
+summary(model3)
+summary(model)
+waldtest(model, model3, vcov=vcovHC)
+```
+
+Part 4
+------
+In our parsimonious model, our errors are endogenous, leading to the omitted variable bias in our coefficient for log(absolute wealth). This is evident from the fact that when we add region, we see a drastic change in the coefficient for log(absolute wealth). Therefore, we cannot say that we have a causal, unbiased estimate, because we know our coefficient is biased.
+Causality holds when we have (apart from MLR1-MLR4) 
+1. Exogeneity of errors (which is volated in this case), and 
+2. the ability to manipulate x to observe changes in y without affecting the error term. We could theoretically conceive of a situation where we find people following an ideal absolute wealth distribution and have them run for elections, observing the results. However, this is not practical in this case.
+
+
+Part 5
+------
+$$Change\ in\ Voteshare = \beta_0 + \beta_1*(Change\ in\ log\ absolute\ wealth) + u$$
+This model would yield a causal result when the error terms that are endogenous, are also time constant, and would therefore cancel out.
+
+However, in our case, this model does not work for several reasons.
+1. We do not have data across time periods.
+2. If we assume that we do have data across time, one could argue that the variable absolute wealth is close to being time-constant, and would therefore mostly cancel out, which would mean we would lose our main independent variable.
+3. Changes in absolute wealth and its affect on the change in votes does not help answer our original research question. A poorer candidate could have a larger change in wealth than a richer candidate, and we would lose this informaation by doing a difference model.
+
 
