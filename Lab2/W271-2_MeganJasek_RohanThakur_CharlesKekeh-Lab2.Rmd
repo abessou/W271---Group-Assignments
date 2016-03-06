@@ -51,7 +51,50 @@ Question 2
 
 Question 3
 ===========
+$y_{i}, i={1,\cdots,n}$ random uniform variables.
 
+Part 1 - Likelihood Function
+----------------------------
+$L(\theta)$ being the likelihood function, we know we have:
+$$L(\theta)=f(y_{1},\cdots,y_{n}|\theta)=f(y_{1}|\theta)f(y_{2}|\theta)\cdots f(y_{n}|\theta)$$
+
+Where f is the uniform probablity density function with parameter $\theta$.
+$$f(y_{i},\theta) = \left\{ \begin{array}{ll}
+\frac{1}{\theta} & \mbox{ for $0 \leq y_{i} \leq \theta$} \\
+0 & \mbox{otherwise}
+\end{array}
+\right.$$
+
+Making
+$$L(\theta) = \left\{ \begin{array}{ll}
+\frac{1}{\theta^{n}} & \mbox{for $0 \leq y_{i} \leq \theta, i \in {1,\cdots,n} $} \\
+0 & \mbox{otherwise}
+\end{array}
+\right.$$
+
+Part 2 - MLE
+----------------------------
+Based on $L(\theta)$ The MLE of $\theta$ is a value of $\theta$ for which $\theta \geq y_{i} for i \in{1,\cdots,n}$ and which maximizes $1/\theta^{n}$.
+$MLE(\theta)$ is the smallest of such values of $\theta$ such that $\theta \geq y_{i} for i \in {1,\cdots,n}$. Therefore:
+$$MLE(\theta) = \hat{\theta} = max(y_{1},\cdots,y_{n})$$
+
+Part 3 - Expectation n=1
+------------------------
+Taking $\hat{\theta} = max(y_{1},\cdots,n)$ and n=1\newline
+We have
+$$\hat{\theta} = y_{1}$$
+And
+$$E[\hat{\theta}] =  E[y_{1}] = \frac{\theta}{2}$$
+Knowing that $y_{i}$ is from a random uniform distribution over $[0,\theta]$
+
+Part 4 - Bias
+-------------
+Yes, from the above, $\hat{\theta}$ is biased. For any ${y_{1},\cdots,y_{n}}$, we expect $max{y_{1},\cdots,n} < \theta$ with probability 1. Hence $\hat{\theta}$ underestimates $\theta$ and we have just proven that for n=1, $E(\hat{\theta}) \neq \theta$
+
+Part 5 - Expectation general case
+---------------------------------
+Taking $\hat{\theta}=max(y_{1},\cdots,y_{n})$ and assuming $n \geq 1$.
+$$E(\hat{\theta}) = E[max(y_{1},\cdots),y_{n}]$$
 
 Question 4
 ==========
