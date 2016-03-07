@@ -136,15 +136,15 @@ Question 4
 ==========
 4.1  Univariate Analysis
 ------------------------
-- __wage__ - The wage variable has a range from $127 to $2,404 with a mean of $579 and median of $543 with most values occuring between $250 and $750.  The histogram shows a data distribution that's positevely skewed.
+- __wage__ - The wage variable has a range from $127 to $2,404 with a mean of $579 and median of $543 with most values occuring between $250 and $750.  The histogram shows a data distribution that's positevely skewed.  There are a few large outliers.  Taking the log of this variable would have the outliers take on values that are much less extreme in relation to the other variable's values.
 - __logWage__ - The logWage variable has a range from $4.844 to $7.785 with a mean of $6.263 and median of $6.297.  The histogram shows a data distribution that's approximately normal.
-- __education__ - The education variable is an integer and has a range from 2 to 18 with a mean of 12 and median of 12.  The histogram shows a data distribution that is slightly negatively skewed.  There is a spike at 12 and a smaller spike at 16.
-- __experience__ - The experience variable is an integer and has a range from 0 to 23 with a mean of 8.788 and median of 8.  The histogram shows a data distribution that is slightly positively skewed.
-- __experienceSquare__ - The experience variable is an integer and has a range from 0 to 529 with a mean of 95.03 and median of 64.  The histogram shows a data distribution that is positively skewed.  There is a spike at about 50.
-- __IQscore__ - The IQscore variable is an integer and has a range from 50 to 144 with a mean of 102.3 and median of 103.  The histogram shows a data distribution that is approximately normal.  There are 316 missing values.
-- __dad_education__ - The dad_education variable is an integer and has a range from 0 to 18 with a mean of 10.18 and median of 11.  The histogram shows a data distribution that has many frequencies at about count 30 and spikes at 8 and 12.  These spikes make intuitive sense because these are natural educaiton breakpoints for people.  Eight years signifying the end of middle school and 12 years indicating the end of high school.  There are 239 missing values.
-- __mom_education__ - The mom_education variable is an integer and has a range from 0 to 18 with a mean of 10.45 and median of 12.  The histogram shows a data distribution that has many frequencies at about count 50 and spikes at 12.  This spike makes intuitive sense because 12 years indicates the end of high school which is a natural education break point for people.  There are 128 missing values.
-- __age__ - The age variable is an integer and has a range from 24 to 34 with a mean of 28.01 and median of 27.  For the ages between 24 and 28, the fequency is around 105.  For the ages between 29 and 34, the frequency is around 65.
+- __education__ - The education variable is an integer and is discrete and has a range from 2 to 18 with a mean of 12 and median of 12.  The histogram shows a data distribution that is slightly negatively skewed.  There is a spike at 12 and a smaller spike at 16.
+- __experience__ - The experience variable is an integer and is discrete and has a range from 0 to 23 with a mean of 8.788 and median of 8.  The histogram shows a data distribution where more values lie at the lower end of the distribution.
+- __experienceSquare__ - The experience variable is an integer and is discrete and has a range from 0 to 529 with a mean of 95.03 and median of 64.  The histogram shows a data distribution where more values lie at the lower end of the distribution.  There is a spike at about 50.  This variable has a large outlier, which is amplified by taking the square.
+- __IQscore__ - The IQscore variable is an integer and is discrete and has a range from 50 to 144 with a mean of 102.3 and median of 103.  The histogram shows a data distribution that is approximately normal.  There are 316 missing values.
+- __dad_education__ - The dad_education variable is an integer and is discrete and has a range from 0 to 18 with a mean of 10.18 and median of 11.  The histogram shows a data distribution that has many frequencies at about count 30 and spikes at 8 and 12.  These spikes make intuitive sense because these are natural educaiton breakpoints for people.  Eight years signifying the end of middle school and 12 years indicating the end of high school.  There are 239 missing values.
+- __mom_education__ - The mom_education variable is an integer and is discrete and has a range from 0 to 18 with a mean of 10.45 and median of 12.  The histogram shows a data distribution that has many frequencies at about count 50 and spikes at 12.  This spike makes intuitive sense because 12 years indicates the end of high school which is a natural education break point for people.  There are 128 missing values.
+- __age__ - The age variable is an integer and is discrete and has a range from 24 to 34 with a mean of 28.01 and median of 27.  For the ages between 24 and 28, the fequency is around 105.  For the ages between 29 and 34, the frequency is around 65.
 - __raceColor__ - The raceColor variable is a binary variable with values 0 or 1 and mean 0.238. This means that there are about 24% 1's and 76% 0's.
 - __rural__ - The rural variable is a binary variable with values 0 or 1 and mean 0.391. This means that there are about 39% 1's and 61% 0's.  39% of the participants live in a rural area and 61% do not.
 - __city__ - The rural variable is a binary variable with values 0 or 1 and mean 0.712. This means that there are about 71% 1's and 29% 0's.  71% of the participants live in a city and 29% do not.
@@ -361,244 +361,254 @@ plot(z2.hist)
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 # Scatter plot with wage variable
-wage.education.plot = ggplot(data, aes(x = wage, y = education)) +
+wage.education.plot = ggplot(data, aes(y = wage, x = education)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. Education", x = "wage ($)", y = "education")
+  labs(title = "Wage vs. Education", y = "wage ($)", x = "education")
 plot(wage.education.plot)
 # Scatter plot with logWage variable
-lwage.education.plot = ggplot(data, aes(x = logWage, y = education)) +
+lwage.education.plot = ggplot(data, aes(y = logWage, x = education)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. Education", x = "logWage ($)", y = "education")
+  labs(title = "LogWage vs. Education", y = "logWage ($)", x = "education")
 plot(lwage.education.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$education)
 cor(data$logWage, data$education)
 
 # Scatter plot with wage variable
-wage.experience.plot = ggplot(data, aes(x = wage, y = experience)) +
+wage.experience.plot = ggplot(data, aes(y = wage, x = experience)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. experience", x = "wage ($)", y = "experience")
+  labs(title = "Wage vs. experience", y = "wage ($)", x = "experience")
 plot(wage.experience.plot)
 # Scatter plot with logWage variable
-lwage.experience.plot = ggplot(data, aes(x = logWage, y = experience)) +
+lwage.experience.plot = ggplot(data, aes(y = logWage, x = experience)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. experience", x = "logWage ($)", y = "experience")
+  labs(title = "LogWage vs. experience", y = "logWage ($)", x = "experience")
 plot(lwage.experience.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$experience)
 cor(data$logWage, data$experience)
 
 # Scatter plot with wage variable
-wage.experienceSquare.plot = ggplot(data, aes(x = wage, y = experienceSquare)) +
+wage.experienceSquare.plot = ggplot(data, aes(y = wage, x = experienceSquare)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. experienceSquare", x = "wage ($)", y = "experienceSquare")
+  labs(title = "Wage vs. experienceSquare", y = "wage ($)", x = "experienceSquare")
 plot(wage.experienceSquare.plot)
 # Scatter plot with logWage variable
-lwage.experienceSquare.plot = ggplot(data, aes(x = logWage, y = experienceSquare)) +
+lwage.experienceSquare.plot = ggplot(data, aes(y = logWage, x = experienceSquare)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. experienceSquare", x = "logWage ($)", y = "experienceSquare")
+  labs(title = "LogWage vs. experienceSquare", y = "logWage ($)", x = "experienceSquare")
 plot(lwage.experienceSquare.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$experienceSquare)
 cor(data$logWage, data$experienceSquare)
 
 # Scatter plot with wage variable
-wage.IQscore.plot = ggplot(data, aes(x = wage, y = IQscore)) +
+wage.IQscore.plot = ggplot(data, aes(y = wage, x = IQscore)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. IQscore", x = "wage ($)", y = "IQscore")
+  labs(title = "Wage vs. IQscore", y = "wage ($)", x = "IQscore")
 plot(wage.IQscore.plot)
 # Scatter plot with logWage variable
-lwage.IQscore.plot = ggplot(data, aes(x = logWage, y = IQscore)) +
+lwage.IQscore.plot = ggplot(data, aes(y = logWage, x = IQscore)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. IQscore", x = "logWage ($)", y = "IQscore")
+  labs(title = "LogWage vs. IQscore", y = "logWage ($)", x = "IQscore")
 plot(lwage.IQscore.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$IQscore, use="complete.obs")
 cor(data$logWage, data$IQscore, use="complete.obs")
 
 # Scatter plot with wage variable
-wage.dad_education.plot = ggplot(data, aes(x = wage, y = dad_education)) +
+wage.dad_education.plot = ggplot(data, aes(y = wage, x = dad_education)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. dad_education", x = "wage ($)", y = "dad_education")
+  labs(title = "Wage vs. dad_education", y = "wage ($)", x = "dad_education")
 plot(wage.dad_education.plot)
 # Scatter plot with logWage variable
-lwage.dad_education.plot = ggplot(data, aes(x = logWage, y = dad_education)) +
+lwage.dad_education.plot = ggplot(data, aes(y = logWage, x = dad_education)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. dad_education", x = "logWage ($)", y = "dad_education")
+  labs(title = "LogWage vs. dad_education", y = "logWage ($)", x = "dad_education")
 plot(lwage.dad_education.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$dad_education, use="complete.obs")
 cor(data$logWage, data$dad_education, use="complete.obs")
 
 # Scatter plot with wage variable
-wage.mom_education.plot = ggplot(data, aes(x = wage, y = mom_education)) +
+wage.mom_education.plot = ggplot(data, aes(y = wage, x = mom_education)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. mom_education", x = "wage ($)", y = "mom_education")
+  labs(title = "Wage vs. mom_education", y = "wage ($)", x = "mom_education")
 plot(wage.mom_education.plot)
 # Scatter plot with logWage variable
-lwage.mom_education.plot = ggplot(data, aes(x = logWage, y = mom_education)) +
+lwage.mom_education.plot = ggplot(data, aes(y = logWage, x = mom_education)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. mom_education", x = "logWage ($)", y = "mom_education")
+  labs(title = "LogWage vs. mom_education", y = "logWage ($)", x = "mom_education")
 plot(lwage.mom_education.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$mom_education, use="complete.obs")
 cor(data$logWage, data$mom_education, use="complete.obs")
 
 # Scatter plot with wage variable
-wage.age.plot = ggplot(data, aes(x = wage, y = age)) +
+wage.age.plot = ggplot(data, aes(y = wage, x = age)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. age", x = "wage ($)", y = "age")
+  labs(title = "Wage vs. age", y = "wage ($)", x = "age")
 plot(wage.age.plot)
 # Scatter plot with logWage variable
-lwage.age.plot = ggplot(data, aes(x = logWage, y = age)) +
+lwage.age.plot = ggplot(data, aes(y = logWage, x = age)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. age", x = "logWage ($)", y = "age")
+  labs(title = "LogWage vs. age", y = "logWage ($)", x = "age")
 plot(lwage.age.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$age)
 cor(data$logWage, data$age)
 
 # Scatter plot with wage variable
-wage.raceColor.plot = ggplot(data, aes(x = wage, y = raceColor)) +
+wage.raceColor.plot = ggplot(data, aes(y = wage, x = raceColor)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. raceColor", x = "wage ($)", y = "raceColor")
+  labs(title = "Wage vs. raceColor", y = "wage ($)", x = "raceColor")
 plot(wage.raceColor.plot)
 # Scatter plot with logWage variable
-lwage.raceColor.plot = ggplot(data, aes(x = logWage, y = raceColor)) +
+lwage.raceColor.plot = ggplot(data, aes(y = logWage, x = raceColor)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. raceColor", x = "logWage ($)", y = "raceColor")
+  labs(title = "LogWage vs. raceColor", y = "logWage ($)", x = "raceColor")
 plot(lwage.raceColor.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$raceColor)
 cor(data$logWage, data$raceColor)
+by(data$wage, data$raceColor, describe)
+by(data$logWage, data$raceColor, describe)
 
 # Scatter plot with wage variable
-wage.rural.plot = ggplot(data, aes(x = wage, y = rural)) +
+wage.rural.plot = ggplot(data, aes(y = wage, x = rural)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. rural", x = "wage ($)", y = "rural")
+  labs(title = "Wage vs. rural", y = "wage ($)", x = "rural")
 plot(wage.rural.plot)
 # Scatter plot with logWage variable
-lwage.rural.plot = ggplot(data, aes(x = logWage, y = rural)) +
+lwage.rural.plot = ggplot(data, aes(y = logWage, x = rural)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. rural", x = "logWage ($)", y = "rural")
+  labs(title = "LogWage vs. rural", y = "logWage ($)", x = "rural")
 plot(lwage.rural.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$rural)
 cor(data$logWage, data$rural)
+by(data$wage, data$rural, describe)
+by(data$logWage, data$rural, describe)
 
 # Scatter plot with wage variable
-wage.city.plot = ggplot(data, aes(x = wage, y = city)) +
+wage.city.plot = ggplot(data, aes(y = wage, x = city)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. city", x = "wage ($)", y = "city")
+  labs(title = "Wage vs. city", y = "wage ($)", x = "city")
 plot(wage.city.plot)
 # Scatter plot with logWage variable
-lwage.city.plot = ggplot(data, aes(x = logWage, y = city)) +
+lwage.city.plot = ggplot(data, aes(y = logWage, x = city)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. city", x = "logWage ($)", y = "city")
+  labs(title = "LogWage vs. city", y = "logWage ($)", x = "city")
 plot(lwage.city.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$city)
 cor(data$logWage, data$city)
+by(data$wage, data$city, describe)
+by(data$logWage, data$city, describe)
 
 # Scatter plot with wage variable
-wage.z1.plot = ggplot(data, aes(x = wage, y = z1)) +
+wage.z1.plot = ggplot(data, aes(y = wage, x = z1)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. z1", x = "wage ($)", y = "z1")
+  labs(title = "Wage vs. z1", y = "wage ($)", x = "z1")
 plot(wage.z1.plot)
 # Scatter plot with logWage variable
-lwage.z1.plot = ggplot(data, aes(x = logWage, y = z1)) +
+lwage.z1.plot = ggplot(data, aes(y = logWage, x = z1)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. z1", x = "logWage ($)", y = "z1")
+  labs(title = "LogWage vs. z1", y = "logWage ($)", x = "z1")
 plot(lwage.z1.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$z1)
 cor(data$logWage, data$z1)
+by(data$wage, data$z1, describe)
+by(data$logWage, data$z1, describe)
 
 # Scatter plot with wage variable
-wage.z2.plot = ggplot(data, aes(x = wage, y = z2)) +
+wage.z2.plot = ggplot(data, aes(y = wage, x = z2)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "Wage vs. z2", x = "wage ($)", y = "z2")
+  labs(title = "Wage vs. z2", y = "wage ($)", x = "z2")
 plot(wage.z2.plot)
 # Scatter plot with logWage variable
-lwage.z2.plot = ggplot(data, aes(x = logWage, y = z2)) +
+lwage.z2.plot = ggplot(data, aes(y = logWage, x = z2)) +
   theme(legend.position = "none") +
   geom_point(colour = "Blue") + 
   geom_jitter(colour = "Blue") +
   geom_smooth(colour = "red", method = "lm") +
-  labs(title = "LogWage vs. z2", x = "logWage ($)", y = "z2")
+  labs(title = "LogWage vs. z2", y = "logWage ($)", x = "z2")
 plot(lwage.z2.plot)
 # Run correlations with wage and logWage variables
 cor(data$wage, data$z2)
 cor(data$logWage, data$z2)
+by(data$wage, data$z2, describe)
+by(data$logWage, data$z2, describe)
 ```
 
 4.3  Regress log(wage) on education, experience, age, and raceColor
@@ -607,7 +617,7 @@ Part 1
 ------
 Report all the estimated coefficients, their standard errors, t-statistics,
 F-statistic of the regression, R2, adjustedR2, and degrees of freedom\newline
-The requested information is shown in the summary information below.
+The requested information is shown in the summary information below.\newline
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 OLS.logWage.educ.exper.age.race = lm(logWage ~ education + experience + age + raceColor, data=data)
@@ -615,7 +625,7 @@ summary(OLS.logWage.educ.exper.age.race)
 ```
 Part 2
 ------
-Degress of freedom = 996.  This value is calculated from the following formula $df = n - k - 1$ where n is the number of observations (n=1000).  k is the number of independent varialbes (k=4).  Plugging in these values we get, $996 = 1000 - 4 - 1$.
+Degress of freedom = 996.  This value is calculated from the following formula $df = n - k - 1$ where n is the number of observations (n=1000).  k is the number of independent varialbes (k=3).  Plugging in these values we get, $996 = 1000 - 3 - 1$.  k=3 because the age variable is not used in the regression even though it is in the formula because it is a linear combination of the other variables.
 
 Part 3
 ------
@@ -631,11 +641,11 @@ summary(data$age.difference)
 ```
 Part 4 - Interpret the coefficient estimate associated with education
 ---------------------------------------------------------------------
-The estimate for the education coefficient is 0.079608.  This means that for every unit change in education, there is an 8.00% change in logWage.  This value is significant at the 0.1% significance level.  This is a small practical effect.
+The estimate for the education coefficient is 0.079608.  This means that for every unit change in education, there is an 8.00% change in wage.  This value is significant at the 5% significance level.  This is a large practical effect.
 
 Part 5 - Interpret the coefficient estimate associated with experience
 ----------------------------------------------------------------------
-The estimate for the experience coefficient is 0.035372.  This means that for every unit change in experience, there is a 3.53% change in logWage.  This value is significant at the 0.1% significance level.  This is a small practical effect.
+The estimate for the experience coefficient is 0.035372.  This means that for every unit change in experience, there is a 3.53% change in wage.  This value is significant at the 5% significance level.  This is a large practical effect, yet it's only about half as big as the effect from education.
 
 Question 4.4
 ------------
@@ -764,7 +774,9 @@ Question 4.6
 ------------
 Part 1
 ------
-The assumptions needed are Cov(z1, education) != 0 and Cov(z1, u) = 0.
+The assumptions needed are as follows:\newline
+1. Cov(z1, education) != 0.  z1 needs to have some correlation with the variable, education, for which it is an instrument.\newline
+2. Cov(z1, u) = 0.  z1 cannot have any correlation with the error term.
 
 Part 2
 ------
@@ -775,8 +787,6 @@ Part 3
 Using the same specification as that in question 4.5, estimate the equation by 2SLS, using both z1 and z2 as instrument variables.\newline
 
 The coefficient estimate on education goes from 0.0681701 in the original model to 0.0950302, however, in the new model, the education estimate is not significant at the 5% level, so the increase in the coefficient can no longer be used in our interpretation.\newline
-
-However, if we remove mom_education and dad_education from both the TSLS and original models, the education coefficient becomes significant again at the 5% level.  The value of the education coefficient now goes from 0.0722416 in the original model to 0.1042749 in the TSLS model.  This means that using z1 and z2 as instrumental variables the effect of educaiton on logWage increases from about 7.2% to 10.4% (an increase of about 3 percentage points).  This is a 44% increase which is a large practical effect.
 
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
