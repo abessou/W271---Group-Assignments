@@ -872,4 +872,145 @@ However, in our case, this model does not work for several reasons.
 2. If we assume that we do have data across time, one could argue that the variable absolute wealth is close to being time-constant, and would therefore mostly cancel out, which would mean we would lose our main independent variable.
 3. Changes in absolute wealth and its affect on the change in votes does not help answer our original research question. A poorer candidate could have a larger change in wealth than a richer candidate, and we would lose this informaation by doing a difference model.
 
+Question6
+==========
+Part 1 - Reorganizing the data
+------------------------------
+With the data loaded, we can see that it includes product data for a period of four years of 2004, 2005, 2006 and 2007. The organization of the data suggests that a transformation to wide form would make the analysis easier.
+The first step of our analysis is to transform the data using the reshape function such that all
+product information for the four years of 2004-2007 is represented on a single row.
 
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+load("retailSales.Rdata")
+```
+
+Part 2 - Variable analysis and establishing a population model
+---------------------------------------------------------------
+The variables in the dataset provided to us are: Year, Product.line, Product.type, Product, Order.method-type, Retailer.country, Revenue, Planned.revenue, Product.cost, Quantity, Unit.cost, Unit.price, Gross.profit and Unit.sale.price.
+Without additional information about these variables, we want to know which ones would introduce multi-collinearity in our model, should we decide to include them jointly and which ones may require transformations.
+
+We want build a model to predict revenue from the variables available, using data from the first two years. We will build a model predicting revenues in 2005 from 2004 data and will validate that model using 2006 data to predict 2007 data.
+
+Part 2.1 Unit.price and Unit.sale.price
+----------------------------------------
+The correlation between these two variables is 0.999275 indicating that only one of these two variables should be part of our model. We choose to drop the Unit.sale.price variable from consideration in our model.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+cor(retailSales$Unit.price, retailSales$Unit.sale.price, use="pairwise.complete.obs")
+```
+
+Part 2.2 Unit.price and Unit.cost
+----------------------------------
+The correlation between these variables has a value of 0.988687. We conclude that adding the two variables to our model will bring little more information than adding a single one. We choose to drop the Unit.cost from consideration in our model.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+cor(retailSales$Unit.price, retailSales$Unit.cost, use="pairwise.complete.obs")
+```
+
+Part 2.3 Gross.profit and Unit.price * Quantity
+-----------------------------------------------
+The correlation value between these terms is 0.9765178. We similarly conclude that incorporating all three variables in out model will add little more information to our model than the two more relevant. Because conceptually Gross.profit is a function of Quantity and Unit.price, we choose to drop Gross.profit from consideration in our model.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+cor(retailSales$Gross.profit, retailSales$Unit.price*retailSales$Quantity, use="pairwise.complete.obs")
+```
+
+Part 2.4 Product, Product.line and Product.type
+-----------------------------------------------
+An analysis of the data confirms that no product belongs to more than one product line or product type as expected. Therefore, we choose to omit the Product.line and Product.type from our prediction model, since they bring no more information than the identification of a product.
+
+Part 2.5 Product.cost and Quantity * Unit.cost
+----------------------------------------------
+The correlation between these two terms is 0.9998837. Under that observation, we conclude that the Product.cost variable
+would bring little information in the model beyond that which we would obtain after adding variables Quantity and Product.cost (or Product.Unit.price as an alternative variable that's highly correlated to it) 
+Part 2.5 Population model
+-----------------------------------------------
+With the above analysis completed, the variables left for consideration when establishing a prediction model are:\newline
+Product\newline
+Order.method.type\newline
+Retailer.country\newline
+Unit.price\newline
+Quantity\newline
+
+
+Part 2.6 Revenue
+----------------
+Revenue is the dependent variable in the model. Before stating the population model with this variable, we take a look at a histogram and statistics about this variable.
+
+An analysis of the Revenue variable shows that 59929 out of 84672 values of that variable are NAs. These will be ommited from the model.
+
+A histogram of the Revenue variable indicates a large variance of the revenue numbers across products as is often the case for monetary figures. The result of the very large range is a very positively skewed distribution of revenues with 
+most of the values in the smaller numbers and a long tail of products with very large revenue numbers.
+In order to adjust the distribution of revenue, we choose to model the log of Revenue.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+#Remove entries with NA values from Revenue
+retailSales.complete <- retailSales[!is.na(retailSales$Revenue),]
+
+summary(retailSales.complete$Revenue)
+stat.desc(retailSales.complete$Revenue)
+print(quantile(retailSales.complete$Revenue, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+
+
+# Plot the histogram of Revenue
+revenue.hist <- ggplot(retailSales.complete, aes(Revenue)) + 
+    theme(legend.position = "none") + 
+    geom_histogram(fill = "Blue", colour = "Black") +
+    labs(title = "Distribution of Revenue", x = "Revenue ($)", y = "Frequency")
+
+plot(revenue.hist)
+
+retailSales.complete$logRevenue <- log(retailSales.complete$Revenue)
+
+# Plot the histogram of log(Revenue)
+log.revenue.hist <- ggplot(retailSales.complete, aes(logRevenue)) + 
+    theme(legend.position = "none") + 
+    geom_histogram(fill = "Blue", colour = "Black") + 
+                   labs(title = "Distribution of log(Revenue)", x = "log(Revenue) ($)", y = "Frequency")
+
+plot(log.revenue.hist)
+```
+
+Part 2.7 Population model
+-------------------------
+We fit our population model using those variables to predict the revenue of the year 2005 revenue based on the value of those variables in 2004.
+Therefore our population model becomes:
+$$logRevenue.2005 = \beta_{0} + \beta{1}*Product + \beta_{2}*Order.method.type + \beta{3}*Retailer.country + \beta_{4}*Revenue.2004 + \beta_{5}*Quantity + u$$
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+#Reshape the data, bringing all 4 years of observations for each product into a single record,
+#in wide format.
+wideRetailSales <- reshape(
+    retailSales.complete, timevar = "Year", 
+    idvar= c("Product", 
+             "Product.line", 
+             "Product.type", 
+             "Order.method.type",
+             "Retailer.country"), 
+    direction="wide")
+```
+
+Part 3: Estimating the population model
+---------------------------------------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+projected.revenue.model <- lm(Revenue.2005 ~ Product + Retailer.country + 
+    Order.method.type + Revenue.2004 + Quantity.2004, wideRetailSales)
+summary(projected.revenue.model)
+```
+
+Part 4: Is the change in the average renevue different from 95 cents when the planned revenue increases by 1
+------------------------------------------------------------------------------------------------------------
+Am I supposed to model average revenue vs planned revenue? Some other relationship?
+
+Part 5: Explain the interaction terms in your model.
+----------------------------------------------------
+I haven't defined any and wouldnt't know which to define.
+
+Part 6: Resons why the OLS coefficients may be biased and/or not consistent
+---------------------------------------------------------------------------
+The coefficients may be biased because of omitted variable bias. There are many variables that affect revenue that are in the error term since they don't appear in our model. All of those variables, if correlated any with the independent variables of our mode have the potential to create a bias of the coefficient of the OLS regression.
+
+
+Part 7: IV Plan to improve forecastign model
+--------------------------------------------
+I need to think of one. Not sure that I have the right variables in ths current model to begin with.
