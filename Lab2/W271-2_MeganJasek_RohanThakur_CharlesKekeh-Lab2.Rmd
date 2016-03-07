@@ -14,7 +14,13 @@ $$\mathbf {E(Y|X)=\frac{x}{2}}$$
 
 Part 2
 ------
-$$E(Y) = E(E(Y|X)) = E(\frac{x}{2}) = \int_{0}^{1}\frac{x}{2} \ dx = \frac {x^2}{4}| _{0}^{1} = \frac{1}{4} - 0$$
+$$E(Y) = E(E(Y|X)) = E(\frac{x}{2}) = \frac{1}{2}E(x)$$
+We know that,
+$$f_{X}(x) = 1$$
+Find E(X) as follows,
+$$E(X) = \int_{0}^{1}x*f_{X}(x) \ dx = \int_{0}^{1}x*1 \ dx = \frac{x^2}{2}|_{0}^{1} = \frac{1}{2} - 0 = \frac{1}{2}$$
+Substituting in for E(x) we get,
+$$E(Y) = \frac{1}{2} * \frac{1}{2} = \frac{1}{4}$$
 $$\mathbf {E(Y)=\frac{1}{4}}$$
 
 Part 3
@@ -40,10 +46,10 @@ $$\mathbf {f_{X|Y}(x|y) = \frac{1}{x\log(\frac{1}{y})}}$$
 
 Part 5
 ------
-$$E(X|Y=\frac{1}{2})= \int_{\frac{1}{2}}^{1} \frac{1}{x\log(2)} dx = \frac{1}{\log(2)}  \int_{\frac{1}{2}}^{1}\frac{1}{x} dx$$ 
-$$=\frac{1}{\log(2)} * (\log(x)|_\frac{1}{2}^{1}) = \frac{1}{\log(2)} * (\log(1)-\log(\frac{1}{2}))$$
-$$=\frac{1}{\log(2)} * (0+\log(2))=\frac{1}{\log(2)} * \log(2)$$
-$$\mathbf{E(X|Y=\frac{1}{2})=1}$$
+$$E(X|Y=\frac{1}{2})= \int_{\frac{1}{2}}^{1} x*\frac{1}{x\log(2)} dx = \frac{1}{\log(2)}  \int_{\frac{1}{2}}^{1} 1 \ dx$$ 
+$$=\frac{1}{\log(2)} * (x|_\frac{1}{2}^{1}) = \frac{1}{\log(2)} * (1 - \frac{1}{2})$$
+$$=\frac{1}{\log(2)} * \frac{1}{2}=\frac{1}{2\log(2)}$$
+$$\mathbf{E(X|Y=\frac{1}{2})=\frac{1}{2\log(2)}}$$
 
 Question 2
 ===========
