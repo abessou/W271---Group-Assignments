@@ -1027,4 +1027,30 @@ summary(projected.revenue.model)
 Part 3 Evaluating the model
 ---------------------------
 For all the reasons listed in part 2.7, we've rejected the proposed population model and therefore skip its analysis as we believe it violates all OLS assumptions.
- 
+
+
+Is the change in the average revenue different from 95 cents when the planned revenue increases by $1?
+------------------------------------------------------------------------------------------------------
+Proposed model:
+$$Revenue = \beta0 + \beta1 Planned.Revenue + \mu$$
+Null Hypothesis is H0: $\beta1 = 0.95$\newline
+Alternate Hypothesis is H1: $\beta1 != 0.95$\newline
+From the model output below we have t as:\newline
+t = (.9694 - .95) / (0.0003921 / sqrt(14085)) = 5871.963\newline
+This analysis yields a very low p-value, so we can reject the null hypothesis that $\beta1=0.95$
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+rs_train = subset(retailSales, retailSales$Year == 2004 | retailSales$Year == 2005)
+m1 = lm(Revenue~Planned.revenue, data=rs_train)
+summary(m1)
+(.9694 - .95) / (0.0003921 / sqrt(14085))
+```
+
+Propose (but do not actually implement) a plan for an IV approach to improve your forecasting model.
+----------------------------------------------------------------------------------------------------
+If we were using the simple model of:
+$$Revenue = \beta0 + \beta1 Planned.Revenue + \mu$$
+A potential IV variable for Planned.Revnue would be stock price (z1) for the company.  If this were the case, then we would need to make the following assumptions:\newline
+1. Cov(z1, Planned.Revenue) != 0. z1 needs to have some correlation with the variable, Planned.Revenue, for which it is an
+instrument.  This could be a reasonable assumption because stock price is a historical indicator of a company's finanical picture which could potentially be related to Planned.Revenue.\newline
+2. Cov(z1, $\mu$) = 0. z1 cannot have any correlation with the error term.\newline
