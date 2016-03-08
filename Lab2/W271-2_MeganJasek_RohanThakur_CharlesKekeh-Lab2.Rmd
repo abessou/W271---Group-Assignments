@@ -877,8 +877,6 @@ Question6
 Part 1 - Reorganizing the data
 ------------------------------
 With the data loaded, we can see that it includes product data for a period of four years of 2004, 2005, 2006 and 2007. The organization of the data suggests that a transformation to wide form would make the analysis easier.
-The first step of our analysis is to transform the data using the reshape function such that all
-product information for the four years of 2004-2007 is represented on a single row.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 load("retailSales.Rdata")
@@ -887,7 +885,7 @@ load("retailSales.Rdata")
 Part 2 - Variable analysis and establishing a population model
 ---------------------------------------------------------------
 The variables in the dataset provided to us are: Year, Product.line, Product.type, Product, Order.method-type, Retailer.country, Revenue, Planned.revenue, Product.cost, Quantity, Unit.cost, Unit.price, Gross.profit and Unit.sale.price.
-Without additional information about these variables, we want to know which ones would introduce multi-collinearity in our model, should we decide to include them jointly and which ones may require transformations.
+Without additional information about these variables, we want to know which ones would introduce multicollinearity in our model, should we decide to include them jointly and which ones may require transformations.
 
 We want build a model to predict revenue from the variables available, using data from the first two years. We will build a model predicting revenues in 2005 from 2004 data and will validate that model using 2006 data to predict 2007 data.
 
@@ -923,6 +921,7 @@ Part 2.5 Product.cost and Quantity * Unit.cost
 ----------------------------------------------
 The correlation between these two terms is 0.9998837. Under that observation, we conclude that the Product.cost variable
 would bring little information in the model beyond that which we would obtain after adding variables Quantity and Product.cost (or Product.Unit.price as an alternative variable that's highly correlated to it) 
+
 Part 2.5 Population model
 -----------------------------------------------
 With the above analysis completed, the variables left for consideration when establishing a prediction model are:\newline
@@ -931,7 +930,6 @@ Order.method.type\newline
 Retailer.country\newline
 Unit.price\newline
 Quantity\newline
-
 
 Part 2.6 Revenue
 ----------------
@@ -971,12 +969,24 @@ log.revenue.hist <- ggplot(retailSales.complete, aes(logRevenue)) +
 plot(log.revenue.hist)
 ```
 
-Part 2.7 Population model
--------------------------
-We fit our population model using those variables to predict the revenue of the year 2005 revenue based on the value of those variables in 2004.
-Therefore our population model becomes:
+Part 2.7 Coming up with a population model
+-------------------------------------
+The previous sections have demonstrated very highg multicolinearity in the data that for most of the variables in the data set consititue a violation of MLR3.
+It's worth considering MLR1 and MLR3 at this point.
+
+The data in the set does not seem to originate from what we would call a population that seems homogeneous. The variety of product lines and product types, indicates disparity. We have one data sample for each product, sometimes across geographic locations, for every 4 year of data in the set. One cannot look at the data and claim that it represents a representative sample of some homogenous population, violating MLR2.
+
+In addition, the remaining variables in the data set afer exclusion of the highly correlated ones, are: product, revenue, retailer country and order method type. There is no theoretical foundation that allows us to establish that any of these variables can be used to model a linear relation with revenue across various products, thus violating MLR1.
+
+For all these reasons, it seem reasonable not to attempt to model revenue from the data provided, since any model built from the data would violate all the assumptions of OLS.
+
+Part 2.8 Hypothetical Population model
+--------------------------------------
+If we were to establish our population model using the remaining variables to predict the revenue of the year 2005 revenue based on the value of those variables in 2004.
+Our population model could be:
 $$logRevenue.2005 = \beta_{0} + \beta{1}*Product + \beta_{2}*Order.method.type + \beta{3}*Retailer.country + \beta_{4}*Revenue.2004 + \beta_{5}*Quantity + u$$
 
+The first step of our analysis would to transform the data using the reshape function such that  product information for the four years of 2004-2007 is represented on a single row.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 #Reshape the data, bringing all 4 years of observations for each product into a single record,
 #in wide format.
@@ -988,29 +998,12 @@ wideRetailSales <- reshape(
              "Order.method.type",
              "Retailer.country"), 
     direction="wide")
-```
 
-Part 3: Estimating the population model
----------------------------------------
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 projected.revenue.model <- lm(Revenue.2005 ~ Product + Retailer.country + 
     Order.method.type + Revenue.2004 + Quantity.2004, wideRetailSales)
 summary(projected.revenue.model)
 ```
 
-Part 4: Is the change in the average renevue different from 95 cents when the planned revenue increases by 1
-------------------------------------------------------------------------------------------------------------
-Am I supposed to model average revenue vs planned revenue? Some other relationship?
-
-Part 5: Explain the interaction terms in your model.
-----------------------------------------------------
-I haven't defined any and wouldnt't know which to define.
-
-Part 6: Resons why the OLS coefficients may be biased and/or not consistent
----------------------------------------------------------------------------
-The coefficients may be biased because of omitted variable bias. There are many variables that affect revenue that are in the error term since they don't appear in our model. All of those variables, if correlated any with the independent variables of our mode have the potential to create a bias of the coefficient of the OLS regression.
-
-
-Part 7: IV Plan to improve forecastign model
---------------------------------------------
-I need to think of one. Not sure that I have the right variables in ths current model to begin with.
+Part 3 Evaluating the model
+---------------------------
+For all the reasons listed in part 2.7, we've rejected the proposed population model and therefore skip its analysis as we believe it violates all OLS assumptions.
