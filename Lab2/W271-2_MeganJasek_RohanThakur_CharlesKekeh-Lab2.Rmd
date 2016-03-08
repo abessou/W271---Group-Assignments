@@ -92,25 +92,25 @@ Part 2 - MLE
 ----------------------------
 Based on $L(\theta)$ The MLE of $\theta$ is a value of $\theta$ for which $\theta \geq y_{i} for i \in{1,\cdots,n}$ and which maximizes $1/\theta^{n}$.
 $MLE(\theta)$ is the smallest of such values of $\theta$ such that $\theta \geq y_{i}$ for $i \in {1,\cdots,n}$. Therefore:
-$$\mathbf{MLE(\theta) = \hat{\theta} = max(y_{1},\cdots,y_{n})}$$
+$$\mathbf{MLE(\theta) = \hat{\theta_{ml}} = max(y_{1},\cdots,y_{n})}$$
 
 Part 3 - Expectation n=1
 ------------------------
-Taking $\hat{\theta} = max(y_{1},\cdots,n)$ and n=1\newline
+Taking $\hat{\theta_{ml}} = max(y_{1},\cdots,n)$ and n=1\newline
 We have
-$$\hat{\theta} = y_{1}$$
+$$\hat{\theta_{ml}} = y_{1}$$
 And
-$$\mathbf{E[\hat{\theta}] =  E[y_{1}] = \frac{\theta}{2}}$$
+$$\mathbf{E[\hat{\theta_{ml}}] =  E[y_{1}] = \frac{\theta}{2}}$$
 Knowing that $y_{i}$ is from a random uniform distribution over $[0,\theta]$
 
 Part 4 - Bias
 -------------
-Yes, from the above, $\hat{\theta}$ is biased. For any ${y_{1},\cdots,y_{n}}$, we expect $max{y_{1},\cdots,n} < \theta$ with probability 1. Hence $\hat{\theta}$ underestimates $\theta$ and we have just proven that for n=1, $E(\hat{\theta}) \neq \theta$.
+Yes, from the above, $\hat{\theta_{ml}}$ is biased. For any ${y_{1},\cdots, y_{n}}$, we expect $max(y_{1},\cdots,y_{n}) < \theta$ with probability 1. Hence $\hat{\theta_{ml}}$ underestimates $\theta$ and we have just proven that for n=1, $E(\hat{\theta_{ml}}) \neq \theta$.
 
 Part 5 - Expectation general case
 ---------------------------------
-Taking $\hat{\theta}=max(y_{1},\cdots,y_{n})$ and assuming $n \geq 1$.
-$$E(\hat{\theta}) = E[max(y_{1},\cdots,y_{n})]$$
+Taking $\hat{\theta_{ml}}=max(y_{1},\cdots,y_{n})$ and assuming $n \geq 1$.
+$$E(\hat{\theta_{ml}}) = E[max(y_{1},\cdots,y_{n})]$$
 
 Let's define $x = max(y_{i}), i \in {1,\cdots,n}$.
 $$CDF(x) = P(max(y_{i},\cdots,y_{n}) < x), i \in {1,\cdots,n}$$
@@ -118,19 +118,19 @@ $$CDF(x) = P(y_{1} < x, y_{2} < x, \cdots, y_{n} < x)$$
 $$CDF(x) = \prod{P(y_{i}<x)}, i \in {1,\cdots,n}$$
 $$CDF(x) = (\frac{x}{\theta})^{n}$$
 
-From CDF(x), which is the cumulative distribution of x, we deterne the desnsity probability as
-$$PDF(x) = \frac{\delta}{\delta x} (\frac{\theta}{x})^{n}$$
+From CDF(x), which is the cumulative distribution of x, we determine the desnsity probability as
+$$PDF(x) = \frac{\delta}{\delta x} (\frac{x}{\theta})^{n}$$
 $$PDF(x) = \frac{n x^{n-1}}{\theta^n}$$
 From PDF(x), we can now compute E(x) as:
 $$E(x) = \int_{x=0}^{\theta} \frac{n (x^{n-1})}{\theta} xdx$$
 and
-$$\mathbf{E(x) = \hat{\theta} = \frac{n}{n+1}\theta}$$
+$$\mathbf{E(x) = E(\hat{\theta_{ml}}) = \frac{n}{n+1}\theta}$$
 
 Part 6 - Expectation general case
 ---------------------------------
 From the previous compututation of the general case of $n \geq 1$, we can state that
-$$\mathbf{\lim_{n \rightarrow \infty} \hat{\theta} = \theta}$$
-and $\hat{\theta}$ is a consistent estimator of $\theta$.
+$$\mathbf{\lim_{n \rightarrow \infty} \hat{\theta_{ml}} = \theta}$$
+and $\hat{\theta_{ml}}$ is a consistent estimator of $\theta$.
 
 Question 4
 ==========
@@ -881,14 +881,17 @@ Causality holds when we have (apart from MLR1-MLR4)
 Part 5
 ------
 $$Change\ in\ Voteshare = \beta_0 + \beta_1*(Change\ in\ log\ absolute\ wealth) + u$$
-This model would yield a causal result when the error terms that are endogenous, are also time constant, and would therefore cancel out.
+This model would yield a causal result when the following 2 assumptions are met:\newline
+__Assumption 1:__  Effects of any omitted variables are constant over time.  The error terms that are endogenous, are also time constant, and would therefore cancel out.\newline
+__Assumption 2:__ Exogeneity of the variables in the model as formulated as:\newline
+Cov((Change\ in\ log\ absolute\ wealth), u) = 0.
 
 However, in our case, this model does not work for several reasons.
 1. We do not have data across time periods.
 2. If we assume that we do have data across time, one could argue that the variable absolute wealth is close to being time-constant, and would therefore mostly cancel out, which would mean we would lose our main independent variable.
 3. Changes in absolute wealth and its affect on the change in votes does not help answer our original research question. A poorer candidate could have a larger change in wealth than a richer candidate, and we would lose this informaation by doing a difference model.
 
-Question6
+Question 6
 ==========
 Part 1 - Reorganizing the data
 ------------------------------
