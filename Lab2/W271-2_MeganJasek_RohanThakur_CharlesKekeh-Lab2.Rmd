@@ -987,12 +987,12 @@ plot(log.revenue.hist)
 
 Part 2.7 Coming up with a population model
 -------------------------------------
-The previous sections have demonstrated very highg multicolinearity in the data that for most of the variables in the data set consititue a violation of MLR3.
+The previous sections have demonstrated very high multicollinearity in the data that, for most of the variables in the data set, consititutes a violation of MLR3.
 It's worth considering MLR1 and MLR3 at this point.
 
 The data in the set does not seem to originate from what we would call a population that seems homogeneous. The variety of product lines and product types, indicates disparity. We have one data sample for each product, sometimes across geographic locations, for every 4 year of data in the set. One cannot look at the data and claim that it represents a representative sample of some homogenous population, violating MLR2.
 
-In addition, the remaining variables in the data set afer exclusion of the highly correlated ones, are: product, revenue, retailer country and order method type. There is no theoretical foundation that allows us to establish that any of these variables can be used to model a linear relation with revenue across various products, thus violating MLR1.
+In addition, the remaining variables in the data set after exclusion of the highly correlated ones, are: product, revenue, retailer country and order method type. There is no theoretical foundation that allows us to establish that any of these variables can be used to model a linear relation with revenue across various products, thus violating MLR1.
 
 For all these reasons, it seem reasonable not to attempt to model revenue from the data provided, since any model built from the data would violate all the assumptions of OLS.
 
