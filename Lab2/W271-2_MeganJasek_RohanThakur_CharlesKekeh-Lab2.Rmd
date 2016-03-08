@@ -786,12 +786,12 @@ Part 3
 ------
 Using the same specification as that in question 4.5, estimate the equation by 2SLS, using both z1 and z2 as instrument variables.\newline
 
-The coefficient estimate on education goes from 0.0681701 in the original model to 0.0950302, however, in the new model, the education estimate is not significant at the 5% level, so the increase in the coefficient can no longer be used in our interpretation.\newline
+The coefficient estimate on education goes from 0.0681701 in the original model to 0.075490, however, in the new model, the education estimate is not significant at the 5% level, so the increase in the coefficient can no longer be used in our interpretation.\newline
 
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 # Run the IV TSLS regression with z1 and z2
-TSLS.logWage.8var = ivreg(logWage ~ education + experience + experienceSquare + raceColor + dad_education + mom_education + rural + city | z1*z2 + experience + experienceSquare + raceColor + dad_education + mom_education + rural + city, data=data)
+TSLS.logWage.8var = ivreg(logWage ~ education + experience + experienceSquare + raceColor + dad_education + mom_education + rural + city | z1 + z2 + experience + experienceSquare + raceColor + dad_education + mom_education + rural + city, data=data)
 # Print the summary of TSLS the model
 summary(TSLS.logWage.8var)
 # Print the summary of the original model
