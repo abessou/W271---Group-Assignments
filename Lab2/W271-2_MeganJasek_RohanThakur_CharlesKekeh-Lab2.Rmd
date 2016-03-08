@@ -1000,9 +1000,10 @@ Part 2.8 Hypothetical Population model
 --------------------------------------
 If we were to establish our population model using the remaining variables to predict the revenue of the year 2005 revenue based on the value of those variables in 2004.
 Our population model could be:
-$$logRevenue.2005 = \beta_{0} + \beta{1}*Product + \beta_{2}*Order.method.type + \beta{3}*Retailer.country + \beta_{4}*Revenue.2004 + \beta_{5}*Quantity + u$$
-
+  $$logRevenue.2005 = \beta_{0} + \beta{1}*Product + \beta_{2}*Order.method.type + \beta{3}*Retailer.country + \beta_{4}*Revenue.2004 + \beta_{5}*Quantity + u$$
+  
 The first step of our analysis would to transform the data using the reshape function such that  product information for the four years of 2004-2007 is represented on a single row.
+ 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 #Reshape the data, bringing all 4 years of observations for each product into a single record,
 #in wide format.
@@ -1023,3 +1024,4 @@ summary(projected.revenue.model)
 Part 3 Evaluating the model
 ---------------------------
 For all the reasons listed in part 2.7, we've rejected the proposed population model and therefore skip its analysis as we believe it violates all OLS assumptions.
+ 
