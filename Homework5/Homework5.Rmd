@@ -66,7 +66,8 @@ Part 5
 ------
 **EQ5** -  Mean of the series stable around 0. Amplitude/Volatility of the series increases sharply around time unit 1000, and fluctuates.  Volatility is about twice as much in the 2nd half of the series as in the first.
 
-**flu** - Seems to be a downward trend from the 60's leading into the 70's. After this, the trend remains flat with a steady seasonal variation (during flu season, winter months) with some years worse than others.  The spikes of the seasonal variation seem to be trending downward.
+**flu** - Seems to be a downward trend from the 60's leading into the 70's. After this, the trend remains flat with a steady seasonal variation (during flu season, winter months) with some years worse than others.  The spikes of the seasonal variation seem to be trending downward. 
+We can speculate that the downward trend is due to improvements in health programs over the years.
 
 **gas** - The weekly gas price forms a downward trend from 200-2002, upward trend from 2002 - 2009, a sharp decrease in 2009, and a gradual increase from 2009 onwards.  Regular variation around the trend with variation spikes between 2005 and 2006 and a variation dip in 2007.
 
@@ -76,7 +77,8 @@ Question 2
 
 **Example 2**-> The daily stock price of TSLA in the past 3 months. The price followed a steady downward trend until the past few weeks when it has made an upward trend.
 
-**Example 3** -> Another example.
+**Example 3** -> One example of time series I have come across is that of hardware failures per
+day in a hosted cloud environment. The series were daily series of failure counts for a number of hardware components (cpu, disk, network), in a datacenter built with low cost utility hardware.
 
 
 Question 3
@@ -88,7 +90,7 @@ white.noise=rnorm(1000,0,1)
 #Plotting timeplot, histogram
 plot.ts(white.noise, main="Simulated White Noise", col="navy",
         ylab="Simulated values", xlab="Simulated Time Period")
-hist(white.noise,main="Simulated White Noise", col="blue",
+hist(white.noise, main="Simulated White Noise", col="blue",
      xlab="Simulated Values")
 ```
 
