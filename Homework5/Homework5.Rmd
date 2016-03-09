@@ -39,25 +39,25 @@ Part 4
 ------
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 #Plotting for EQ5
-plot(EQ5,type="o", main="Seismic Trace of Earthquake number 5 series",
+plot(EQ5, main="Seismic Trace of Earthquake number 5 series",
      ylab="Seismic trace of Earthquake",
      xlab="Time unit", col="blue")
 hist(EQ5,main="Seismic Trace of Earthquake number 5 series", col="blue",
      xlab="Seismic Trace of Earthquake number 5 series", ylab="Frequency")
 
 #Plotting for flu
-plot(flu,type="o", main="Monthly pneumonia and influenza deaths in the U.S., 1968 to 1978",
+plot(flu, main="Monthly pneumonia and influenza deaths in the U.S., 1968 to 1978",
      ylab="Pneumonia and influenza deaths",
      xlab="Year", col="blue")
 hist(flu,main="Monthly pneumonia and influenza deaths in the U.S., 1968 to 1978", col="blue",
      xlab="Pneumonia and influenza deaths", ylab="Frequency")
 
 #Plotting for gas
-plot(gas,type="o", main="Weekly Gas Prices",
-     ylab="Gas Prices",
+plot(gas, main="Weekly Gas Prices",
+     ylab="Gas Prices - cents per gallon",
      xlab="Year", col="blue")
 hist(gas,main="Weekly Gas Prices", col="blue",
-     xlab="Weekly Gas Price", ylab="Frequency")
+     xlab="Weekly Gas Price - cents per gallon", ylab="Frequency")
 ```
 
 
@@ -66,10 +66,11 @@ Part 5
 ------
 **EQ5** -  Mean of the series stable around 0. Amplitude/Volatility of the series increases sharply around time unit 1000, and fluctuates.  Volatility is about twice as much in the 2nd half of the series as in the first.
 
-**flu** - Seems to be a downward trend from the 60's leading into the 70's. After this, the trend remains flat with a steady seasonal variation (during flu season, winter months) with some years worse than others.  The spikes of the seasonal variation seem to be trending downward. 
-We can speculate that the downward trend is due to improvements in health programs over the years.
+**flu** - Seems to be a downward trend from the 60's leading into the 70's. After this, the  trend is less pronounced downwards and possibly flat with a steady seasonal variation (during flu season, winter months) with some years worse than others.  The spikes of the seasonal variation seem to be trending downward throughout the time series. 
+We can speculate that the downward trends are due to improvements in health programs over the years.
 
 **gas** - The weekly gas price forms a downward trend from 200-2002, upward trend from 2002 - 2009, a sharp decrease in 2009, and a gradual increase from 2009 onwards.  Regular variation around the trend with variation spikes between 2005 and 2006 and a variation dip in 2007.
+Given the product represented (gasoline), we speculate that the prices in the series followed the evolution of the global prices of oil with increases corresponding to supply/demand mechanisms and world events of importance. Thus the seemingly random nature of the fluctuation. Where the years 2000-2005 showed relatively little fluctuation, years 2005 to 2010 show much more ample fluctuations of the prices.
 
 Question 2
 ==========
@@ -97,11 +98,9 @@ hist(white.noise, main="Simulated White Noise", col="blue",
 
 Question 4
 ==========
-- The AR(1) model with 0.9 has values from -7.1 to 8.2 with a mean of -0.1.
-- The AR(1) model with 0.2 has values from -3.2 to 3.6 with a mean of -0.01.
+- The AR(1) model with 0.9 has a larger value range than the AR(1) model with 0.2. The parameters used to construct the series are an explanation for the difference in range.
 - The AR(1) model with 0.2 fluctuates more in a smaller time period, so its plot appears more dense and where as the AR(1) model with 0.9 appears more sparse.  When the AR(1) model with 0.2 goes up, it stays up for longer, when the AR(1) model with 0.9 goes down it stays down for longer.
 
-Unsure of comments.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 #Simulating First series
 white.noise.series.1 = rnorm(1000,0,1)
@@ -113,7 +112,10 @@ for (t in 2:length(white.noise.series.1)){
 white.noise.series.2 = rnorm(1000,0,1)
 series.2 <- white.noise.series.2
 for (t in 2:length(white.noise.series.2)){
-  series.2[t] <- 0.9*series.2[t-1] + white.noise.series.2[t]}
+  series.2[t] <- 0.2*series.2[t-1] + white.noise.series.2[t]}
+
+summary(series.1)
+summary(series.2)
 
 #Plotting Graphs
 par(mfrow=c(2,2))
@@ -131,10 +133,10 @@ hist(series.2,main="Simulated AR(ar=c(0.2)) Series", col="blue",
 Question 5
 ==========
 - __The deterministic series:__ This series has a mean of 260.25.  It is a straight line trending upwards with a slope of 0.5.  It has zero variation.
-- __Random walk without drift:__ This series has a mean of 7.42.  It trends flat from 0 to 800 and then has a slight upward trend.  There is some variation that is random.
-- __Random walk with 0.5 drift:__ This series has a mean of 257.67.  It trends upward with a slope about 0.5.  There is some variation that is random.
+- __Random walk without drift:__ This trends flat from 0 to 600 and then has a slight upward trend.  There is some variation that is random.
+- __Random walk with 0.5 drift:__ This series trends upward with a slope about 0.5.  There is some variation that is random.
 
-Unsure of comments
+
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 white.noise.series.new=rnorm(1000,0,1)
 r.walk=cumsum(white.noise.series.new) 
