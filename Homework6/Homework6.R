@@ -3,6 +3,26 @@ library(knitr)
 library(astsa)
 library(psych)
 
+set.seed(1)
+
+#Exercise 2
+white.noise <- rnorm(500)
+rw.wod=cumsum(white.noise)
+mean(rw.wod)
+sd(rw.wod)
+quantile(rw.wod)
+describe(rw.wod)
+
+#Exercise 3
+w1 = white.noise + 0.5
+rw.wid = cumsum(w1)
+mean(rw.wid)
+sd(rw.wid)
+quantile(rw.wid)
+describe(rw.wid)
+
+
+#Exercise 4
 data <- read.csv("INJCJC.csv")
 str(data)
 dim(data)
