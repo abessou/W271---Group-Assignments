@@ -29,17 +29,17 @@ This mean function is different from the mean function of observations of a sing
 For time series, the observation of $x_{t}$ is dependent on previous observations of $x_{t-1}, x_{t-2}, \dots$. That dependency is captured in the joint probability distribution which is unavailable to us, as the time series represents the single instance of the realization of the stochastic process that we are able to observe.
 
 
-__Variance Function__ For time series defined as described in the mean functionm discussion above, the variance function, a function of time t, is defined as:
+__Variance Function__ For time series defined as described in the mean function discussion above, the variance function, a function of time t, is defined as:
 $$\sigma_{x}(t) = E(x_{t}-\mu_{x}(t))^2 = \int_{-\infty}^{+\infty}(x_{t} - \mu_{x})^2 f_{t}(x_{t}) dx_{t}$$
 Where $f_{t}(x_{t})$ is the marginal probability distribution of $x_{t}$ in the stochastic process.\newline
 This variance function is also different from the variance of the observations of a single random variable studied with classical linear models, because of the dependency of $x_{t}$ over $x_{t-1}, x_{t-2}, \dots$ as expressed in the joint probability distribution.
 
 part b
 -------
-The assumption of strict stationarity is very strong strong assumption of stationarity.\newline
-For a given time series, we say that it is __strictly stationary__ is its distribution is unchanged for any time shift. i.e. given a joint distribution $F(x_{t1}, x_{t2}, \cdots, x_{tn})$ as introduced earlier, a time series x_{t} is strictly stationary if $F(x_{t1}, x_{t2}, \cdots, x_{tn}) = F(x_{t1+m}, x_{t2+m}, \cdots, x_{tn+m}), \forall t_{1}, \cdots, t_{n}$ and m
+The assumption of strict stationarity is very strong assumption of stationarity.\newline
+For a given time series, we say that it is __strictly stationary__ if its distribution is unchanged for any time shift. i.e. given a joint distribution $F(x_{t1}, x_{t2}, \cdots, x_{tn})$ as introduced earlier, a time series $x_{t}$ is strictly stationary if $F(x_{t1}, x_{t2}, \cdots, x_{tn}) = F(x_{t1+m}, x_{t2+m}, \cdots, x_{tn+m}), \forall t_{1}, \cdots, t_{n}$ and m
 
-The assumption of __weak stationarity__ (or second order stationarity) is a weaker assumption of stationarity. A time series $x_{t}$ is weak stationary if its mean and variance stationary and is auto-covariance  $Cov(x_{t}, x_{t+k})$ depends only on the lag k, and is not a function of time t.\newline
+The assumption of __weak stationarity__ (or second order stationarity) is a weaker assumption of stationarity. A time series $x_{t}$ is weak stationary if it is mean and variance stationary and is auto-covariance  $Cov(x_{t}, x_{t+k})$ depends only on the lag k, and is not a function of time t.\newline
 The auto-covariance of a time series that is only dependent of lag k is defined as: $$\gamma_{k} = E[(x_{t}-\mu)(x_{t+k}-\mu)]$$
 where $\mu$ is the stationary mean of the time series.
 
@@ -127,8 +127,6 @@ Part e
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 pacf(ts(rw.wid), main="Randon Walk With Drift Time Series")
 ```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
 
 Exercise 4
 ==========
