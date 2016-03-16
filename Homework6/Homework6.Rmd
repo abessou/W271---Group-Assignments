@@ -37,9 +37,9 @@ This variance function is also different from the variance of the observations o
 part b
 -------
 The assumption of strict stationarity is very strong strong assumption of stationarity.\newline
-For a given time series, we say that it is __strictly stationary__ is its distribution is unchanged for any time shift. i.e. given a joint distribution $F(x_{t1}, x_{t2}, \cdots, x_{tn})$ as introduced earlier, a time series x_{t} is strictly stationary if $F(x_{t1}, x_{t2}, \cdots, x_{tn}) = F(x_{t1+m}, x_{t2+m}, \cdots, x_{tn+m}), \forall t_{1}, \cdots, t_{n}$ and m
+For a given time series, we say that it is __strictly stationary__ is its distribution is unchanged for any time shift. i.e. given a joint distribution $F(x_{t1}, x_{t2}, \cdots, x_{tn})$ as introduced earlier, a time series $x_{t}$ is strictly stationary if $F(x_{t1}, x_{t2}, \cdots, x_{tn}) = F(x_{t1+m}, x_{t2+m}, \cdots, x_{tn+m}), \forall t_{1}, \cdots, t_{n}$ and m
 
-The assumption of __weak stationarity__ (or second order stationarity) is a weaker assumption of stationarity. A time series $x_{t}$ is weak stationary if its mean and variance stationary and is auto-covariance  $Cov(x_{t}, x_{t+k})$ depends only on the lag k, and is not a function of time t.\newline
+The assumption of __weak stationarity__ (or second order stationarity) is a weaker assumption of stationarity. A time series $x_{t}$ is weak stationary if its mean and variance are stationary and its auto-covariance  $Cov(x_{t}, x_{t+k})$ depends only on the lag k, and is not a function of time t.\newline
 The auto-covariance of a time series that is only dependent of lag k is defined as: $$\gamma_{k} = E[(x_{t}-\mu)(x_{t+k}-\mu)]$$
 where $\mu$ is the stationary mean of the time series.
 
@@ -52,15 +52,28 @@ Part a
 rw.wod <- white.noise <- rnorm(500)
 for (t in 2:length(rw.wod)){
     rw.wod[t] <- rw.wod[t-1] + white.noise[t]
+    
+
+#From Megan:  Random walk uses cumsum.  Above is an AR(1) model
+white.noise <- rnorm(500)
+rw.wod=cumsum(white.noise)
+
 }
 ```
 
 Part b
 -------
 __Mean of time series__
-The mean of the time series is: 9.838132
-The standard deviation of the time series is: 4.723985
-The 25th, 50th and 75th quantiles of the time series are: 6.187022 9.525720 13.694139
+- The mean of the time series is: 9.838132\newline
+- The standard deviation of the time series is: 4.723985\newline
+- The 25th, 50th and 75th quantiles of the time series are: 6.187022 9.525720 13.694139\newline
+
+- The mean of the time series is: 3.750754
+- The standard deviation of the time series is: 4.907826
+- The 25th, 50th and 75th quantiles of the time series are: -0.1391342 3.8627068 8.1896239
+- The minimum of the time series is: -8.7110
+- The maximum of the time series is: 13.7200
+
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 mean(rw.wod)
@@ -96,12 +109,22 @@ rw.wid <- white.noise
 for (t in 2:length(rw.wid)){
     rw.wid[t] <- rw.wid[t-1] + .5 + white.noise[t]
 }
+
+# Megan's random walk with drift
+w1 = white.noise + 0.5
+rw.wid = cumsum(w1)
 ```
 
 __Mean of time series__
-The mean of the time series is: 134.5881
-The standard deviation of the time series is: 74.88504
-The 25th, 50th and 75th quantiles of the time series are: 76.3171217 130.3604551 199.4784637
+- The mean of the time series is: 134.5881\newline
+- The standard deviation of the time series is: 74.88504\newline
+- The 25th, 50th and 75th quantiles of the time series are: 76.3171217 130.3604551 199.4784637\newline
+
+- The mean of the time series is: 132.693
+- The standard deviation of the time series is: 75.42878
+- The 25th, 50th and 75th quantiles of the time series are: 68.187578 125.052338 204.076424
+- The minimum of the time series is: -1.102
+- The maximum of the time series is: 259.700
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 mean(rw.wid)
@@ -160,20 +183,21 @@ INJCJC.time <- time(data.ts)
 Part d
 -------
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+head(cbind(INJCJC.time, data.ts), 5)
 head(cbind(INJCJC.time, data.ts), 10)
+head(cbind(INJCJC.time, data.ts), 12)
 ```
 
 Part e1
 --------
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 plot.ts(data.ts, xlab="Years", ylab="Number of Claims", main="Initial Jobless Claims")
 ```
 
 Part e2
 ---------
-What the histogram doesn't show is how the values in the distribution occur over time.
-It does show the distribution of the values over time.
-The number of bins is selected based on the representation that provides a more visually complete rendering of the distribution of the values of the time series.
+What the histogram doesn't show is how the values in the distribution occur over time and the dependencies between the values.  It does show the distribution of the values.
+The number of bins is selected based on the representation that provides a more visually complete rendering of the distribution of the values of the time series.  The range the values is considered and then an appropriate granularity is chosen based on how many different values occur within the range.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 hist(data.ts, xlab="Number of  Claims", main="Initial Jobless Claims", breaks=30)
 ```
@@ -192,14 +216,14 @@ pacf(data.ts)
 
 Part e5
 -------
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 lag.plot(data.ts, lags=9, layout=c(3,3), 
-         diag=TRUE, disg.col="red",main="Autocorrelation between Initial Jobless Claims and  its own lags")
+         diag=TRUE, disg.col="red",main="Autocorrelation between Initial Jobless Claims and its own lags")
 ```
 
 Part f1
 --------
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Create a 52 weeks and a 5 weeks moving average smoother
 mo52 = filter(data.ts, sides = 2, rep(1,52)/52)
 mo5=filter(data.ts, sides = 2, rep(1, 5)/5)
@@ -216,7 +240,7 @@ legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
 
 Part f2
 -------
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 wk = time(data.ts) - mean(time(data.ts))  
 wk2 = wk^2 
 wk3 = wk^3
@@ -237,7 +261,7 @@ legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
 
 Part f3
 -------
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 plot(data.ts, main="Initial Jobless Claims (Weekly Series) and Kernel Smoothing", 
      pch=4, lty=5, lwd=1, xlab="Year", 
      ylab="Number of claims per week")
@@ -251,8 +275,8 @@ legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
 
 Part f4
 -------
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
-plot(data.ts, main="Initial Jobless Claims (Weekly Series) and Nearest Neighborhood Smoothing", 
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+plot(data.ts, main="Initial Jobless Claims Wkly Series, Nearest Neighborhood Smoothing", 
      pch=4, lty=5, lwd=1, xlab="Year", 
      ylab="Number of claims per week")
 lines(supsmu(time(data.ts), data.ts, span=.01),lty=1, lwd=1.5, col="green")
@@ -265,7 +289,7 @@ legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
 
 Part f5
 --------
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 plot(data.ts, main="Initial Jobless Claims (Weekly Series) and LOWESS Smoothing", 
      pch=4, lty=5, lwd=1, xlab="Year", 
      ylab="Number of deaths per week")
@@ -279,14 +303,14 @@ legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
 
 Part f6
 --------
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 plot(data.ts, main="Initial Jobless Claims (Weekly Series) and Smoothing Splines", 
      pch=4, lty=5, lwd=1, xlab="Year", 
      ylab="Number of claims per week")
 lines(smooth.spline(time(data.ts), data.ts, spar=0.05),lty=1, lwd=1.5, col="green")          
 lines(smooth.spline(time(data.ts), data.ts, spar=0.9),lty=1, lwd=1.5, col="blue")  
 # Add Legend
-leg.txt <- c("Original Series", "Spline: Smoothing Parameter=.05", "Spline: Smoothing Parameter=0.8")
+leg.txt <- c("Original Series", "Spline: Smoothing Parameter=.05", "Spline: Smoothing Parameter=0.9")
 legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
        bty='n', cex=1, merge = TRUE, bg=336)
 ```
