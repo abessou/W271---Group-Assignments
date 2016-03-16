@@ -1,0 +1,292 @@
+---
+title: "Homework6"
+author: "Megan Jasek, Rohan Thakur, Charles Kekeh"
+date: "Tuesday, March 15, 2016"
+output: pdf_document
+---
+
+```{r,include=FALSE}
+library(pastecs)
+library(knitr)
+library(astsa)
+library(psych)
+opts_chunk$set(tidy.opts=list(width.cutoff=70))
+
+# Set the seed so that reported numbers remain stable
+set.seed(1)
+```
+
+Exercise 1
+==========
+part a
+------
+__Mean Function__ A time series defined as an observation of a stochastic process resulting in a set of variables $x_{1}, x_{2}, \cdots, x_{n}$ is defined by a joint distribution function $F(c_{1}, c_{2}, \cdots, c_{n}) = P(x_{i1} \leq c_{1}, x_{i2} \leq c_{2}, \cdots, x_{in} \leq c_{n})$\newline
+Assuming knowledge of such a joint probability distribution, we would derive the marginal probability distributions $f_{t}(x_{t})$\newline
+And from such marginal probability distributions, we define the mean function:
+$$\mu_{x}(t) = E(x_{t}) = \int_{-\infty}^{+\infty}f_{t}(x_{t})dx_{t}$$
+
+This mean function is different from the mean function of observations of a single random variable, as seen with with the classical linear model.\newline
+For time series, the observation of $x_{t}$ is dependent on previous observations of $x_{t-1}, x_{t-2}, \dots$. That dependency is captured in the joint probability distribution which is unavailable to us, as the time series represents the single instance of the realization of the stochastic process that we are able to observe.
+
+
+__Variance Function__ For time series defined as described in the mean functionm discussion above, the variance function, a function of time t, is defined as:
+$$\sigma_{x}(t) = E(x_{t}-\mu_{x}(t))^2 = \int_{-\infty}^{+\infty}(x_{t} - \mu_{x})^2 f_{t}(x_{t}) dx_{t}$$
+Where $f_{t}(x_{t})$ is the marginal probability distribution of $x_{t}$ in the stochastic process.\newline
+This variance function is also different from the variance of the observations of a single random variable studied with classical linear models, because of the dependency of $x_{t}$ over $x_{t-1}, x_{t-2}, \dots$ as expressed in the joint probability distribution.
+
+part b
+-------
+The assumption of strict stationarity is very strong strong assumption of stationarity.\newline
+For a given time series, we say that it is __strictly stationary__ is its distribution is unchanged for any time shift. i.e. given a joint distribution $F(x_{t1}, x_{t2}, \cdots, x_{tn})$ as introduced earlier, a time series x_{t} is strictly stationary if $F(x_{t1}, x_{t2}, \cdots, x_{tn}) = F(x_{t1+m}, x_{t2+m}, \cdots, x_{tn+m}), \forall t_{1}, \cdots, t_{n}$ and m
+
+The assumption of __weak stationarity__ (or second order stationarity) is a weaker assumption of stationarity. A time series $x_{t}$ is weak stationary if its mean and variance stationary and is auto-covariance  $Cov(x_{t}, x_{t+k})$ depends only on the lag k, and is not a function of time t.\newline
+The auto-covariance of a time series that is only dependent of lag k is defined as: $$\gamma_{k} = E[(x_{t}-\mu)(x_{t+k}-\mu)]$$
+where $\mu$ is the stationary mean of the time series.
+
+
+Exercise 2
+==========
+Part a
+-------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+rw.wod <- white.noise <- rnorm(500)
+for (t in 2:length(rw.wod)){
+    rw.wod[t] <- rw.wod[t-1] + white.noise[t]
+}
+```
+
+Part b
+-------
+__Mean of time series__
+The mean of the time series is: 9.838132
+The standard deviation of the time series is: 4.723985
+The 25th, 50th and 75th quantiles of the time series are: 6.187022 9.525720 13.694139
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+mean(rw.wod)
+sd(rw.wod)
+quantile(rw.wod)
+describe(rw.wod)
+```
+
+Part c
+------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+plot.ts(rw.wod, xlab="Simulation time unit", ylab="Generated values", main="Random Walk Without Drift Time Series ")
+```
+
+Part d
+------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+acf(ts(rw.wod), main="Randon Walk Without Drift Time Series")
+```
+
+Part e
+------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+pacf(ts(rw.wod), main="Randon Walk Without Drift Time Series")
+```
+
+Exercise 3
+==========
+Part a
+-------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+rw.wid <- white.noise
+for (t in 2:length(rw.wid)){
+    rw.wid[t] <- rw.wid[t-1] + .5 + white.noise[t]
+}
+```
+
+__Mean of time series__
+The mean of the time series is: 134.5881
+The standard deviation of the time series is: 74.88504
+The 25th, 50th and 75th quantiles of the time series are: 76.3171217 130.3604551 199.4784637
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+mean(rw.wid)
+sd(rw.wid)
+quantile(rw.wid)
+describe(rw.wid)
+```
+
+Part c
+------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+plot.ts(rw.wid, xlab="Simulation time unit", ylab="Generated values", main="Random Walk With Drift Time Series ")
+```
+
+Part d
+------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+acf(ts(rw.wid), main="Randon Walk With Drift Time Series")
+```
+
+Part e
+------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+pacf(ts(rw.wid), main="Randon Walk With Drift Time Series")
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+Exercise 4
+==========
+Part a
+------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+data <- read.csv("INJCJC.csv")
+
+str(data)
+dim(data)
+head(data)
+tail(data)
+```
+
+Part b
+------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+data.ts <- ts(data$INJCJC, frequency = 52, start = c(1990,1), end = c(2014,52))
+summary(data.ts)
+quantile(data.ts)
+```
+
+Part c
+------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+INJCJC.time <- time(data.ts)
+```
+
+Part d
+-------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+head(cbind(INJCJC.time, data.ts), 10)
+```
+
+Part e1
+--------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+plot.ts(data.ts, xlab="Years", ylab="Number of Claims", main="Initial Jobless Claims")
+```
+
+Part e2
+---------
+What the histogram doesn't show is how the values in the distribution occur over time.
+It does show the distribution of the values over time.
+The number of bins is selected based on the representation that provides a more visually complete rendering of the distribution of the values of the time series.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+hist(data.ts, xlab="Number of  Claims", main="Initial Jobless Claims", breaks=30)
+```
+
+Part e3
+--------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+acf(data.ts)
+```
+
+Part e4
+--------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+pacf(data.ts)
+```
+
+Part e5
+-------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+lag.plot(data.ts, lags=9, layout=c(3,3), 
+         diag=TRUE, disg.col="red",main="Autocorrelation between Initial Jobless Claims and  its own lags")
+```
+
+Part f1
+--------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+# Create a 52 weeks and a 5 weeks moving average smoother
+mo52 = filter(data.ts, sides = 2, rep(1,52)/52)
+mo5=filter(data.ts, sides = 2, rep(1, 5)/5)
+
+plot(data.ts, main="INJCJC", pch=4, lty=5, lwd=1, xlab="Year", ylab="Number of Claims")
+lines(mo52, lty=1, lwd=1.5, col="green")
+lines(mo5, lty=1, lwd=1.5, col="blue")
+# Add Legend
+leg.txt <- c("Original Series", "5-Point Symmetric Moving Average", "52-Point Symmetric Moving Average")
+legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
+       bty='n', cex=1, merge = TRUE, bg=336)
+
+```
+
+Part f2
+-------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+wk = time(data.ts) - mean(time(data.ts))  
+wk2 = wk^2 
+wk3 = wk^3
+cs = cos(2*pi*wk)  
+sn = sin(2*pi*wk)
+reg1 = lm(data.ts~wk + wk2 + wk3, na.action=NULL)
+reg2 = lm(data.ts~wk + wk2 + cs + sn, na.action=NULL)
+plot(data.ts, main="Initial Jobless Claims (Weekly Series) and Regression Smoothing", 
+     pch=4, lty=5, lwd=1, xlab="Year", 
+     ylab="Number of claims")
+lines(fitted(reg1), lty=1, lwd=1.5, col="green")
+lines(fitted(reg2), lty=1, lwd=1.5, col="blue")
+# Add Legend
+leg.txt <- c("Original Series", "Cubic Trend Regression Smoothing", "Periodic Regression Smoothing")
+legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
+       bty='n', cex=1, merge = TRUE, bg=336)
+```
+
+Part f3
+-------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+plot(data.ts, main="Initial Jobless Claims (Weekly Series) and Kernel Smoothing", 
+     pch=4, lty=5, lwd=1, xlab="Year", 
+     ylab="Number of claims per week")
+lines(ksmooth(time(data.ts), data.ts, "normal", bandwidth=5/52),lty=1, lwd=1.5, col="green")
+lines(ksmooth(time(data.ts), data.ts, "normal", bandwidth=2),lty=1, lwd=1.5, col="blue")
+# Add Legend
+leg.txt <- c("Original Series", "Kernel Smoothing: bandwidth=5/52", "Kernel Smoothing: bandwidth=2")
+legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
+       bty='n', cex=1, merge = TRUE, bg=336)
+```
+
+Part f4
+-------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+plot(data.ts, main="Initial Jobless Claims (Weekly Series) and Nearest Neighborhood Smoothing", 
+     pch=4, lty=5, lwd=1, xlab="Year", 
+     ylab="Number of claims per week")
+lines(supsmu(time(data.ts), data.ts, span=.01),lty=1, lwd=1.5, col="green")
+lines(supsmu(time(data.ts), data.ts, span=.5),lty=1, lwd=1.5, col="blue")
+# Add Legend
+leg.txt <- c("Original Series", "NN Smoothing: bandwidth=.01", "NN Smoothing: bandwidth=.5")
+legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
+       bty='n', cex=1, merge = TRUE, bg=336)
+```
+
+Part f5
+--------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+plot(data.ts, main="Initial Jobless Claims (Weekly Series) and LOWESS Smoothing", 
+     pch=4, lty=5, lwd=1, xlab="Year", 
+     ylab="Number of deaths per week")
+lines(lowess(data.ts, f=.02),lty=1, lwd=1.5, col="green")
+lines(lowess(data.ts, f=2/3),lty=1, lwd=1.5, col="blue")
+# Add Legend
+leg.txt <- c("Original Series", "LOWESS Smoothing: bandwidth=.02", "LOWESS Smoothing: bandwidth=2/3")
+legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
+       bty='n', cex=1, merge = TRUE, bg=336)
+```
+
+Part f6
+--------
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+plot(data.ts, main="Initial Jobless Claims (Weekly Series) and Smoothing Splines", 
+     pch=4, lty=5, lwd=1, xlab="Year", 
+     ylab="Number of claims per week")
+lines(smooth.spline(time(data.ts), data.ts, spar=0.05),lty=1, lwd=1.5, col="green")          
+lines(smooth.spline(time(data.ts), data.ts, spar=0.9),lty=1, lwd=1.5, col="blue")  
+# Add Legend
+leg.txt <- c("Original Series", "Spline: Smoothing Parameter=.05", "Spline: Smoothing Parameter=0.8")
+legend("topright", legend=leg.txt, lty=c(1,1,1), col=c("black","green","blue"),
+       bty='n', cex=1, merge = TRUE, bg=336)
+```
