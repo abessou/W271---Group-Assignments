@@ -1,0 +1,176 @@
+---
+title: "Homework6"
+author: "Megan Jasek, Rohan Thakur, Charles Kekeh"
+date: "Sunday, March 27, 2016"
+output: pdf_document
+---
+
+```{r,include=FALSE}
+library(pastecs)
+library(knitr)
+library(astsa)
+library(psych)
+opts_chunk$set(tidy.opts=list(width.cutoff=60))
+
+# Set the seed so that reported numbers remain stable
+set.seed(1)
+```
+
+Exercise 1
+==========
+1.1 Load hw07_series1.csv
+-------------------------
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+hw07.series1 = ts(read.csv("hw07_series1.csv", header=TRUE))
+```
+
+1.2 Describe the basic structure of the data and provide summary statistics of the series
+-----------------------------------------------------------------------------------------
+The data are a time series of 74 values.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+str(hw07.series1)
+describe(hw07.series1)
+summary(hw07.series1)
+quantile(hw07.series1, probs=c(.25, .50, .75))
+```
+
+1.3 Plot histogram and time-series plot of the series. Describe the patterns exhibited in histograrm and time-series plot.
+--------------------------------------------------------------------------------------------------------------------------
+The histogram has values from 9.75 to 11.94 with a mean of 10.82. It has multiple modes.  There are spikes around 10.3 and 11.  The histogram generally rises on the left-hand side of the graph and falls on the right-hand side of the graph.
+
+The plot generally trends up from time=0 to about time=22.  From time=22 to about time=72, the plot trends down except for a spike at about time=42.  At aboue time=72, it appears that the data is starting to trend up again.  The data has some persistence in that when it goes up it tends to stay up and when it goes down it tends to stay down.  There doesn't appear to be consistent seasonality.
+
+For time series analysis, is it sufficient to use only histogram to describe a series?
+--------------------------------------------------------------------------------------
+It is not sufficient to use only histogram for a time series because the histogram does not show the dependencies among the data.  It does not show the time component.  It only shows the values of the series and not how they relate to each other.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+hist(hw07.series1, 100)
+plot(hw07.series1)
+```
+
+1.4 Plot the ACF and PACF of the series. Describe the patterns exhibited in the ACF and PACF.
+-----------------------------------------------------------------------------------------------
+The ACF is positive from lag=0 to lag=13.  At lag=14, the acf is negative.  It has steadily decreasing amplitude.  At lag=14, the amplitude of the lag is about -0.5 and then continues to decrease with negative amplitude.
+??Is it supposed to degrade to 0? this one goes past 0, what does that mean?
+
+The PACF drops off after lag 2 indicating that it is an autoregressive model with order 2.
+??AR1 models drop off sharply after the first lag.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+par(mfrow=c(1,1))
+acf(hw07.series1)
+pacf(hw07.series1)
+```
+
+1.5 Estimate the series using the ar() function.
+------------------------------------------------
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+hw07.series1.ar = ar(hw07.series1)
+```
+
+1.6 Report the estimated AR parameters, the order of the model, and standard errors.
+------------------------------------------------------------------------------------
+- Estimated AR parameters - 0.4803726 and 0.2854828
+- Order of the model - 2
+- Standard error for 0.4803726 - 0.1137392
+- Standard error for 0.2854828 - 0.1137392
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# parameter estimates
+hw07.series1.ar$ar
+# order of the model with lowest AIC
+hw07.series1.ar$order
+# standard deviation
+sqrt(hw07.series1.ar$asy.var)
+```
+
+Exercise 2
+==========
+2.1 Simulate a time series of length 100 for the following model. Name the series x.
+------------------------------------------------------------------------------------
+$$x_{t} = \frac{5}{6}x_{t-1} - \frac{1}{6}x_{t-2} + \omega_{t}$$
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+white.noise = rnorm(100, 0, 1)
+x = white.noise
+for (t in 3:length(white.noise)){
+     x[t] = 5/6*x[t-1] - 1/6*x[t-2] + white.noise[t]
+}
+```
+
+2.2 Plot the correlogram and partial correlogram for the simulated series. Comment on the plots.
+------------------------------------------------------------------------------------------------
+The ACF is slowly decaying toward zero.  It oscillates from positive numbers to negative numbers.
+
+The PACF drops off sharply after lag 2 which indicates that it could be an autoregressive series of order 2.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+par(mfrow=c(1,1))
+acf(x)
+pacf(x)
+```
+
+2.3 Estimate an AR model for this simulated series. Report the estimated AR parameters, standard erros, and the order of the AR model.
+----------------------------------------------------------------------------------------------------------------------------------------
+- Estimated AR parameters - 0.7789692 and -0.1630600 and -0.1502864
+- Standard error for 0.7789692 - 0.09729566
+- Standard error for -0.1630600 - 0.1215105
+- Standard error for -0.1502864 - 0.09729566
+- Order of the model - 3
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# Estimate the model
+x.ar = ar(x, method="mle")
+# Parameter estimates
+x.ar$ar
+# Standard deviation
+sqrt(x.ar$asy.var)
+# Order
+x.ar$order
+# This is the difference of each AIc with the lowest AIC
+x.ar$aic
+```
+
+2.4 Construct a 95% confidence interval for the parameter estimates of the estimated model. Do the "true" model parameters fall within the confidence intervals? Explain the 95% confidence intervals in this context.
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+x.ar$ar + c(-2,2)*sqrt(x.ar$asy.var)
+```
+
+2.5 Is the estimated model stationary or non-stationary?
+--------------------------------------------------------
+A model is stationary if the absolute value of all of the roots of its characteristic equation are greater than 1.
+$$Characteristic \ Equation = \theta_p(B) = (1 - 0.7789692B + 0.1630600B^2 + 0.1502864B^3)$$
+$$roots:  1.098508+0.905915i, 1.098508-0.905915i, -3.282012+0.000000i$$
+The absolute value of a complex number is:
+$$|a + bi| = \sqrt{a^2 + b^2}$$
+The absolute value of the roots are:
+$$\sqrt{1.098508^2+0.905915^2}, \sqrt{1.098508^2+(-0.905915)^2}, |-3.282012|$$
+$$1.423869, 1.423869, 3.282012$$
+
+The estimated model is stationary since the absolute value of all of the roots of its characteristic equation are greater than 1.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# Calculate the roots of the characteristic equation
+polyroot(c(1, -0.7789692, 0.1630600, 0.1502864))
+# Calculate the absolute values of the roots which are complex numbers
+sqrt(1.098508^2+0.905915^2)
+sqrt(1.098508^2+(-0.905915)^2)
+```
+
+2.6 Plot the correlogram of the residuals of the estimated model. Comment on the plot.
+--------------------------------------------------------------------------------------
+<need comments>
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+par(mfrow=c(1,1))
+acf(x.ar$resid[-c(1:4)], main="ACF of the Residuals")
+pacf(x.ar$resid[-c(1:4)], main="PACF of the Residuals")
+```
+
