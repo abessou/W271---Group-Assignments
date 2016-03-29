@@ -1,5 +1,5 @@
 ---
-title: "Homework6"
+title: "Homework7"
 author: "Megan Jasek, Rohan Thakur, Charles Kekeh"
 date: "Sunday, March 27, 2016"
 output: pdf_document
@@ -44,25 +44,24 @@ The plot generally trends up from time=0 to about time=22.  From time=22 to abou
 
 For time series analysis, is it sufficient to use only histogram to describe a series?
 --------------------------------------------------------------------------------------
-It is not sufficient to use only histogram for a time series because the histogram does not show the dependencies among the data.  It does not show the time component.  It only shows the values of the series and not how they relate to each other.
+It is not sufficient to use only histogram for a time series because the histogram does not show the dependencies among the data over time.  It does not show the time component.  It only shows the values of the series and not how they relate to each other.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-hist(hw07.series1, 100)
-plot(hw07.series1)
+hist(hw07.series1, 100, , xlab='Time unit', ylab='Time series values', main='Histogram of time series data')
+plot(hw07.series1, type='l', main='Time series data', ylab='Time series values', xlab='Time unit')
 ```
 
 1.4 Plot the ACF and PACF of the series. Describe the patterns exhibited in the ACF and PACF.
 -----------------------------------------------------------------------------------------------
 The ACF is positive from lag=0 to lag=13.  At lag=14, the acf is negative.  It has steadily decreasing amplitude.  At lag=14, the amplitude of the lag is about -0.5 and then continues to decrease with negative amplitude.
-??Is it supposed to degrade to 0? this one goes past 0, what does that mean?
+The ACF displays damped oscillations, indicating a time series of order greater than one with negative coefficients.
 
-The PACF drops off after lag 2 indicating that it is an autoregressive model with order 2.
-??AR1 models drop off sharply after the first lag.
+The PACF drops off to non-significant values after lag 2 indicating that it is an autoregressive model with order 2.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 par(mfrow=c(1,1))
-acf(hw07.series1)
-pacf(hw07.series1)
+acf(hw07.series1, main='Time series auto-correlation')
+pacf(hw07.series1, main='Time series partial auto-correlation')
 ```
 
 1.5 Estimate the series using the ar() function.
@@ -104,14 +103,14 @@ for (t in 3:length(white.noise)){
 
 2.2 Plot the correlogram and partial correlogram for the simulated series. Comment on the plots.
 ------------------------------------------------------------------------------------------------
-The ACF is slowly decaying toward zero.  It oscillates from positive numbers to negative numbers.
+The ACF is slowly decaying toward zero.  It oscillates from positive numbers to negative numbers. It has a damped oscillation that we would expect with an AR(p) model (P>1) with negative coefficients.
 
-The PACF drops off sharply after lag 2 which indicates that it could be an autoregressive series of order 2.
+The PACF drops off to non-significant values after lag 2 which indicates that it could be an autoregressive series of order 2.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 par(mfrow=c(1,1))
-acf(x)
-pacf(x)
+acf(x, main='Simulated series auto-correlation')
+pacf(x, main='Simulated series partial auto-correlation')
 ```
 
 2.3 Estimate an AR model for this simulated series. Report the estimated AR parameters, standard erros, and the order of the AR model.
@@ -121,6 +120,10 @@ pacf(x)
 - Standard error for -0.1630600 - 0.1215105
 - Standard error for -0.1502864 - 0.09729566
 - Order of the model - 3
+
+The best models fitted is an AR(3) model. However we can see from the relative AICs that the
+AR(2) model that we know is teh true model, has the closest AIC value to the AR(3) model.
+Print the parameter estimates
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Estimate the model
@@ -138,9 +141,19 @@ x.ar$aic
 2.4 Construct a 95% confidence interval for the parameter estimates of the estimated model. Do the "true" model parameters fall within the confidence intervals? Explain the 95% confidence intervals in this context.
 ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+The computed confidence intervals for the model paramaters are as follows:
+$$\varphi1 = [0.5882697, 0.9696687]$$
+$$\varphi2 = [-0.40122049, 0.07510058]$$
+$$\varphi3 = [-0.3409859, 0.0404131]$$
 
+All true parameters fall inside the 95% confidence intervals of the estimated parameters.
+The 95% confidence interval is the interval where we expect 95% of the parameters to fall
+given our estimation of the parameters of the distribution of the time series parameters.
+ 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-x.ar$ar + c(-2,2)*sqrt(x.ar$asy.var)
+print ((x.ar$ar[1]) + c(-1.96, 1.96)*sqrt(x.ar$asy.var[1,1]))
+print ((x.ar$ar[2]) + c(-1.96, 1.96)*sqrt(x.ar$asy.var[2,2]))
+print ((x.ar$ar[3]) + c(-1.96, 1.96)*sqrt(x.ar$asy.var[3,3]))
 ```
 
 2.5 Is the estimated model stationary or non-stationary?
@@ -158,7 +171,7 @@ The estimated model is stationary since the absolute value of all of the roots o
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Calculate the roots of the characteristic equation
-polyroot(c(1, -0.7789692, 0.1630600, 0.1502864))
+polyroot(c(1, -x.ar$ar))
 # Calculate the absolute values of the roots which are complex numbers
 sqrt(1.098508^2+0.905915^2)
 sqrt(1.098508^2+(-0.905915)^2)
@@ -166,7 +179,12 @@ sqrt(1.098508^2+(-0.905915)^2)
 
 2.6 Plot the correlogram of the residuals of the estimated model. Comment on the plot.
 --------------------------------------------------------------------------------------
-<need comments>
+The autocorrelation has the pattern of a white noise series with significant correlation for
+leg 0 and non-significant for all other legs.
+The partial autp-correlation confirms the pattern of the acf with non-significant pacf for all
+legs greater than 0. The pattern is consistent with a white noise time series.
+
+To confim the observed pattern of a white noise series for residuals, we plot a qqplot and qqline for the residuals. Both the qqplot and qqline indicate close simularity with a normal distribution, confirming the white noise pattern
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 par(mfrow=c(1,1))
@@ -174,3 +192,8 @@ acf(x.ar$resid[-c(1:4)], main="ACF of the Residuals")
 pacf(x.ar$resid[-c(1:4)], main="PACF of the Residuals")
 ```
 
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+par(mfrow=c(1,1))
+qqnorm(x.ar$resid[-c(1:5)], main='QQ plot of the residual of the fitted time series')
+qqline(x.ar$resid[-c(1:5)], main="QQ line of the residual of the fitted time series")
+```
