@@ -47,7 +47,7 @@ For time series analysis, is it sufficient to use only histogram to describe a s
 It is not sufficient to use only histogram for a time series because the histogram does not show the dependencies among the data over time.  It does not show the time component.  It only shows the values of the series and not how they relate to each other.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-hist(hw07.series1, 100, , xlab='Time unit', ylab='Time series values', main='Histogram of time series data')
+hist(hw07.series1, 100, , ylab='Frequency', xlab='Time series values', main='Histogram of time series data')
 plot(hw07.series1, type='l', main='Time series data', ylab='Time series values', xlab='Time unit')
 ```
 
@@ -122,7 +122,7 @@ pacf(x, main='Simulated series partial auto-correlation')
 - Order of the model - 3
 
 The best models fitted is an AR(3) model. However we can see from the relative AICs that the
-AR(2) model that we know is teh true model, has the closest AIC value to the AR(3) model.
+AR(2) model that we know is the true model, has the closest AIC value to the AR(3) model.
 Print the parameter estimates
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
@@ -134,7 +134,7 @@ x.ar$ar
 sqrt(x.ar$asy.var)
 # Order
 x.ar$order
-# This is the difference of each AIc with the lowest AIC
+# This is the difference of each AIC with the lowest AIC
 x.ar$aic
 ```
 
@@ -180,11 +180,11 @@ sqrt(1.098508^2+(-0.905915)^2)
 2.6 Plot the correlogram of the residuals of the estimated model. Comment on the plot.
 --------------------------------------------------------------------------------------
 The autocorrelation has the pattern of a white noise series with significant correlation for
-leg 0 and non-significant for all other legs.
-The partial autp-correlation confirms the pattern of the acf with non-significant pacf for all
-legs greater than 0. The pattern is consistent with a white noise time series.
+lag 0 and non-significant for all other lags.
+The partial auto-correlation confirms the pattern of the acf with non-significant pacf for all
+lags greater than 0. The pattern is consistent with a white noise time series.
 
-To confim the observed pattern of a white noise series for residuals, we plot a qqplot and qqline for the residuals. Both the qqplot and qqline indicate close simularity with a normal distribution, confirming the white noise pattern
+To confim the observed pattern of a white noise series for residuals, we plot a qqplot and qqline for the residuals. Both the qqplot and qqline indicate close simularity with a normal distribution, confirming the white noise pattern.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 par(mfrow=c(1,1))
