@@ -25,10 +25,10 @@ Part 1 - Examining and Visualizing the Series
 **Key Takeaways:**
 
  1. The series has 372 units of time - possibly some kind of monthly data for 31 years.
- 2. Time series plot shows that the series is very persistent, strongly trending upwards.
- 3. Histogram shows no clear distribution - does not give us much information with the time component left out
- 3. ACF of the series very strongly resembles that of a random walk with drift - with correlations at around 0.8 for almost 25 lags (if this is indeed monthly data, that is almost 2 years!)
- 4. PACF drops off immediately after first lag
+ 2. Time series plot shows that the series is very persistent, strongly trending upwards.  There is a dip at about time=310.  The series is not stationary.
+ 3. Histogram shows no clear distribution.  It is multi-modal and does not give us information about the time component.
+ 3. ACF of the series very strongly resembles that of a random walk with drift - with correlations at around 0.8 for almost 25 lags.  (If this is indeed monthly data, that is almost 2 years!)
+ 4. PACF drops off immediately after first lag.  There are 2 points that fall outside the 95% confidence interval (blue lines) at lag=13 and lag=25.
 
 At initial glance, the series strongly resembles a random walk with drift.
 
@@ -44,7 +44,7 @@ summary(series)
 cbind(head(series), tail(series))
 quantile(as.numeric(series), c(.01,.05,.1,.25,.5,.75,.9,.95,.99))
 
-#Plot in order to see what is going on
+#Plot histogram, time-series plot, ACF and PACF
 par(mfrow=c(2,2))
 hist(series, breaks=60, col="blue", main = "Histogram of Series")
 plot.ts(series, main="Time Series Plot",
