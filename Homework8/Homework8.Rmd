@@ -1,0 +1,245 @@
+---
+title: "Homework8"
+author: "Megan Jasek, Rohan Thakur, Charles Kekeh"
+date: "Tuesday, April 5, 2016"
+output: pdf_document
+---
+
+```{r,include=FALSE}
+library(pastecs)
+library(knitr)
+library(psych)
+library(astsa)
+library(zoo)    
+library(forecast)
+library(quantmod)
+
+opts_chunk$set(tidy.opts=list(width.cutoff=60))
+
+# Set the seed so that reported numbers remain stable
+set.seed(1)
+```
+
+Part 1 - Examining and Visualizing the Series
+=============================================
+**Key Takeaways:**
+
+ 1. The series has 372 units of time - possibly some kind of monthly data for 31 years.
+ 2. Time series plot shows that the series is very persistent, strongly trending upwards.
+ 3. Histogram shows no clear distribution - does not give us much information with the time component left out
+ 3. ACF of the series very strongly resembles that of a random walk with drift - with correlations at around 0.8 for almost 25 lags (if this is indeed monthly data, that is almost 2 years!)
+ 4. PACF drops off immediately after first lag
+
+At initial glance, the series strongly resembles a random walk with drift.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+series = ts(read.csv("hw08_series.csv", header=TRUE))
+#removing extra column
+
+series=series[,c("x")]
+
+#Describing Series
+str(series)
+summary(series)
+cbind(head(series), tail(series))
+quantile(as.numeric(series), c(.01,.05,.1,.25,.5,.75,.9,.95,.99))
+
+#Plot in order to see what is going on
+par(mfrow=c(2,2))
+hist(series, breaks=60, col="blue", main = "Histogram of Series")
+plot.ts(series, main="Time Series Plot",
+        ylab="Values",
+        xlab="Time Period")
+acf(series, main = "ACF of Series")
+pacf(series, main = "PACF of Series")
+```
+
+Part 2 - Estimating Models and Examining Residuals
+==================================================
+**Key Takeaways:**
+We estimated various AR and ARMA models, and chose AR(1) as best representing the series according to AIC value and independence of residuals.
+
+We tested 2 assumptions for this model:
+
+ 1. Independence of Residuals: We can take this assumption to hold, as upon running the Ljung Box Test, we were unable to reject the null at the 5% level, that residuals are independently distributed.
+ 2. Stationarity: The process is not stationary, since its root = 1. This is also evident from visual inspection of the graph, as we can see that it persistently trends upwards, and so the mean cannot be stationary.
+
+
+**Detailed Results**
+Since there is no reversion to the mean, we decided to ignore pure MA models, and go ahead with tests for AR and ARMA models. The following 4 models were estimated:
+
+ 1. AR(12): Estimation using the ar() function using MLE gave us an AR model of order 12. Aside from having higher AIC than other models, this model had a large coefficient for the first lag term but very small coefficients for subsequent lag terms. Therefore, we choose to pursure parsimony and ignore this model.
+ 2. AR(1): This model gave us the lowest AIC, along with a Ljung Box test that failed to reject the null hypothesis at the 5% level, that residuals are independently distributed. It will be our choice moving forward. The fitted value versus residuals plot did not show any clear trend, although there did seem to be increasing variance along with the passage of time.
+ 3. ARMA(1,1) and ARMA(2,2): Both models showed higher AIC values than the AR(1). For both models, upon running the Ljung Box Test, we were able to reject the null hypothesis that the residuals are independent, at the 5% level. Therefore, we do not continue with these models. 
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+#Since there is no reversion to the mean, an MA model is probably not a great fit for this series. We will attempt to fit AR and ARMA models to the series.
+
+#Try fitting the model to an AR
+series.model = ar(series, method="mle")
+series.model
+series.model$aic
+sqrt(series.model$asy.var)
+
+#We get a model of order 12. Seems like this is overfitting the data, and we could
+#easily do with fewer parameters.
+series.model2= arima(series, order=c(1,0,0))
+series.model2
+
+#We try and fit an ARMA model to check for a MA piece
+series.model3 <- arima(series, order=c(1,0,1))
+series.model3
+
+#We try and fit an ARMA model to check for a MA piece
+series.model4 = arima(series, order=c(2,0,2), method="ML")
+series.model4
+
+#Now, examining Residuals
+
+#AR(1)
+head(series.model2$resid)
+par(mfrow=c(2,2))
+plot(series.model2$resid, fitted(series.model2), 
+     main="Residuals vs Fitted values ", xlab="Residuals", ylab="Fitted Values")
+plot(series.model2$resid, type="l", main="AR(1) Residuals Plot"
+     , xlab="Time", ylab="Residual Values")
+acf(series.model2$resid, main="ACF of the Residual Series")
+pacf(series.model2$resid, main="PACF of the Residual Series")
+
+par(mfrow=c(1,2))
+hist(series.model2$resid, breaks=60, col="blue",
+     main="AR(1) Residual Series Histogram", xlab="Residual Values")
+qqnorm(series.model2$resid, main="Normal Q-Q Plot of the Residuals",
+       type="p");
+qqline(series.model$resid[-1], col="blue")
+
+
+
+#ARMA(1,1)
+head(series.model3$resid)
+par(mfrow=c(2,2))
+plot(series.model3$resid, fitted(series.model3), 
+     main="Residuals vs Fitted values", xlab="Residuals", ylab="Fitted Values")
+plot(series.model3$resid, type="l", main="AR(1,1) Residuals Plot"
+     , xlab="Time", ylab="Residual Values")
+acf(series.model3$resid, main="ACF of the Residual Series")
+pacf(series.model3$resid, main="PACF of the Residual Series")
+
+par(mfrow=c(1,2))
+hist(series.model3$resid, breaks=60, col="blue",
+     main="Residual Series Histogram", xlab="Residual Values")
+qqnorm(series.model3$resid, main="Normal Q-Q Plot of the Residuals",
+       type="p");
+qqline(series.model3$resid[-1], col="blue")
+
+
+#ARMA(2,2)
+head(series.model4$resid)
+par(mfrow=c(2,2))
+plot(series.model4$resid, fitted(series.model4), 
+     main="Residuals vs Fitted values", xlab="Residuals", ylab="Fitted Values")
+plot(series.model4$resid, type="l", main="AR(2,2) Residuals Plot"
+     , xlab="Time", ylab="Residual Values")
+acf(series.model4$resid, main="ACF of the Residual Series")
+pacf(series.model4$resid, main="PACF of the Residual Series")
+
+par(mfrow=c(1,2))
+hist(series.model4$resid, breaks=60, col="blue",
+     main="Residual Series Histogram", xlab="Residual Values")
+qqnorm(series.model4$resid, main="Normal Q-Q Plot of the Residuals",
+       type="p");
+qqline(series.model4$resid[-1], col="blue")
+
+#Running the box test to see independence of the residuals
+Box.test(series.model2$resid, type="Ljung-Box")
+Box.test(series.model3$resid, type="Ljung-Box")
+Box.test(series.model4$resid, type="Ljung-Box")
+
+
+#Since we have chosen to move forward with the AR(1), we test assumptions
+roots = polyroot(c(1, -series.model2$coef["ar1"]))
+Mod(roots[1])
+#Not stationary
+```
+
+
+Part 3 - In-Sample Fit
+=======================
+The AR(1) fits the series extremely well, the only cause for concern being the increasing amplitude of the residuals with time.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+par(mfrow=c(1,1))
+plot.ts(series,col="navy",lty=2,
+        main="Original vs a AR(1) Estimated Series with Residuals",
+        ylab="Original and Estimate Values")
+par(new=T)
+plot(fitted(series.model2),col="blue",axes=F,ylab="")
+leg.txt <- c("Original Series", "Estimated Series", "Residuals")
+legend("topleft", legend=leg.txt, lty=c(2,1,2), 
+       col=c("navy","blue","green"),
+       bty='n', cex=1)
+par(new=T)
+plot.ts(series.model2$resid,axes=F,xlab="",ylab="",col="green", pch=1, lty=2)
+axis(side=4, col="green")
+mtext("Residuals", side=4, line=2,col="green")
+```
+
+Part 4 - 12 Step Ahead Forecast
+===============================
+**Key Takeaways:**
+ 1. 
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+series.model.fcast <- forecast.Arima(series.model2, h=12)
+
+length(series.model.fcast$mean)
+
+plot(series.model.fcast, 
+     main="12-Step Ahead Forecast and Original & Estimated Series",
+     xlab="Simulated Time Period", 
+     ylab="Original, Estimated, and Forecasted Values",lty=2,lwd=1.5)
+par(new=T)
+plot.ts(fitted(series.model2),col="blue", 
+        lty=2, lwd=2, xlab="",ylab="")
+leg.txt <- c("Original Series", "Estimated Series", "Forecast")
+legend("topleft", legend=leg.txt, lty=c(2,2,1), lwd=c(1,2,2),
+       col=c("black","blue","blue"), bty='n', cex=1)
+
+```
+
+
+Part 5 - Backtesting
+=====================
+**Key Takeaways:**
+ 1. The backtesting model does a good job of forecasting, with the series falling within the forecast.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+series.model.b <- Arima(series[1:(length(series)-37)], order=c(1,0,0))
+summary(series.model.b)
+length(fitted(series.model.b))
+length(series.model.b$resid)
+df=cbind(series[1:(length(series)-37)], fitted(series.model.b), series.model.b$resid)
+colnames(df)=c("orig_series", "fitted_vals", "resid")
+head(df)
+# Plot the original and estimate series 
+par(mfrow=c(1,1))
+plot.ts(df[,"orig_series"], col="navy", 
+        main="Original vs a AR(1) Estimated Series with Resdiauls",
+        ylab="Original and Estimated Values")
+par(new=T)
+plot.ts(df[,"fitted_vals"],col="blue",axes=T,xlab="",ylab="") 
+
+
+#Step 2: Out of sample forecast
+series.model.b.fcast <- forecast.Arima(series.model.b, h=49)
+length(series.model.b.fcast$mean)
+par(mfrow=c(1,1))
+plot(series.model.b.fcast,lty=2,
+     main="Out-of-Sample Forecast",
+     ylab="Original, Estimated, and Forecast Values")
+par(new=T)
+plot.ts(series, col="navy",axes=F,lty=1)
+leg.txt <- c("Original Series", "Forecast series")
+legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
+       bty='n', cex=1)
+```
