@@ -249,7 +249,8 @@ plot(series.model.b.fcast,lty=2, col="navy",
      ylab="Original, Estimated, and Forecast Values",
      xlim=c(0, 384), ylim=c(30,160))
 par(new=T)
-plot.ts(series,axes=F,lty=1, xlim=c(0, 384), ylim=c(30,160),)
+plot.ts(series,axes=F,lty=1, xlim=c(0, 384), ylim=c(30,160),
+        ylab="")
 leg.txt <- c("Original Series", "Forecast series")
 legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
        bty='n', cex=1)
