@@ -171,23 +171,22 @@ The AR(1) fits the series extremely well, the only cause for concern being the i
 par(mfrow=c(1,1))
 plot.ts(series,col="navy",lty=2,
         main="Original vs a AR(1) Estimated Series with Residuals",
-        ylab="Original and Estimate Values")
+        ylab="Original and Estimate Values", ylim=c(-15, 150))
 par(new=T)
-plot(fitted(series.model2),col="blue",axes=F,ylab="")
+plot(fitted(series.model2),col="blue",axes=F,ylab="", ylim=c(-15, 150))
 leg.txt <- c("Original Series", "Estimated Series", "Residuals")
 legend("topleft", legend=leg.txt, lty=c(2,1,2), 
        col=c("navy","blue","green"),
        bty='n', cex=1)
 par(new=T)
-plot.ts(series.model2$resid,axes=F,xlab="",ylab="",col="green", pch=1, lty=2)
+plot.ts(series.model2$resid,axes=F,xlab="",ylab="",col="green", ylim=c(-15, 150), pch=1, lty=2)
 axis(side=4, col="green")
 mtext("Residuals", side=4, line=2,col="green")
 ```
 
-Part 4 - 12 Step Ahead Forecast
+Part 4 - 12 Steps Ahead Forecast
 ===============================
-**Key Takeaways:**
- 1. 
+With 12 steps ahead prediction, we observe a decreasing prediction mean that's not consistent with the final trend of the original series. However, we also observe that the likely value of the original model is within the 95% confidence interval of the prediction.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 series.model.fcast <- forecast.Arima(series.model2, h=12)
@@ -197,21 +196,23 @@ length(series.model.fcast$mean)
 plot(series.model.fcast, 
      main="12-Step Ahead Forecast and Original & Estimated Series",
      xlab="Simulated Time Period", 
-     ylab="Original, Estimated, and Forecasted Values",lty=2,lwd=1.5)
+     ylab="Original, Estimated, and Forecasted Values",
+     xlim=c(0, 384), ylim=c(30,160), lty=2,lwd=1.5)
 par(new=T)
 plot.ts(fitted(series.model2),col="blue", 
-        lty=2, lwd=2, xlab="",ylab="")
+        lty=2, lwd=2, xlim=c(0,384), ylim=c(30,160), xlab="",ylab="")
 leg.txt <- c("Original Series", "Estimated Series", "Forecast")
 legend("topleft", legend=leg.txt, lty=c(2,2,1), lwd=c(1,2,2),
        col=c("black","blue","blue"), bty='n', cex=1)
-
 ```
 
 
 Part 5 - Backtesting
 =====================
-**Key Takeaways:**
- 1. The backtesting model does a good job of forecasting, with the series falling within the forecast.
+The backtesting model does a good job of forecasting, with the series falling within the forecast.
+
+What we observe is that the AR(1) series back-forecast shows a decrease of mean predicted values that is not consistent with the observed time series for the same 38 time units. However, we also observe that the original series is for the most part within the 95% confidence interval of the forecast, giving us confidence that the AR(1) model could be used as a decent predictive model for the observed time series.
+
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 series.model.b <- Arima(series[1:(length(series)-37)], order=c(1,0,0))
@@ -223,22 +224,32 @@ colnames(df)=c("orig_series", "fitted_vals", "resid")
 head(df)
 # Plot the original and estimate series 
 par(mfrow=c(1,1))
-plot.ts(df[,"orig_series"], col="navy", 
-        main="Original vs a AR(1) Estimated Series with Resdiauls",
-        ylab="Original and Estimated Values")
+plot.ts(df[,"orig_series"], col="red", 
+        main="Original vs a AR(1) Estimated Series with Residuals",
+        ylab="Original and Estimated Values",
+        xlim=c(0, 372), ylim=c(30,160))
 par(new=T)
-plot.ts(df[,"fitted_vals"],col="blue",axes=T,xlab="",ylab="") 
-
+plot.ts(df[,"fitted_vals"],col="blue",axes=T,xlab="",ylab="",
+        xlim=c(0, 372), ylim=c(30,160)) 
+leg.txt <- c("Original Series", "Estimated Series", "Residuals")
+legend("top", legend=leg.txt, lty=1, col=c("red", "navy", "green"),
+       bty='n', cex=1)
+par(new=T)
+plot.ts(df[,"resid"],axes=F,xlab="",ylab="",col="green",
+        xlim=c(0, 372), ylim=c(-15,160), pch=1)
+axis(side=4, col="green")
+mtext("Residuals", side=4, line=2,col="green")
 
 #Step 2: Out of sample forecast
 series.model.b.fcast <- forecast.Arima(series.model.b, h=49)
 length(series.model.b.fcast$mean)
 par(mfrow=c(1,1))
-plot(series.model.b.fcast,lty=2,
+plot(series.model.b.fcast,lty=2, col="navy",
      main="Out-of-Sample Forecast",
-     ylab="Original, Estimated, and Forecast Values")
+     ylab="Original, Estimated, and Forecast Values",
+     xlim=c(0, 384), ylim=c(30,160))
 par(new=T)
-plot.ts(series, col="navy",axes=F,lty=1)
+plot.ts(series,axes=F,lty=1, xlim=c(0, 384), ylim=c(30,160),)
 leg.txt <- c("Original Series", "Forecast series")
 legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
        bty='n', cex=1)
