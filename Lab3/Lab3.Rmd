@@ -1,0 +1,218 @@
+---
+title: "W271 Lab 3 Spring 2016"
+author: "Megan Jasek, Rohan Thakur, Charles Kekeh"
+date: "Friday, April 22, 2016"
+output: pdf_document
+---
+
+```{r,include=FALSE}
+library(pastecs)
+library(knitr)
+library(psych)
+library(astsa)
+library(zoo)    
+library(forecast)
+library(quantmod)
+library(fGarch)
+library(tseries)
+library(ggplot2)
+library(stargazer)
+
+opts_chunk$set(tidy.opts=list(width.cutoff=60))
+
+# Set the seed so that reported numbers remain stable
+set.seed(1)
+```
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# Functions for Parts 2, 3, 4
+get.best.arima <- function(x.ts, maxord = c(1,1,1))
+{
+  best.aic <- 1e8
+  all.aics <- vector()
+  all.models <- vector()
+  n <- length(x.ts)
+  for (p in 0:maxord[1]) for(d in 0:maxord[2]) for(q in 0:maxord[3]) 
+  {
+    fit <- arima(x.ts, order = c(p,d,q), method="ML")
+    fit.aic <- -2 * fit$loglik + (log(n) + 1) * length(fit$coef)
+    if (fit.aic < best.aic) 
+    {
+      best.aic <- fit.aic
+      best.fit <- fit
+      best.model <- c(p,d,q) 
+    }
+    all.aics <- c(all.aics, fit.aic)
+    all.models <- c(all.models, sprintf("(%d, %d, %d)", p,d,q))
+  }
+  list(best=list(best.aic, best.fit, best.model), others=data.frame(aics=all.aics, models=all.models))
+}
+
+get.best.sarima <- function(x.ts, maxord=c(1,1,1,1,1,1), freq)
+{
+  best.aic <- 1e8
+  all.aics <- vector()
+  all.models <- vector()
+  n <- length(x.ts)
+  for (p in 0:maxord[1]) for (d in 0:maxord[2]) for (q in 0:maxord[3])
+    for (P in 0:maxord[3]) for (D in 0:maxord[4]) for (Q in 0:maxord[5])
+    {
+      fit <- arima(x.ts, order = c(p,d,q),
+                   seasonal=list(order= c(P,D,Q),freq),
+                   method ="CSS", optim.control = list(maxit = 10000))
+      fit.aic <- -2*fit$loglik + (log(n) + 1) * length(fit$coef)
+      if (fit.aic < best.aic){
+        best.aic <- fit.aic
+        best.fit <- fit
+        best.model <- c(p,d,q,P,D,Q)
+      }
+      all.aics <- c(all.aics, fit.aic)
+      all.models <- c(all.models, sprintf("(%d, %d, %d, %d, %d, %d)", p,d,q,P,D,Q))
+    }
+  list(best=list(best.aic, best.fit, best.model), others=data.frame(aics=all.aics, models=all.models))
+}
+
+plot.time.series <- function(x.ts,bins=30, name)
+{
+  str(x.ts)
+  par(mfrow=c(2,2))
+  hist(x.ts,bins, main = paste("Histogram of", name, sep=" "),
+       xlab="Values")
+  plot(x.ts, main=paste("Plot of", name, sep=" "),
+       ylab="Values", xlab="Time Period")
+  acf(x.ts, main = paste("ACF of", name, sep=" "))
+  pacf(x.ts, main = paste("PACF of", name, sep=" "))
+}
+
+plot.residuals.ts <- function(x.mod, model_name)
+{
+  par(mfrow=c(1,1))
+  hist(x.mod$residuals,30, main=paste("Histogram of", model_name,
+                                      "Residuals", sep=" "), xlab="Values")
+  par(mfrow=c(2,2))
+  plot(x.mod$residuals, fitted(x.mod), main=paste(model_name, "Fitted vs. Residuals", sep=" "),
+       ylab="Fitted Values", xlab="Residuals")
+  plot(x.mod$residuals, main=paste(model_name, "Residuals", sep=" "),
+       ylab=paste("Residuals", sep=" "))
+  acf(x.mod$residuals, main = paste("ACF of", model_name, sep=" "))
+  pacf(x.mod$residuals, main = paste("PACF of", model_name, sep=" "))
+  Box.test(x.mod$residuals, type="Ljung-Box")
+}
+
+estimate.ar <- function(x.ts)
+{
+  x.ar = ar(x.ts)
+  print("Difference in AICs")
+  print(x.ar$aic)
+  print("AR parameters")
+  print(x.ar$ar)
+  print("AR order")
+  print(x.ar$order)
+  return(x.ar)
+}
+
+plot.orig.model.resid <- function(x.ts, x.mod, model_name, xlim, ylim)
+{
+  df <- data.frame(cbind(x.ts,fitted(x.mod),x.mod$residuals ))
+  class(df)  
+  stargazer(df, type="text", title="Descriptive Stat", digits=1)
+
+  summary(x.ts)
+  summary(x.mod$residuals)
+  par(mfrow=c(1,1))
+  plot.ts(x.ts, col="red", 
+        main=paste("Orivinal vs Estimated", model_name,
+                   "Series with Resdiauls", sep=" "),
+        ylab="Original and Estimated Values",
+        xlim=xlim, ylim=ylim, pch=1, lty=2)
+  par(new=T)
+  plot.ts(fitted(x.mod),col="blue",axes=T,xlab="",ylab="",
+        xlim=xlim, ylim=ylim, lty=1) 
+  leg.txt <- c("Original Series", "Estimated Series", "Residuals")
+  legend("topleft", legend=leg.txt, lty=c(2,1,2), 
+       col=c("red","blue","green"), bty='n', cex=1)
+  par(new=T)
+  plot.ts(x.mod$residuals,axes=F,xlab="",ylab="",col="green",
+        xlim=xlim, ylim=ylim, lty=2, pch=1, col.axis="green")
+  axis(side=4, col="green")
+  mtext("Residuals", side=4, line=2,col="green")
+}
+
+```
+
+
+Part 3 (25 points): Forecast the Web Search Activity for global Warming
+=======================================================================
+**Data Analysis**
+
+ 1. The time series has weekly 630 values starting at 1/4/04 and ending at 1/24/16.  The minimum value is -0.551 and the maximum value is 4.104.
+ 2. Time series plot shows that the series is very persistent,  The series is basically flat from 2004 to 2012.  After 2012, there is a sharp trend upward.  There is more volatility after 2012.  There are spikes and dips which could be seasonal with a yearly frequency.  The series is not stationary.
+ 3. Histogram shows is heavily positively skewed with most values between -0.551 and -0.3.
+ 3. ACF of the series has correlations at around 0.75 for almost 25 lags.
+ 4. PACF drops off immediately after first lag.  There are 4 points that fall outside the 95% confidence interval (blue lines) at lags 3, 5, 11 and 14.
+
+**Model Selection Process**
+
+1. __Try AR models.__  Use the ar() command in R to find AR(p) models or order p that potentially fit the time series.  This command output a model or order 15, but looking at the difference in AICs, the AIC for the AR(1) model is not that different from the AIC of the AR(15), so for parsimony we will try using that one.  Check if the residuals look like white noise.
+- Histogram:  Yes.  This looks like a normal distribution.
+- Fitted vs. Residuals:  No.  The plot does not look like an evenly distributed cloud.
+- Plot:  No.  The plot does not look random, there is a lot of volatility on the right hand side of the graph.
+- ACF:  No.  The ACF drops off after lag 0, but has only a few lags where the correlation comes out of the 95% CI.
+- PACF:  No.  The PACF shows correlation with several values outside of the 9%% CI.
+In summary, the residuals for this model do not look like white noise, so there is more variation that could be explained by our model.
+
+2. __Try ARIMA models.__  Use the get.best.arima() function which will try models with c(p,d,q) where p=0-4, d=0-2 and q=0-2.  And then we can print out a list in ascending order by AIC of the 20 models with the lowest AIC.  Inspecty these models for parsimony and select one with a good AIC and a small number of parameters.  The best model output from the function had an AIC of -1058.794 with parameters = c(1, 2, 2).  For parsimony a model of c(1,1,1) was chosen with an AIC of -1032.364 which is not that different from the best AIC.  Check if the residuals look like white noise.  No, the residuals do not look like white noise.  They exhibit the same characteristics as the AR(1) model from step 1.
+
+3. __Try SARIMA models.__  Use the get.best.sarima() function with parameters c(2,2,2,2,2,2).  The best AIC output is -1276.817 with a model of c(1, 2, 2, 1, 0, 2).  For parsimony try running get.best.sarima() with c(1,1,1,1,1,1).  A parsimonious model from this output is c(0, 1, 1, 1, 0, 1) with AIC -1246.412 which is very close to the AIC output from c(2,2,2,2,2,2).  For parsimony we will choose c(0, 1, 1, 1, 0, 1) and check the residuals.  No, the residuals do not look like white noise.  They exhibit the same characteristics as the AR(1) model from step 1.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# Read in the time series data
+glob.warm = read.csv("globalWarming.csv", header=TRUE)
+#glob.warm.ts = ts(glob.warm$data.science, start=2004, frequency = 52)
+glob.warm.ts = ts(glob.warm$data.science)
+# Print descriptive statistics
+str(glob.warm.ts)
+summary(glob.warm.ts)
+cbind(head(glob.warm.ts), tail(glob.warm.ts))
+quantile(as.numeric(glob.warm.ts), c(.01,.05,.1,.25,.5,.75,.9,.95,.99))
+# Plot the time series
+plot.time.series(glob.warm.ts, 50, "Global Warming")
+
+### Try AR models
+glob.warm.ar = estimate.ar(glob.warm.ts)
+glob.warm.ar1=arima(glob.warm.ts, order=c(1,0,0))
+# Plot the residuals
+plot.residuals.ts(glob.warm.ar1, "AR(1)")
+# Plot the In-sample fit
+plot.orig.model.resid(glob.warm.ts, glob.warm.ar1, "AR(1)", c(0,640), c(-0.7,4))
+
+### Try ARIMA models
+#gw.arima.best <- get.best.arima(glob.warm.ts, maxord=c(4,2,2))
+# Print the top 20 best models based on AIC
+#gw.arima.best$others[order(gw.arima.best$others$aics)[1:20],]
+glob.warm.arima=arima(glob.warm.ts, order=c(1,1,1))
+# Plot the residuals
+plot.residuals.ts(glob.warm.arima,"ARIMA(1,1,1)")
+# Plot the In-sample fit
+plot.orig.model.resid(glob.warm.ts, glob.warm.arima, "ARIMA(1,1,1)", c(0,640), c(-0.7,4))
+
+### Try SARIMA models
+#gw.seas.best <- get.best.sarima(glob.warm.ts, maxord=c(2,2,2,2,2,2), 52)
+# Print the top 20 best models based on AIC
+#gw.seas.best$others[order(gw.seas.best$others$aics)[1:20],]
+
+#gw.seas.best1 <- get.best.sarima(glob.warm.ts, maxord=c(1,1,1,1,1,1), 52)
+# Print the top 20 best models based on AIC
+#gw.seas.best1$others[order(gw.seas.best1$others$aics)[1:20],]
+glob.warm.arima.seas = arima(glob.warm.ts, order = c(0,1,1),
+                             seas = list(order = c(1,0,1), 52),
+                             method="CSS")
+# Plot the residuals
+plot.residuals.ts(glob.warm.arima.seas,"SARIMA(0,1,1,1,0,1)")
+# Plot the In-sample fit
+plot.orig.model.resid(glob.warm.ts, glob.warm.arima.seas, "SARIMA(0,1,1,1,0,1)", c(0,640), c(-0.7,4))
+#ts.plot(cbind(glob.warm.ts,
+#              predict(glob.warm.arima.seas,12)$pred),lty=1:2)
+
+```
+
