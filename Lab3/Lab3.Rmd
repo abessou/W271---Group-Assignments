@@ -169,7 +169,7 @@ We will therefore not try to fit a model that includes a seasonal component to t
 We now proceed to analyze the first difference of the time series.
 
 We get confirmation from the 1st difference series obtained that the original financial series likely has an AR(1) component as the first difference series is stationary in the mean. We also 
-observe that after the first difference is taken, the ACF of the series, just like the PACF do not show noticeble dynamic in the mean. We have no reason to suspect an additional MA component in the original series. But the first differential series does show clustered volatility in the variance.
+observe that after the first difference is taken, the ACF of the series, just like the PACF suggest white noise dynamics. We have no reason to suspect an additional MA component in the original series. But the first differential series does show clustered volatility in the variance.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #Load the data and describe it
