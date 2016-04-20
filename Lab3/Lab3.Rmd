@@ -1,7 +1,7 @@
 ---
 title: "W271 Lab 3 Spring 2016"
 author: "Megan Jasek, Rohan Thakur, Charles Kekeh"
-date: "Friday, April 22, 2016"
+date: "Sunday, April 24, 2016"
 output: pdf_document
 ---
 
@@ -48,7 +48,7 @@ get.best.arima <- function(x.ts, maxord = c(1,1,1))
   list(best=list(best.aic, best.fit, best.model), others=data.frame(aics=all.aics, models=all.models))
 }
 
-get.best.sarima <- function(x.ts, maxord=c(1,1,1,1,1,1), freq=frequency(x.ts))
+get.best.sarima <- function(x.ts, maxord=c(1,1,1,1,1,1), freq)
 {
   best.aic <- 1e8
   all.aics <- vector()
@@ -138,6 +138,22 @@ plot.orig.model.resid <- function(x.ts, x.mod, model_name, xlim, ylim)
   mtext("Residuals", side=4, line=2,col="green")
 }
 
+plot.model.forecast <- function(x.mod, mod.fcast, num_steps, x, y)
+{
+  par(mfrow=c(1,1))
+  plot(mod.fcast,
+       main=paste(num_steps, "-Step Ahead Forecast and Original & Estimated Series", sep=""),
+       xlab="Simulated Time Period",
+       ylab="Original, Estimated, and Forecasted Values",
+       xlim=x, ylim=y, lty=2, lwd=1.5)
+  par(new=T)
+  plot.ts(fitted(x.mod),col="blue", 
+        lty=2, lwd=2, xlab="", ylab="", xlim=x, ylim=y)
+  leg.txt <- c("Original Series", "Estimated Series", "Forecast")
+  legend("topleft", legend=leg.txt, lty=c(2,2,1), lwd=c(1,2,2),
+       col=c("black","blue","blue"), bty='n', cex=1)
+}
+
 ```
 
 Part 2 (25 points): Modeling and Forecasting a Real-World Macroeconomic / Financial time series
@@ -194,9 +210,9 @@ Interestingly, the best model based on AIC is a seasonal model with (p,d,q,P,D,Q
 We therefore decide to use (p,d,q,P,D,Q)=(0, 1, 0, 0, 0, 0) as our fitted model going forward.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-data.best <- get.best.sarima(data$DXCM, maxord=rep(3,6))
-data.best$best
-data.best$others[order(data.best$others$aics)[1:20],]
+#data.best <- get.best.sarima(data$DXCM, maxord=rep(3,6),1)
+#data.best$best
+#data.best$others[order(data.best$others$aics)[1:20],]
 ```
 
 The fitted model is simply a first differential series, and therefore has no parameters which need 95 confidence intervals that we need to validate.
@@ -387,17 +403,32 @@ Part 3 (25 points): Forecast the Web Search Activity for global Warming
 - Plot:  No.  The plot does not look random, there is a lot of volatility on the right hand side of the graph.
 - ACF:  No.  The ACF drops off after lag 0, but has only a few lags where the correlation comes out of the 95% CI.
 - PACF:  No.  The PACF shows correlation with several values outside of the 9%% CI.
-In summary, the residuals for this model do not look like white noise, so there is more variation that could be explained by our model.
+In summary, the residuals for this model do not look like white noise, so there is more variation that could be explained by our model.\newline
+The In-Sample fit of this estimated model matches the original model very well as evidenced in the plot.
 
-2. __Try ARIMA models.__  Use the get.best.arima() function which will try models with c(p,d,q) where p=0-4, d=0-2 and q=0-2.  And then we can print out a list in ascending order by AIC of the 20 models with the lowest AIC.  Inspecty these models for parsimony and select one with a good AIC and a small number of parameters.  The best model output from the function had an AIC of -1058.794 with parameters = c(1, 2, 2).  For parsimony a model of c(1,1,1) was chosen with an AIC of -1032.364 which is not that different from the best AIC.  Check if the residuals look like white noise.  No, the residuals do not look like white noise.  They exhibit the same characteristics as the AR(1) model from step 1.
+2. __Try ARIMA models.__  Use the get.best.arima() function which will try models with c(p,d,q) where p=0-4, d=0-2 and q=0-2.  And then we can print out a list in ascending order by AIC of the 20 models with the lowest AIC.  Inspecty these models for parsimony and select one with a good AIC and a small number of parameters.  The best model output from the function had an AIC of -1058.794 with parameters = c(1, 2, 2).  For parsimony a model of c(1,1,1) was chosen with an AIC of -1032.364 which is not that different from the best AIC.  Check if the residuals look like white noise.  No, the residuals do not look like white noise.  They exhibit the same characteristics as the AR(1) model from step 1.\newline
+The In-Sample fit of this estimated model matches the original model very well as evidenced in the plot.
 
-3. __Try SARIMA models.__  Use the get.best.sarima() function with parameters c(2,2,2,2,2,2).  The best AIC output is -1276.817 with a model of c(1, 2, 2, 1, 0, 2).  For parsimony try running get.best.sarima() with c(1,1,1,1,1,1).  A parsimonious model from this output is c(0, 1, 1, 1, 0, 1) with AIC -1246.412 which is very close to the AIC output from c(2,2,2,2,2,2).  For parsimony we will choose c(0, 1, 1, 1, 0, 1) and check the residuals.  No, the residuals do not look like white noise.  They exhibit the same characteristics as the AR(1) model from step 1.
+3. __Try SARIMA models.__  From the plot of the original series, it looks like this series has a seasonal component with a 52-week periodicity.  Use the get.best.sarima() function with parameters c(2,2,2,2,2,2).  The best AIC output is -1276.817 with a model of c(1, 2, 2, 1, 0, 2).  For parsimony try running get.best.sarima() with c(1,1,1,1,1,1).  A parsimonious model from this output is c(0, 1, 1, 1, 0, 1) with AIC -1246.412 which is very close to the AIC output from c(2,2,2,2,2,2).  For parsimony we will choose c(0, 1, 1, 1, 0, 1) and check the residuals.  No, the residuals do not look like white noise.  They exhibit the same characteristics as the AR(1) model from step 1.  The residuals exhibit evidence of time\newline
+The In-Sample fit of this estimated model matches the original model very well as evidenced in the plot.
+
+4. __Backtesting.__
+
+5. __Forecast the model.__  Using the SARIMA model, we will make the requested 12-step ahead forecast of the model.  The forecast looks like it captures the seasonality of the model as it matches the upward trend and the seasonal volatility.
+
+6. __GARCH.__ Since the residuals look like they have time-varying volatility, we will use GARCH to model the residuals.  The ACF of the squared residuals shows no obvious patterns or significant values. The model has reached and acceptable fit to the original time series.
+
+7. __Update the forecast with GARCH.__ To add the GARCH information to the forecast, we create a GARCH forecast.  We then take the forecast from the SARIMA model and update it with the GARCH confidence intervals.
+
+**Conclusion**
+
+This time series is satisfactorily modeled with a SARMIMA(x,x,x,x,x,x) model to hande trends and seasonality and a GARCH model to handle the time-varying volatility.  We observe that the forecasts of the model are consisent with the seasonality of the original series and the forecasts are within the 95% confidence interval produced by GARCH.  This gives us confidence that this model will give us decent forecasts for the original time series.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Read in the time series data
 glob.warm = read.csv("globalWarming.csv", header=TRUE)
-#glob.warm.ts = ts(glob.warm$data.science, start=2004, frequency = 52)
-glob.warm.ts = ts(glob.warm$data.science)
+glob.warm.ts = ts(glob.warm$data.science, start=2004, frequency = 52)
+#glob.warm.ts = ts(glob.warm$data.science)
 # Print descriptive statistics
 str(glob.warm.ts)
 summary(glob.warm.ts)
@@ -406,15 +437,15 @@ quantile(as.numeric(glob.warm.ts), c(.01,.05,.1,.25,.5,.75,.9,.95,.99))
 # Plot the time series
 plot.time.series(glob.warm.ts, 50, "Global Warming")
 
-### Try AR models
+### 1. Try AR models
 glob.warm.ar = estimate.ar(glob.warm.ts)
 glob.warm.ar1=arima(glob.warm.ts, order=c(1,0,0))
 # Plot the residuals
 plot.residuals.ts(glob.warm.ar1, "AR(1)")
 # Plot the In-sample fit
-plot.orig.model.resid(glob.warm.ts, glob.warm.ar1, "AR(1)", c(0,640), c(-0.7,4))
+plot.orig.model.resid(glob.warm.ts, glob.warm.ar1, "AR(1)", c(2004,2016), c(-0.7,4))
 
-### Try ARIMA models
+### 2. Try ARIMA models
 #gw.arima.best <- get.best.arima(glob.warm.ts, maxord=c(4,2,2))
 # Print the top 20 best models based on AIC
 #gw.arima.best$others[order(gw.arima.best$others$aics)[1:20],]
@@ -422,9 +453,9 @@ glob.warm.arima=arima(glob.warm.ts, order=c(1,1,1))
 # Plot the residuals
 plot.residuals.ts(glob.warm.arima,"ARIMA(1,1,1)")
 # Plot the In-sample fit
-plot.orig.model.resid(glob.warm.ts, glob.warm.arima, "ARIMA(1,1,1)", c(0,640), c(-0.7,4))
+plot.orig.model.resid(glob.warm.ts, glob.warm.arima, "ARIMA(1,1,1)", c(2004,2016), c(-0.7,4))
 
-### Try SARIMA models
+### 3. Try SARIMA models
 #gw.seas.best <- get.best.sarima(glob.warm.ts, maxord=c(2,2,2,2,2,2), 52)
 # Print the top 20 best models based on AIC
 #gw.seas.best$others[order(gw.seas.best$others$aics)[1:20],]
@@ -436,11 +467,73 @@ glob.warm.arima.seas = arima(glob.warm.ts, order = c(0,1,1),
                              seas = list(order = c(1,0,1), 52),
                              method="CSS")
 # Plot the residuals
+glob.warm.arima.seas.res = glob.warm.arima.seas$residuals
 plot.residuals.ts(glob.warm.arima.seas,"SARIMA(0,1,1,1,0,1)")
+par(mfrow=c(1,1))
+acf(glob.warm.arima.seas.res^2)
 # Plot the In-sample fit
-plot.orig.model.resid(glob.warm.ts, glob.warm.arima.seas, "SARIMA(0,1,1,1,0,1)", c(0,640), c(-0.7,4))
-#ts.plot(cbind(glob.warm.ts,
-#              predict(glob.warm.arima.seas,12)$pred),lty=1:2)
+plot.orig.model.resid(glob.warm.ts, glob.warm.arima.seas, "SARIMA(0,1,1,1,0,1)", c(2004,2016), c(-0.7,4))
+
+### 4. Backtesting
+glob.warm.bt.ts = ts(glob.warm.ts[1:(length(glob.warm.ts)-52)],start=2004,frequency = 52)
+glob.warm.arima.seas.bt = arima(glob.warm.bt.ts, order = c(0,1,1),
+                             seas = list(order = c(1,0,1), 52), method="CSS")
+df = cbind(glob.warm.bt.ts, 
+           fitted(glob.warm.arima.seas.bt),
+           glob.warm.arima.seas.bt$resid)
+colnames(df) = c("orig_series", "fitted_vals", "resid")
+head(df)
+# Plot the original and estimate series
+par(mfrow = c(1, 1))
+plot.ts(df[, "orig_series"], col = "red", main = "Original vs SARIMA Estimated Series with Residuals",
+        ylab = "Original and Estimated Values", xlim = c(2004, 2016),
+        ylim = c(-.7,4))
+par(new = T)
+plot.ts(df[, "fitted_vals"], col = "blue", axes = T, xlab = "",
+        ylab = "", xlim = c(2004, 2016), ylim = c(-.7,4))
+leg.txt <- c("Original Series", "Estimated Series", "Residuals")
+legend("top", legend = leg.txt, lty = 1, col = c("red", "navy",
+                                                 "green"), bty = "n", cex = 1)
+par(new = T)
+plot.ts(df[, "resid"], axes = F, xlab = "", ylab = "", col = "green",
+        xlim = c(2004, 2016), ylim = c(-.7,4), pch = 1)
+axis(side = 4, col = "green")
+mtext("Residuals", side = 4, line = 2, col = "green")
+
+glob.warm.arima.bt.fcast = forecast.Arima(glob.warm.arima.seas.bt, h=52)
+par(mfrow = c(1, 1))
+plot(glob.warm.arima.bt.fcast, lty = 2, col = "navy", main = "Out-of-Sample Forecast",
+     ylab = "Original, Estimated, and Forecast Values",
+     xlim = c(2004, 2016), ylim = c(-.7, 4))
+par(new = T)
+plot.ts(glob.warm.ts, axes=F, lty = 1, col = "black", xlim = c(2004, 2016),
+        ylim = c(-.7, 4), ylab = "")
+leg.txt <- c("Original Series", "Forecast series")
+legend("top", legend = leg.txt, lty = 1, col = c("black", "blue"),
+       bty = "n", cex = 1)
+
+### 5. Forecast the model
+glob.warm.arima.fcast = forecast.Arima(glob.warm.arima.seas, h=12)
+plot.model.forecast(glob.warm.arima.seas, glob.warm.arima.fcast,
+                    "12", c(2004,2016), c(-0.7,5.5))
+
+### 6. GARCH
+glob.warm.garch.fit = garchFit(~ garch(1, 1), data = glob.warm.arima.seas.res, trace = FALSE)
+gw.garch.pred <- predict(glob.warm.garch.fit, n.ahead=12, plot=TRUE)
+glob.warm.garch.res <- glob.warm.garch.fit@residuals
+par(mfrow=c(1,2))
+acf(glob.warm.garch.res)
+acf(glob.warm.garch.res^2)
+
+### 7. Update the forecast with GARCH
+# Clear the 80% confident interval of the fitted ARIMA by setting all values to the predicted mean of it
+# And set the values of the 95% confidence interval to those that came out of the GARCH model
+glob.warm.arima.fcast$lower[,1] <- glob.warm.arima.fcast$mean
+glob.warm.arima.fcast$upper[,1] <- glob.warm.arima.fcast$mean
+glob.warm.arima.fcast$lower[,2] <- gw.garch.pred$lowerInterval+glob.warm.arima.fcast$mean
+glob.warm.arima.fcast$upper[,2] <- gw.garch.pred$upperInterval+glob.warm.arima.fcast$mean
+
+plot.model.forecast(glob.warm.arima.seas, glob.warm.arima.fcast,
+                    "12", c(2004,2016), c(-0.7,5.5))
 
 ```
-
