@@ -17,6 +17,12 @@ library(fGarch)
 library(tseries)
 library(ggplot2)
 library(stargazer)
+library(car)
+library(ggplot2)
+library(sandwich)
+library(lmtest)
+library(pastecs)
+library(ivpack)
 
 opts_chunk$set(tidy.opts=list(width.cutoff=60))
 
@@ -24,6 +30,7 @@ opts_chunk$set(tidy.opts=list(width.cutoff=60))
 set.seed(1)
 ```
 
+Below, we define some functions we will be using in the problem set:
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Functions for Parts 2, 3, 4
 get.best.arima <- function(x.ts, maxord = c(1,1,1))
@@ -155,6 +162,295 @@ plot.model.forecast <- function(x.mod, mod.fcast, num_steps, x, y)
 }
 
 ```
+
+\newpage
+
+Part 1 (25 points): Modeling House Values
+=========================================
+
+Step 1 - Univariate Analysis
+----------------------------
+1. **Crime Rate** - This variable is positively skewed, with 90% of datapoints having a crime rate below 11.2%, but outliers above that going upto 89%. We take the log to create a new variable before proceeding.
+2. **nonRetailBusiness** - Has a suspiciously high mode at 0.18, which may indicate that a lot of the data points come from the same neighbourhood, which would explain the high number of occurences of a single value.
+3. **withWater** - This is a categorical variable. 6.75% of homes in the given sample are in neighbourhoods within 5 miles of a water body.
+4. **ageHouse** - This value is in percentage terms and not in strict proportion like other variables in the dataset. Over 50% of the houses in the dataset are in neighbourhoods with a proportion of houses older than 1950 that is greater than 78%
+5. **distanceToCity** - 75% of the houses are less than 15 miles away from a city, and 90% are less than 25 miles away. However, the variable has a lage outlier, which is almost 55 miles away from a city. We take a log of the variable before proceeding, in order to make it more evenly distributed.
+6. **distanceToHighway** - Definition of the variable is not provided in the dictionary. We see that there are 104 datapoints, exactly 24 miles away from the highway, so we assume this variable measures distance of a neighbourhood from the highway. This is exactly the same number of points for which nonRetailBusiness has a value of 0.18, so it further strengthens the argument that a lot of the datapoints seem to be for houses in the same or very close neighbourhood.
+7. **pupilTeacherRatio** - We find another variable with a high modal value of exactly 23.2 pupils per teacher. Furthers the above argument that a large part of the sample is taken from a single neighbourhood.
+8. **pctLowIncome** - 90% of the homes come from neighbourhoods with less than 30% households being low-income, however we do have values going up to 49% in the dataset.
+9. **homeValue** - The distribution has 95% of houses valued at well below $1 million, however, there are outliers above that value upto $1.125 million. We take the log of the variable to make it closer to a normal distribution.
+10. **pollutionIndex** - Has a scattered distribution with a median of 38.8, and a large outlier at 72.1.
+11. **nBedRooms** - Close to normal distribution, with the mean and median around 4.25 bedrooms on average for a single family home, however there are small, as well as large outliers in the distribution. 
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+q1.dataset = read.csv('houseValueData.csv')
+
+str(q1.dataset)
+summary(q1.dataset)
+
+#Performing univariate analysis
+#Crime Rate
+summary(q1.dataset$crimeRate_pc)
+quantile(q1.dataset$crimeRate_pc, 
+         probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
+hist(q1.dataset$crimeRate_pc, breaks=60, col="blue", main = "Distribution of Crime Rate", xlab = "Crime Rate")
+#This variable is extremely +vely skewed, so we take the log
+q1.dataset$logCrimeRate_pc = log(q1.dataset$crimeRate_pc)
+hist(q1.dataset$logCrimeRate_pc, breaks=60, col="blue", main = "Distribution of log(Crime Rate)", xlab = "log(Crime Rate)")
+
+#nonRetailBusiness
+summary(q1.dataset$nonRetailBusiness)
+quantile(q1.dataset$nonRetailBusiness, 
+         probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
+hist(q1.dataset$nonRetailBusiness, breaks=60, col="blue", main = "Distribution of nonRetailBusiness", xlab = "nonRetailBusiness")
+head(q1.dataset[order(q1.dataset$nonRetailBusiness, decreasing = TRUE), 
+                c("nonRetailBusiness")], n=50)
+tail(sort(table(q1.dataset$nonRetailBusiness)),5)
+#suspicious that this has such a large modal value. May be some coded val
+
+#withWater
+summary(q1.dataset$withWater)
+#7% have water
+
+#ageHouse
+summary(q1.dataset$ageHouse)
+quantile(q1.dataset$ageHouse, 
+         probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
+hist(q1.dataset$ageHouse, breaks=60, col="blue", main = "Distribution of ageHouse", xlab = "ageHouse")
+#Looks like a % value. 
+#May require a power transformation
+
+#disttocity
+summary(q1.dataset$distanceToCity)
+quantile(q1.dataset$distanceToCity, 
+         probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
+hist(q1.dataset$distanceToCity, breaks=60, col="blue", main = "Distribution of distanceToCity", xlab = "DistanceToCity")
+q1.dataset$logDistanceToCity = log(q1.dataset$distanceToCity)
+#skewed with a large outlier at the end. Keep in mind while running model
+
+#pupilTeacher
+summary(q1.dataset$pupilTeacherRatio)
+quantile(q1.dataset$pupilTeacherRatio, 
+         probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
+hist(q1.dataset$pupilTeacherRatio, breaks=60, col="blue", main = "Distribution of pupilTeacher Ratio", xlab = "pupilTeacher Ratio")
+tail(sort(table(q1.dataset$pupilTeacherRatio)),5)
+#High mode at 23.2, suspicious 
+
+#dist to highway
+summary(q1.dataset$distanceToHighway)
+quantile(q1.dataset$distanceToHighway, 
+         probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
+hist(q1.dataset$distanceToHighway, breaks=60, col="blue",  main = "Distribution of DistanceToHighway",  xlab = "DistanceToHighway")
+tail(sort(table(q1.dataset$distanceToHighway)),5)
+#Very strange that so many values are exactly 24. May not be best thing for regression.
+
+#pctlowincome
+summary(q1.dataset$pctLowIncome)
+quantile(q1.dataset$pctLowIncome, 
+         probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
+hist(q1.dataset$pctLowIncome, breaks=60, col="blue", main = "Distribution of % low income", xlab = "% Low Income")
+tail(sort(table(q1.dataset$pctLowIncome)),5)
+#slight neg skew
+
+#Home value
+summary(q1.dataset$homeValue)
+quantile(q1.dataset$homeValue, 
+         probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
+hist(q1.dataset$homeValue, breaks=60, col="blue", main = "Distribution of Home Value", xlab = "Home Value")
+q1.dataset$logHomeValue = log(q1.dataset$homeValue)
+hist(q1.dataset$logHomeValue, breaks=60, col="blue", main = "Distribution of Log(Home Value)",  xlab = "Log(Home Value)")
+#Pretty normal
+
+#poll Index
+summary(q1.dataset$pollutionIndex)
+quantile(q1.dataset$pollutionIndex, 
+         probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
+hist(q1.dataset$pollutionIndex, breaks=60, col="blue",  main = "Distribution of Pollution Index",   xlab = "Pollution Index")
+#scattered dist, one high outlier at 72
+
+#nbedrooms
+summary(q1.dataset$nBedRooms)
+quantile(q1.dataset$nBedRooms, 
+         probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
+hist(q1.dataset$nBedRooms, breaks=60, col="blue", main = "Distribution of nBedRooms", xlab = "nBedRooms")
+#Pretty normal
+```
+
+
+
+\newpage
+
+Step 2 - Bivariate Analysis
+----------------------------
+We examine bivariate correlations and scatterplots for all (transformed) variables in the dataset.
+
+##Conclusions
+
+1. A lot of variables show strong correlations with each other in the dataset (absolute val of correlation > 0.7). We must be wary of multicollinearity when including these variables together in our regression models which would make our model coefficients lose precision. At the same time, it is important to include necessary variables in order to prevent any omitted variable bias.
+ * logCrimeRate shows a strong correlation with logdistanceToCity, distanceToHighway and pollutionIndex
+ * nonRetailBusiness shows a strong correlation with logdistanceToCity and pollutionIndex
+ * ageHouse also shows a strong correlation with logdistanceToCity and pollutionIndex
+ * logDistancetoCity shows a strong correlation with pollutionIndex
+ 
+
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+panel.hist <- function(x, ...)
+   {
+     usr <- par("usr"); on.exit(par(usr))
+     par(usr = c(usr[1:2], 0, 1.5) )
+     h <- hist(x, plot = FALSE)
+     breaks <- h$breaks; nB <- length(breaks)
+     y <- h$counts; y <- y/max(y)
+     rect(breaks[-nB], 0, breaks[-1], y, col = "cyan", ...)
+}
+
+panel.cor <- function(x, y, digits = 2, prefix = "", cex.cor, ...)
+   {
+     usr <- par("usr"); on.exit(par(usr))
+     par(usr = c(0, 1, 0, 1))
+     r <- abs(cor(x, y))
+     txt <- format(c(r, 0.123456789), digits = digits)[1]
+     txt <- paste0(prefix, txt)
+     if(missing(cex.cor)) cex.cor <- 0.8/strwidth(txt)
+     text(0.5, 0.5, txt, cex = cex.cor * r)
+}
+
+pairs(logHomeValue~logCrimeRate_pc+nonRetailBusiness+withWater+ageHouse+
+        logDistanceToCity+distanceToHighway+pupilTeacherRatio+pctLowIncome+
+        pollutionIndex+nBedRooms, data=q1.dataset, upper.panel=panel.smooth, 
+      lower.panel=panel.cor, diag.panel=panel.hist)
+```
+
+
+\newpage
+
+Step 3 - Model Estimation
+-------------------------
+We start off with a naive approach, including all variables in the regression to observe results.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+model.1 = lm(logHomeValue~logCrimeRate_pc+nonRetailBusiness+withWater+ageHouse+
+        logDistanceToCity+distanceToHighway+pupilTeacherRatio+pctLowIncome+
+        pollutionIndex+nBedRooms, data=q1.dataset)
+summary(model.1)
+AIC(model.1)
+BIC(model.1)
+```
+
+In this model, we see that several variables do not have statistical significance. We see that the coefficients lack precision, having extremely high standard errors. 
+
+Before we move on to more parsimonious models, we will examine interaction variables to see if they add any explanatory power to our model. We have two categorical variables in our dataset: withWater and distanceToHighway (though a numerical variable, it has only nine distinct values, effectively functioning as a categorical). We add all possible interactions with these variables to see if we obtain any noteworthy result.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+model.2 = lm(logHomeValue~logCrimeRate_pc+nonRetailBusiness+withWater+ageHouse+
+        logDistanceToCity+distanceToHighway+pupilTeacherRatio+pctLowIncome+
+        pollutionIndex+nBedRooms+distanceToHighway:logCrimeRate_pc+distanceToHighway:nonRetailBusiness+distanceToHighway:ageHouse+distanceToHighway:pupilTeacherRatio+distanceToHighway:pctLowIncome+distanceToHighway:pollutionIndex+distanceToHighway:nBedRooms+
+        withWater:pollutionIndex+withWater:logCrimeRate_pc+withWater:nonRetailBusiness+withWater:ageHouse+withWater:logDistanceToCity+withWater:pupilTeacherRatio+withWater:pctLowIncome+withWater:nBedRooms, data=q1.dataset)
+summary(model.2)
+AIC(model.2)
+BIC(model.2)
+waldtest(model.1, model.2)
+```
+
+We do see some additional explanatory power through the addition of the interaction terms as we obtain a model with higher R square, lower AIC and lower BIC, as well as a significant Wald Test p value. However, apart from having a model which is extremely difficult to interpret, we also notice that most of the coefficient estimates are extremely small, having very little practical significance.
+
+Now, we want to narrow down our model to include only variables that really add to the explanatory power of the model, that reduce multicollinearity, that provide some valuable practical significance, while meeting the think-tank's specific ask of desirable neighbourhood features and environmental features' relation to home values.
+
+We remove the following variables:
+
+1. nonRetailBusiness: It has a high correlation with several of the variables in the dataset, and is not of direct interest to answering the question asked.
+2. ageHouse: It is not of direct consequence to the question asked.
+3. DistanceToCity has a high correlation with pollutionIndex, a variable we are definitely interested in, so we remove it to reduce the loss of precision that comes with multicollinearity
+4. nBedRooms: It is not of direct consequence to the question asked.
+5. distanceToHighway interactions except the interaction with log crime: This is the only interaction with a variable still in the model which has statistical and practical significance.
+6. withWater interactions except the interaction with pollutionIndex: This interaction seems to have some practical as well as statistical significance.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+model.3 = lm(logHomeValue~logCrimeRate_pc+withWater+
+        distanceToHighway+pctLowIncome+
+        pollutionIndex+distanceToHighway:logCrimeRate_pc+
+        withWater:pollutionIndex, data=q1.dataset)
+summary(model.3)
+AIC(model.3)
+BIC(model.3)
+```
+
+We see that the distanceToHighway and pollutionIndex variables don't seem to have statistical significance. We will remove the distanceToHighway variable since it does not have direct consequence to the question asked. Further, we remove the logCrimeRate variable, since it has a high correlation with pollutionIndex, a variable of importance to us. We do this to observe if its removal increases the precision of the pollutonIndex variable. 
+Note that this also means that we remove the interaction of distanceToHighway and logCrimeRate
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+model.4 = lm(logHomeValue~withWater+  pctLowIncome+
+        pollutionIndex+withWater:pollutionIndex, data=q1.dataset)
+summary(model.4)
+AIC(model.4)
+BIC(model.4)
+```
+
+We still obtain no significance for our pollutionIndex variable, and are unable to make any confident claims about this variable's impact on homeValue. Perhaps this variable, which was significant in earlier models with more variables, is losing precision due to an omitted variable bias. 
+
+We try adding back the pupilTeacherRatio variable to see if that makes any difference to the model.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+model.5 = lm(logHomeValue~withWater+  pctLowIncome+pupilTeacherRatio+
+        pollutionIndex+withWater:pollutionIndex, data=q1.dataset)
+summary(model.5)
+AIC(model.5)
+BIC(model.5)
+```
+
+We obtain statistical significance for all our coefficients, while maintaining a high R square value. While AIC and BIC values are not the lowest, we prefer the parsimony of this model, and choose this as our final model to present to the think-tank.
+
+We do not consider introducing instrument variables to the model for the following reasons:
+
+1. None of our predictors seems to have any correlation with the error term, making them all exogenous (shown above).
+2. While some variables do meet the criteria for instrument relevance, they are correlated with multiple variables in the model, so they do not make good overall candidates for instruments as they would introduct multicollinearity to the prediction of the variable for which they would serve as instruments.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+cor(q1.dataset$pctLowIncome, model.5$residuals)
+cor(q1.dataset$pollutionIndex, model.5$residuals)
+cor(q1.dataset$pupilTeacherRatio, model.5$residuals)
+
+plot(q1.dataset$pctLowIncome, model.5$residuals)
+plot(q1.dataset$pollutionIndex, model.5$residuals)
+plot(q1.dataset$pupilTeacherRatio, model.5$residuals)
+```
+
+Now, we look at diagnostics for our final model.
+
+1. The residuals vs fitted plot shows a very slight upward trend. The slope is negligible, so we assume zero conditional mean to hold.
+2. Errors follow a close to normal distribution. In either case, we have 400 observations, enabling us to rely on OLS asymptotics
+3. The scale-location plot shows some trend which is not a significant cause for concern. It shows some heteroskedasticity, which we account for by taking robust standard errors below. Variables in our model remain significant. The Wald-Test shows that the model also remains significant.
+4. The Residuals vs Leverrage plot shows some outliers but no major cause for concern.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+coeftest(model.5)
+waldtest(model.5, vcov=vcovHC)
+plot(model.5)
+```
+
+
+\newpage
+
+Step 4 - Final Model Conclusions
+--------------------------------
+##Conclusion
+Below we present the a comparison of initial and the final models run. We see that despite removing 6 variables, we see a reduction of only around 4% in R square, implying that we have preserved most of the explanatory power of the model, while sticking with parsimony.
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+stargazer(model.1, model.5, type="text")
+```
+
+##Explanation of the Model
+The final results from the model we present to the think-tank are as follows:
+
+1. Home values are 50% greater for homes located within 5 miles of water.
+2. For every unit percentage increase in low-income households, home values are close to 3% lower. 
+3. For every one unit increase in the pupilTeacherRatio in a neighbourhood, home values are close to 4% lower.
+4. For an additional unit on the pollutionIndex, we expect to see a decrease in home value of 0.2% if it is in a neighbourhood not within 5 miles of a water body. However, if it is within 5 miles of a water body, we expect an almost 1% decrease in home value.
+
+
+\newpage
 
 Part 2 (25 points): Modeling and Forecasting a Real-World Macroeconomic / Financial time series
 ===============================================================================================
@@ -389,6 +685,8 @@ legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
        bty='n', cex=1)
 par(new=T)
 ```
+
+\newpage
 
 Part 3 (25 points): Forecast the Web Search Activity for global Warming
 =======================================================================
