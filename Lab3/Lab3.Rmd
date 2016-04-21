@@ -23,7 +23,7 @@ library(sandwich)
 library(lmtest)
 library(pastecs)
 library(ivpack)
-
+library(stats)
 opts_chunk$set(tidy.opts=list(width.cutoff=60))
 
 # Set the seed so that reported numbers remain stable
@@ -55,7 +55,7 @@ get.best.arima <- function(x.ts, maxord = c(1,1,1))
   list(best=list(best.aic, best.fit, best.model), others=data.frame(aics=all.aics, models=all.models))
 }
 
-get.best.sarima <- function(x.ts, maxord=c(1,1,1,1,1,1), freq)
+get.best.sarima <- function(x.ts, maxord=c(1,1,1,1,1,1), freq=frequency(x.ts))
 {
   best.aic <- 1e8
   all.aics <- vector()
@@ -839,4 +839,284 @@ glob.warm.arima.fcast$upper[,2] <- gw.garch.pred$upperInterval+glob.warm.arima.f
 plot.model.forecast(glob.warm.arima.seas, glob.warm.arima.fcast,
                     "12", c(2004,2016), c(-0.7,5.5))
 
+```
+
+Part 4 (25 points): Forecast Inflation-Adjusted Gas Price
+==========================================================
+
+The dataframe contains three variables. Date, Production and Price. It consists of 410 observations of those variables. The Date variable indicates that the data ranges from January 01 1978 to February 01 2012. We now perform some exploratory data analysis of those variables.
+
+1 __Variable Production__ The histogram shows a data distribution of the variable that appears to be multimodal. We can certainly not assume that the underlying data comes from a normal distribution. However, there are no outliers or singularities in the data that would require that we investigate further or that we remove them from the data set.
+
+2 __Variable Price__ The histogram shows a data distribution that appears to e positively skewed. There are no indications from the histogram that the data would follow a normal distribution. However, there are no outliers or singularities in the data that would require that we investigate further or that we remove them from the data set. Our side by side plot of both series shows trends up and down and volatility. The series appear to be non-stationary in the mean.
+ 
+
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# Load the data
+gas.data <- load(file.path('gasOil.Rdata'))
+
+# Sumamry information about the data
+str(gasOil)
+summary(gasOil)
+cbind(head(gasOil$Date), head(gasOil$Price), head(gasOil$Production), 
+      tail(gasOil$Date), tail(gasOil$Price), tail(gasOil$Production))
+
+# EDA for variable Production
+print(quantile(gasOil$Production, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+
+# Plot the histogram of at 15 bins
+gasOil.prod.hist <- ggplot(gasOil, aes(Production)) + 
+    theme(legend.position = "none") + 
+    geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(gasOil$Production)[2] - range(gasOil$Production)[1])/15) +
+    labs(title = "Oil Production from 01/01/1978 to 02/01/2012", x = "Oil Production", y = "Frequency")
+
+plot(gasOil.prod.hist)
+
+# EDA for variable Price
+print(quantile(gasOil$Price, probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1)))
+
+# Plot the histogram of at 15 bins
+gasOil.price.hist <- ggplot(gasOil, aes(Price)) + 
+    theme(legend.position = "none") + 
+    geom_histogram(fill = "Blue", colour = "Black", binwidth = (range(gasOil$Price)[2] - range(gasOil$Price)[1])/15) +
+    labs(title = "Oil Price from 01/01/1978 to 02/01/2012", x = "Oil Price", y = "Frequency")
+
+plot(gasOil.price.hist)
+
+# Side by side ynamics of Price and Production time series
+# First convert the price data to a time series:
+price.ts <- ts(gasOil$Price, start=c(1978,1), end=c(2012,2), frequency=12)
+# Convert the production data to a time series
+production.ts <- ts(gasOil$Production, start=c(1978,1), end=c(2012,2), frequency=12)
+
+# Plot the two time series
+par(mfrow=c(1,1))
+plot.ts(price.ts, main="Oil Prices and Production From 1978 to 2012",
+        ylab="Price and Production", xlab ="Time Units",
+        col="navy")
+par(new=T)
+plot.ts(production.ts, ylab="", xlab="",
+        col="green", axes=F)
+axis(side=4, col="green")
+leg.txt <- c("Oil Prices", "Oil Production")
+legend("top", legend=leg.txt, lty=1, col=c("navy", "green"),
+       bty='n', cex=1)
+
+```
+
+Task1
+-----
+We can assume that the AP tested the correlation of the time series of Oil Price and Oil Production. We can replicate the calculation of the reported p-value with a test of the correlation of the
+variables Price and Production. The test reports a p-value of 0.5752, which is non-significant. The reported 95% confidence interval for the correlation is [-0.06927648  0.12427029]. Since the p-value for the test is non-significant, the confidence interval non-surprisingly spans the zero value.
+
+When computing the correlation of two sets of observations of data, we assume that the data is from random samples drawn from the same population with a distribution that has a constant mean and variance. 
+We know that our data is from a time time series. We have seen from the side by side plots that it's non-stationary in the mean. Therefore the assumption of constant mean in the calculation of the correlation does not hold and the calculated p-value is likely flawed.
+Another assumtion made with correlations is the assumption of independence of variables in the samples. As stated before, we usually assume that the samples are random draws from a population. For a time series the assumption of independence between the data observations must be rejected. For times series, the observation of $x_{t}$ is dependent on previous observations of $x_{t−1}$, $x_{t−2}$,.... 
+That dependency is captured in a joint probability distribution which is unavailable to us, as the time series represents the single instance of the realisation of a stochastic process that we are unable to observe.
+
+We next turn to studying the time series of gas prices.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+cor.test(gasOil$Price, gasOil$Production)
+```
+
+Task 2
+-------
+The series exhibits trends up and down and a lot of volatility. It appears to be non-stationary in the mean.
+We can also see that ACF is gradually descending, indicating a possible ARIMA or SARIMA dynamics. Knowing the series to be that of oil prices, we can speculate that it incorporates seasonality as we'd expect prices to follow the seasons of the year. We would expect yearly seasonality. The PACF shows significant correlations at lags 1 and possibly 2, suggesting that the series might have characteristics of an AR(1) or AR(2) component. 
+To verify our observations, we next study 1 and 2 order differences of the series.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+#EDA on series
+par(mfrow=c(2,2))
+plot.ts(price.ts, main="Oil Prices From 1978 to 2011 Time Series",
+        ylab="Value", xlab ="Time Units",
+        col="blue")
+hist(price.ts, col="gray", main="Value")
+acf(price.ts, main="ACF of Time Series")
+pacf(price.ts, main="PACF of Time Series")
+```
+
+As expected, the lag(1) and lag(2) series are stationary in the mean. They appear to show conditional volatility that will need to be analyzed with an GARCH model.
+We can also observe patterns that appear to be seasonal patterns of repetition on yearly basis in the series. That observation would support the ituition that weather cycles and corresponding consuption changes may affect gas prices.
+Because the first difference series is stationary in the mean, we will not need the second order differencing of the series when we study it furter. 
+We can also see that the ACF of the first and second order series drop sharply after lag 1 indicating the presence of an MA(1) component in the series. Similarly, the PACF of the first and second difference series have a single significant correlation at lag 1, indicating the possible presence of an AR(1) component in the series. We next perform a systematic search of the best model fit for the series based on the AIC.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+par(mfrow=c(2,2))
+plot.ts(diff(price.ts), main="First order difference Oil Prices series",
+        ylab="Value", xlab ="Time Units",
+        col="blue")
+hist(diff(price.ts), col="gray", main="Value")
+acf(diff(price.ts), main="ACF of Time Series")
+pacf(diff(price.ts), main="PACF of Time Series")
+
+par(mfrow=c(2,2))
+plot.ts(diff(price.ts, lag=2), main="Second order difference Oil Prices series",
+        ylab="Value", xlab ="Time Units",
+        col="blue")
+hist(diff(price.ts, lag=2), col="gray", main="Value")
+acf(diff(price.ts, lag=2), main="ACF of Time Series")
+pacf(diff(price.ts, lag=2), main="PACF of Time Series")
+```
+
+The best SARIMA model fitted is a (p,d,q,P,D,Q) of (0, 1, 2, 1, 0, 3) with an AIC of -672.50. We do take note of the fact that immediately following that series, is a SARIMA of parameters (0, 1, 1, 1, 0, 3) with an AIC of -672.19.
+With parsimony in mind, we select that model to fit our data and proceed to asses the in-sample fit of that model. It matches our earlier observations of a stationary first difference series, and of the possible presence of AR(1) and MA(1) components in the time series, along with that of a seasonal component.
+An inspection of the confidence intervals of the parematers of this model indicate that the parameter for the second MA component of the seasonal model is not significant. But the third parameter of the same seasonal component is significant.
+We next perform in-sample fit using the fitted series to assess our fitted model.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+#price.best <- get.best.sarima(price.ts, maxord=rep(3,6))
+#price.best$best
+#price.best$others[order(price.best$others$aics)[1:20],]
+```
+
+The fitted series models the original series very well and the model selection seems appropriate based on in-sample fit.
+To further assess the fitted series, We next perform 48 steps backtesting.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+
+# Fi the selected ARIMA model to the time series data.
+price.fit <- Arima(price.ts, order=c(0,1,1), seasonal=list(order = c(1,0,3), period=12), method="CSS-ML")
+price.res <- price.fit$resid
+t(confint(price.fit))
+quantile(as.numeric(price.res), c(0, .01,.05,.1,.25,.5,.75,.9,.95,.99, 1))
+
+
+# We now perform in-sample fit using the fitted series to assess our fitted model.
+par(mfrow=c(1,1))
+plot.ts(price.ts,col="navy",lty=2,
+        main="Original vs a SAMIMA(0, 1, 1, 1, 0, 3) Estimated Series with Residuals",
+        ylab="Original and Estimate Values", ylim=c(1, 5))
+par(new=T)
+plot(fitted(price.fit),col="blue",axes=F,ylab="", ylim=c(1, 5))
+leg.txt <- c("Original Series", "Estimated Series", "Residuals")
+legend("topleft", legend=leg.txt, lty=c(2,1,2), 
+       col=c("navy","blue","green"),
+       bty='n', cex=1)
+par(new=T)
+plot.ts(price.res,axes=F,xlab="",ylab="",col="green", ylim=c(-1, 5), pch=1, lty=2)
+axis(side=4, col="green")
+mtext("Residuals", side=4, line=2,col="green")
+```
+
+Our out of sample forecast appears to be reasonable. The 80 and 95 % confidence intervals of the forecast partially include the actual values of the series. We had previously observed that the variance of the residuals seemed to show some volatility that we know is not modeled by the fitted point series.
+Therefore, we next turn our eyes to the residuals of the fitted series and to the analysis of the dynamics of its variance.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+price.fit.back <- Arima(price.ts[1:(length(price.ts)-48)], 
+                     order=c(0,1,1), seasonal=list(order = c(1,0,3), period=12), 
+                     method="CSS-ML")
+summary(price.fit.back)
+length(fitted(price.fit.back))
+length(price.fit.back$resid)
+df=cbind(price.ts[1:(length(price.ts)-48)], fitted(price.fit.back), price.fit.back$resid)
+colnames(df)=c("orig_series", "fitted_vals", "resid")
+head(df)
+# Step 1: Plot the original and estimate series 
+par(mfrow=c(1,1))
+plot.ts(df[,"orig_series"], col="red", 
+        main="Original vs a AR(1) Estimated Series with Residuals",
+        ylab="Original and Estimated Values",
+        ylim=c(1,5))
+par(new=T)
+plot.ts(df[,"fitted_vals"],col="blue",axes=T,xlab="",ylab="",
+        ylim=c(1,5)) 
+leg.txt <- c("Original Series", "Estimated Series", "Residuals")
+legend("top", legend=leg.txt, lty=1, col=c("red", "navy", "green"),
+       bty='n', cex=1)
+par(new=T)
+plot.ts(df[,"resid"],axes=F,xlab="",ylab="",col="green",
+        ylim=c(-1,5), pch=1)
+axis(side=4, col="green")
+mtext("Residuals", side=4, line=2,col="green")
+
+#Step 2: Out of sample forecast
+price.fit.back.fcast <- forecast.Arima(price.fit.back, h=48)
+length(price.fit.back.fcast$mean)
+par(mfrow=c(1,1))
+plot(price.fit.back.fcast,lty=2, col="navy",
+     main="Out-of-Sample Forecast",
+     ylab="Original, Estimated, and Forecast Values",
+     ylim=c(1,5), ,axes=F)
+par(new=T)
+plot.ts(price.ts,axes=T,lty=1, ylim=c(1,5), ylab="")
+leg.txt <- c("Original Series", "Forecast series")
+legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
+       bty='n', cex=1)
+```
+
+The ACF and PACF of the residual series resemble those of a white noise series. But we observe from the squared residuals time series that the variance of the series is non-stationary. 
+The series exhibits volatility with a variance changing in a regular way. It exhibits conditional heteroskedasticity behavior. Therefore, we will to model its residuals using GARCH.
+With this in mind, we proceed to an initial 48 steps ahead forecast of the gas price series.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# Plot the residuals time series
+par(mfrow=c(3,2))
+plot.ts(price.res, main="Residuals of Oil Prices Series",
+        ylab="Value", xlab ="Time Units",
+        col="blue")
+hist(price.res, col="gray", main="Value")
+acf(price.res, main="ACF of Residuals")
+pacf(price.res, main="PACF of Residuals")
+acf(price.res^2, main="ACF of Squared Residuals")
+```
+
+The point estimates of our forecasts look reasoanble. We are aware that the model used for this point forecast assumes a stationary mean and variance. We can assess a stationary mean, but not a variance. The consequence of teh non-stationary variance is that the confidence intervals around our estimates are biased.
+Having acknowledged the confidence interval problem on the prediction caused by the non-stationary variance of the financial search time series, we want to use our fitted GARCH model to predict the mean and variance of the residuals of the point series.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+#2012-2016 steps ahead sample forecast
+price.fit.ahead.fcast <- forecast.Arima(price.fit, h=48)
+length(price.fit.ahead.fcast$mean)
+par(mfrow=c(1,1))
+plot(price.fit.ahead.fcast,lty=2, col="navy",
+     main="Out-of-Sample Forecast",
+     ylab="Original, Estimated, and Forecast Values",
+     ylim=c(1,5))
+par(new=T)
+plot.ts(price.ts,axes=F,lty=1, ylim=c(1,5),xlim=c(1978,2016), ylab="")
+leg.txt <- c("Original Series", "Forecast series")
+legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
+       bty='n', cex=1)
+```
+
+We observe from the ACF of the residuals of the GARCH fitted series that they have characteristics of white noise with mostly non-significant correlations at all lags of the ACF. What the GARCH model of the residuals tells is that we can expect more or less volatility through the forecast of the point series. 
+That volatility affects the confidence intervals of the estimates of our SARIMA model as previously observed with the backstesting.
+Using our fitted GARCH model, we can now better predict the variance of the point estimates from 2012 to 2016.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# Fit a GARCH model to the residuals of the fitted time series
+price.garch <- garch(price.res, order=c(1,1), trace=F)
+t(confint(price.garch))
+price.garch.res <- resid(price.garch)[-1]
+
+# Perform EDA on residuals of fit
+par(mfrow=c(2,2))
+hist(price.garch.res, col="gray", main="Value")
+acf(price.garch.res, na.action=na.pass, main="ACF of GARCH Residuals")
+pacf(price.garch.res, na.action=na.pass, main="PACF of GARCH Residuals")
+
+# Predict the residuals variance 4 years ahead 
+price.garch.fit <- garchFit(~ garch(1, 1), data = price.res, trace = FALSE)
+par(mfrow=c(1,1))
+price.garch.pred <- predict(price.garch.fit, n.ahead=48, plot=TRUE)
+```
+
+Having better estimates of the variance with GARCH, we now update our estimated SARIMA model's confidence interval with those.
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# Recompute the lower and upper 95% confidence intervals based on GARCH variance
+price.fit.ahead.fcast$lower[,1] <- price.fit.ahead.fcast$mean
+price.fit.ahead.fcast$upper[,1] <- price.fit.ahead.fcast$mean
+
+price.fit.ahead.fcast$lower[,2] <- -(((price.fit.ahead.fcast$mean-price.fit.ahead.fcast$lower[,2])/(1.96*sqrt(price.fit.ahead.fcast$model$sigma2)))*price.garch.pred$standardDeviation)+price.fit.ahead.fcast$mean
+price.fit.ahead.fcast$lower[,2]
+price.fit.ahead.fcast$upper[,2] <- (((price.fit.ahead.fcast$upper[,2]-price.fit.ahead.fcast$mean)/(1.96*sqrt(price.fit.ahead.fcast$model$sigma2)))*price.garch.pred$standardDeviation)+price.fit.ahead.fcast$mean
+price.fit.ahead.fcast$upper[,2]
+```
+
+We can now plot our 2012 to 2016 point estimates with the proper 95% confidence interval. 
+```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# 2012-2016 steps ahead sample forecast
+par(mfrow=c(1,1))
+plot(price.fit.ahead.fcast,lty=2, col="navy",
+     main="Out-of-Sample Forecast",
+     ylab="Original, Estimated, and Forecast Values",
+     ylim=c(1,5))
+par(new=T)
+plot.ts(price.ts,axes=F,lty=1, ylim=c(1,5),xlim=c(1978,2016), ylab="")
+leg.txt <- c("Original Series", "Forecast series")
+legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
+       bty='n', cex=1)
 ```
