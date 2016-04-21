@@ -647,7 +647,7 @@ Having acknowledged the confidence interval problem on the prediction caused by 
 The results of this prediction are a better estimate of the 95%confidence interval of the residuals of the global warming time series after modeling with our SAMIMA (1,1,1,0,0,0) model. We note that the volatility is predicted by the GARCH model to be in the range of -5 to 5, far wider than the predicted by the SARIMA model but consistent with the volatility observed towards the end of the original time series.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 data.garch.fit = garchFit(~ garch(1, 1), data = data.res, trace = FALSE)
-gw.garch.pred <- predict(data.garch.fit, n.ahead=36, plot=TRUE)
+data.garch.pred <- predict(data.garch.fit, n.ahead=36, plot=TRUE)
 ```
 
 Using our GARCH model fitted on the residuals, we now plot the predicted confidence intervals 
@@ -660,10 +660,10 @@ data.fit.ahead.fcast$mean
 The corresponding lower and upper confidence intervals after substituting for the conditional variance obtained from GARCH model are:
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Reset the 95% confidence interval using the conditional variance from GARCH
-data.fit.ahead.fcast$lower[,2] <- -(((data.fit.ahead.fcast$mean-data.fit.ahead.fcast$lower[,2])/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*gw.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
+data.fit.ahead.fcast$lower[,2] <- -(((data.fit.ahead.fcast$mean-data.fit.ahead.fcast$lower[,2])/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*data.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
 data.fit.ahead.fcast$lower[,2]
 
-data.fit.ahead.fcast$upper[,2] <- (((data.fit.ahead.fcast$upper[,2]-data.fit.ahead.fcast$mean)/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*gw.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
+data.fit.ahead.fcast$upper[,2] <- (((data.fit.ahead.fcast$upper[,2]-data.fit.ahead.fcast$mean)/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*data.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
 data.fit.ahead.fcast$upper[,2]
 ```
 
