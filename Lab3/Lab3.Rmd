@@ -361,17 +361,22 @@ The mean series of the 36 steps ahead predctions obtained from the fitted first 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 data.fit.ahead.fcast$mean
 ```
-The corresponding lower and upper confidence intervals obtained from teh GARCH model are:
+The corresponding lower and upper confidence intervals after substituting for the conditional variance obtained from GARCH model are:
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-gw.garch.pred$lowerInterval
-gw.garch.pred$upperInterval
+# Reset the 95% confidence interval using the conditional variance from GARCH
+data.fit.ahead.fcast$lower[,2] <- -(((data.fit.ahead.fcast$mean-data.fit.ahead.fcast$lower[,2])/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*gw.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
+data.fit.ahead.fcast$lower[,2]
+
+data.fit.ahead.fcast$upper[,2] <- (((data.fit.ahead.fcast$upper[,2]-data.fit.ahead.fcast$mean)/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*gw.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
+data.fit.ahead.fcast$upper[,2]
 ```
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
+# Clear the 80% confidence interval
 data.fit.ahead.fcast$lower[,1] <- data.fit.ahead.fcast$mean
 data.fit.ahead.fcast$upper[,1] <- data.fit.ahead.fcast$mean
-data.fit.ahead.fcast$lower[,2] <- gw.garch.pred$lowerInterval+data.fit.ahead.fcast$mean
-data.fit.ahead.fcast$upper[,2] <- gw.garch.pred$upperInterval+data.fit.ahead.fcast$mean
+
+# Plot the forecast with the updated 
 par(mfrow=c(1,1))
 plot(data.fit.ahead.fcast,lty=2, col="navy",
      main="Out-of-Sample Forecast",
