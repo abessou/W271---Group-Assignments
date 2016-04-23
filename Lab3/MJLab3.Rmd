@@ -25,7 +25,7 @@ set.seed(1)
 ```
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-# Functions for Parts 2, 3, 4
+# Functions for Parts 3
 get.best.arima <- function(x.ts, maxord = c(1,1,1))
 {
   best.aic <- 1e8
@@ -79,7 +79,7 @@ plot.time.series <- function(x.ts,bins=30, name)
   hist(x.ts,bins, main = paste("Histogram of", name, sep=" "),
        xlab="Values")
   plot(x.ts, main=paste("Plot of", name, sep=" "),
-       ylab="Values", xlab="Time Period")
+       ylab="Values", xlab="Time")
   acf(x.ts, main = paste("ACF of", name, sep=" "))
   pacf(x.ts, main = paste("PACF of", name, sep=" "))
 }
@@ -228,7 +228,7 @@ glob.warm.arima.seas = arima(glob.warm.ts, order = c(0,1,1),
 glob.warm.arima.seas.res = glob.warm.arima.seas$residuals
 plot.residuals.ts(glob.warm.arima.seas,"SARIMA(0,1,1,1,0,1)")
 par(mfrow=c(1,1))
-acf(glob.warm.arima.seas.res^2)
+acf(glob.warm.arima.seas.res^2, main="ACF of SARIMA(0,1,1,1,0,1) Residuals^2")
 # Plot the In-sample fit
 plot.orig.model.resid(glob.warm.ts, glob.warm.arima.seas, "", "SARIMA(0,1,1,1,0,1)", c(2004,2016), c(-0.7,4))
 
@@ -236,8 +236,8 @@ plot.orig.model.resid(glob.warm.ts, glob.warm.arima.seas, "", "SARIMA(0,1,1,1,0,
 glob.warm.garch.fit = garchFit(~ garch(1, 1), data = glob.warm.arima.seas.res, trace = FALSE)
 glob.warm.garch.res <- glob.warm.garch.fit@residuals
 par(mfrow=c(2,1))
-acf(glob.warm.garch.res)
-acf(glob.warm.garch.res^2)
+acf(glob.warm.garch.res, main="ACF of GARCH with SARIMA(0,1,1,1,0,1) Residuals")
+acf(glob.warm.garch.res^2, main="ACF of GARCH SARIMA(0,1,1,1,0,1) Residuals^2")
 ```
 
 5. __Using a portion of the data.__ Since no satisfactory model was found using the full data series, using a portion of the data will be considered.  The data has a clear split around 2012 or 2013 where it goes from being stationary in the mean to being non-stationary in the mean.  Since we are interested in forecasting this information after 2016, we will try creating a model for the latter part of the data, the part that contains the most recent information and then forecasting after that.  2012 could have been chosen, but it still had some of the non-trending data contained in it, so 2013 was chosen as a start year.  We will repeat the same analysis as above.  When graphs are created with this 2013-2016 series, they will be denoted by the phrase "Abrv. Original" instead of "Original"
@@ -260,7 +260,7 @@ In summary, the residuals for this model do not look like white noise, so there 
 
 **Conclusion**
 
-MJ WILL FINISH WRITING LATE.  The 2013-2016 abbreviated time series is satisfactorily modeled with a SARMIMA(x,x,x,x,x,x) model to hande trends and seasonality.  We observe that the forecasts of the model are consisent with the seasonality of the original series and the forecasts are within the 95% confidence interval.
+The Abbrieviated 2013-2016 Global Warming time series is satisfactorily modeled with a SARMIMA(0,1,0,0,0,1) model to handle trends and seasonality.  The residuals are close enough to white noise and the seasonality is modeled.  Given this, we will stay with the Abbrieviated time series to make our forecast.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 ### 5. Using a portion of the data
@@ -312,8 +312,8 @@ glob.warm.part.sarima = arima(glob.warm.part.ts, order = c(0,1,0),
 # Plot the residuals
 plot.residuals.ts(glob.warm.part.sarima, "SARIMA(0,1,0,0,0,1)")
 par(mfrow=c(2,1))
-acf(glob.warm.part.sarima$residuals, main="Abrv. GW 2013-2016 SARIMA(0,1,0,0,0,1) Residuals")
-acf(glob.warm.part.sarima$residuals^2, main="Abrv. GW 2013-2016 SARIMA(0,1,0,0,0,1) Residuals")
+acf(glob.warm.part.sarima$residuals, main="ACF of Abrv. GW 2013-2016 SARIMA(0,1,0,0,0,1) Residuals")
+acf(glob.warm.part.sarima$residuals^2, main="ACF of Abrv. GW 2013-2016 SARIMA(0,1,0,0,0,1) Residuals^2")
 # Plot the In-sample fit
 plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.sarima, part_name, "SARIMA(0,1,0,0,0,1)", c(2014,2016.5), c(-0.7,5))
 
