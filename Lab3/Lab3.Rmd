@@ -456,16 +456,15 @@ Part 2 (25 points): Modeling and Forecasting a Real-World Macroeconomic / Financ
 ===============================================================================================
 The series appears to be a time series of financial data, presumably one of a daily closing price of some financial instrumemt or index.
 
-We observe that the time series is non-stationary in the mean. That observation, is coupled with the fact that the PACF of the time series indicates a correlation at lag 1 that ressembles and AR(1) series.
-Therefore we can attempt to diff the time series to see if the resulting series is stationary
-in the mean.
+We observe that the time series is non-stationary in the mean. Therefore we can attempt to diff the time series to see if the resulting series is stationary in the mean. 
+We also observe that the PACF of the time series indicates a correlation at lag 1 that ressembles and AR(1) series.
 
-The plot of the original financial series does not indicate any amount of seasonality. The observation is confirmed by the ACF which doesn't display any significant amount of correlation at any lag.
+The plot of the original financial series does not indicate any amount of seasonality. The observation is confirmed by the ACF which doesn't display any significant amount of correlation at any lag other than the first.
 We will therefore not try to fit a model that includes a seasonal component to the data.
 We now proceed to analyze the first difference of the time series.
 
-We get confirmation from the 1st difference series obtained that the original financial series likely has an AR(1) component as the first difference series is stationary in the mean. We also 
-observe that after the first difference is taken, the ACF of the series, just like the PACF suggest white noise dynamics. We have no reason to suspect an additional MA component in the original series. But the first differential series does show clustered volatility in the variance.
+The 1st difference series is stationary in the mean. We also 
+observe that after the first difference is taken, the ACF of the series, just like the PACF suggest white noise dynamics. But the first differential series does show clustered volatility in the variance.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #Load the data and describe it
@@ -501,9 +500,8 @@ pacf(diff(data$DXCM.Close), main="PACF of Time Series")
 ```
 
 We now try to determine a best SARIMA model based on the best AIC for that series.
-Interestingly, the best model based on AIC is a seasonal model with (p,d,q,P,D,Q) of values
-(0, 0, 0, 0, 1, 0). If we assume a frequency of one, that model is the same as the second best model, which has orders (p,d,q,P,D,Q) of (0, 1, 0, 0, 0, 0). The results confirm the observation we made of a lag 1 correlation looking at the PACF of the financial time series
-We therefore decide to use (p,d,q,P,D,Q)=(0, 1, 0, 0, 0, 0) as our fitted model going forward.
+Interestingly enough, the best model based on AIC is a seasonal model with (p,d,q,P,D,Q) of values
+(0, 0, 0, 0, 1, 0). Since we're assuming a frequency of one, that model is the same as the second best model, which has orders (p,d,q,P,D,Q) of (0, 1, 0, 0, 0, 0). We therefore decide to use (p,d,q,P,D,Q)=(0, 1, 0, 0, 0, 0) as our fitted model going forward.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #data.best <- get.best.sarima(data$DXCM, maxord=rep(3,6),1)
@@ -511,18 +509,17 @@ We therefore decide to use (p,d,q,P,D,Q)=(0, 1, 0, 0, 0, 0) as our fitted model 
 #data.best$others[order(data.best$others$aics)[1:20],]
 ```
 
-The fitted model is simply a first differential series, and therefore has no parameters which need 95 confidence intervals that we need to validate.
-
+The fitted model is one with a differential component of value one, and has no other parameters for which we need to validate 95 confidence intervals.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Fitting a first difference series to our model
-data.fit <- Arima(data$DXCM, order=c(1,0,0), seasonal=list(order = c(0,0,0)), method="CSS-ML")
+data.fit <- Arima(data$DXCM, order=c(0,1,0), seasonal=list(order = c(0,0,0)), method="CSS-ML")
 data.res <- data.fit$resid
 quantile(as.numeric(data.res), c(0, .01,.05,.1,.25,.5,.75,.9,.95,.99, 1))
 t(confint(data.fit))
 ```
 
 We now perform in-sample fit using the fitted series to assess our fitted model.
-The fitted series models the original series very well and the model selection seems appropriat based on in-sample fit. 
+The fitted series models the original series very well and the model selection seems appropriate based on in-sample fit. 
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Performing in-sample fit using our fitted series
