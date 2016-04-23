@@ -24,6 +24,8 @@ library(lmtest)
 library(pastecs)
 library(ivpack)
 library(stats)
+library(stargazer)
+
 opts_chunk$set(tidy.opts=list(width.cutoff=60))
 
 # Set the seed so that reported numbers remain stable
@@ -541,7 +543,7 @@ mtext("Residuals", side=4, line=2,col="green")
 
 To further assess the fitted series, We now perform 36 steps backtesting.
 What the out of sample forecast shows is that the original series falls for the most part within the 80% confidence interval and almost totally within the 95% confidence interval of the prediction. 
-However, we can see from the plot of the financial time series that the volatility of the series seems to increase over time. Clustered volatility in the variance likely explain this dynamic. We next turn our eyes to the residuals of the fitted series and to analysis of the dynamics of its variance.
+However, we can see from the plot of the financial time series that the volatility of the series seems to increase over time. Clustered volatility likely explains this dynamic. We next turn our eyes to the residuals of the fitted series and to the analysis of the dynamics of its variance.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Performing 36 steps backtesting using our fitted series
@@ -606,7 +608,7 @@ We observe from the ACF of the residuals of the GARCH fitted series that they ha
 What the GARCH model of the residuals tells is that we can expect more or less volatility through the forecast of the point series that invalidate the confidence interval of our predictions since those were made with the assumption of a stationary variance.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-# Model the residuala of the financila time series using GARCH
+# Model the residuals of the financial time series using GARCH
 data.garch <- garch(data.res, trace=F)
 t(confint(data.garch))
 data.garch.res <- resid(data.garch)[-1]
@@ -618,7 +620,7 @@ acf(data.garch.res, na.action=na.pass, main="ACF of GARCH Residuals")
 pacf(data.garch.res, na.action=na.pass, main="PACF of GARCH Residuals")
 ```
 
-With the previous observations in mind, we still use the fitted series to predict 36 steps ahead. We will later adjust the confidence intervals of the predictions using our fitted GARCH model.
+With the previous observations about volatility in mind, we still use the fitted series to predict 36 steps ahead. We will later adjust the confidence intervals of the predictions using our fitted GARCH model.
 
 To perform a 36 steps ahead forecast of our series, we use the original point estimate of the series, that being the (0,1,0,0,0,0) SARIMA model initially estimated.
 The GARCH model of the residuals will additionally be used to forcast the variance of the series, and help us adjust the confidence interval of the prediction.
@@ -641,7 +643,7 @@ legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
 
 Having acknowledged the confidence interval problem on the prediction caused by the non-stationary variance of the financial search time series, we want to use our fitted GARCH model to predict the mean and variance of the residuals of the series.
 
-The results of this prediction are a better estimate of the 95%confidence interval of the residuals of the global warming time series after modeling with our SAMIMA (1,1,1,0,0,0) model. We note that the volatility is predicted by the GARCH model to be in the range of -5 to 5, far wider than the predicted by the SARIMA model but consistent with the volatility observed towards the end of the original time series.
+The results of this prediction are a better estimate of the 95%confidence interval of the residuals of the global warming time series after modeling with our SAMIMA (0,1,0,0,0,0) model. We note that the volatility is predicted by the GARCH model to be in the range of -5 to 5, wider than the range predicted by the SARIMA model but consistent with the volatility observed towards the end of the original time series.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 data.garch.fit = garchFit(~ garch(1, 1), data = data.res, trace = FALSE)
 data.garch.pred <- predict(data.garch.fit, n.ahead=36, plot=TRUE)
@@ -649,27 +651,28 @@ data.garch.pred <- predict(data.garch.fit, n.ahead=36, plot=TRUE)
 
 Using our GARCH model fitted on the residuals, we now plot the predicted confidence intervals 
 obtained with GARCH modeling over the  original fitted SARIMA(0,1,0,0,0,0) series.
-Replace the 95% confidence interval of the fitted SARIMA with the GARCH confidence interval
-The mean series of the 36 steps ahead predctions obtained from the fitted first difference model are:
-```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-data.fit.ahead.fcast$mean
-```
-The corresponding lower and upper confidence intervals after substituting for the conditional variance obtained from GARCH model are:
+
+The mean series of the 36 steps ahead predctions obtained from the fitted SARIMA(0,1,0,0,0,0) model and the corresponding lower and upper confidence intervals after substituting for the conditional variance obtained from GARCH model are:
+
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Reset the 95% confidence interval using the conditional variance from GARCH
 data.fit.ahead.fcast$lower[,2] <- -(((data.fit.ahead.fcast$mean-data.fit.ahead.fcast$lower[,2])/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*data.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
-data.fit.ahead.fcast$lower[,2]
 
 data.fit.ahead.fcast$upper[,2] <- (((data.fit.ahead.fcast$upper[,2]-data.fit.ahead.fcast$mean)/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*data.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
-data.fit.ahead.fcast$upper[,2]
+
+df<-data.frame(cbind(data.fit.ahead.fcast$mean, data.fit.ahead.fcast$lower[,2], data.fit.ahead.fcast$upper[,2]))
+names(df) <- c("Mean", "Lower 95% conf", "Upper 95% conf")
+stargazer(df, type="text", summary=FALSE)
 ```
 
+Having computed 95% confidence intervals based on GARCH, we now plot the predicted
+point series with the 95% confidence interval updated.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Clear the 80% confidence interval
 data.fit.ahead.fcast$lower[,1] <- data.fit.ahead.fcast$mean
 data.fit.ahead.fcast$upper[,1] <- data.fit.ahead.fcast$mean
 
-# Plot the forecast with the updated 
+# Plot the forecast with the updated 95% confidence inteval
 par(mfrow=c(1,1))
 plot(data.fit.ahead.fcast,lty=2, col="navy",
      main="Out-of-Sample Forecast",
@@ -680,7 +683,6 @@ plot.ts(data$DXCM,axes=F,lty=1, xlim=c(0, 3000), ylim=c(0,110),ylab="")
 leg.txt <- c("Original Series", "Forecast series")
 legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
        bty='n', cex=1)
-par(new=T)
 ```
 
 \newpage
