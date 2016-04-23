@@ -111,7 +111,7 @@ estimate.ar <- function(x.ts)
   return(x.ar)
 }
 
-plot.orig.model.resid <- function(x.ts, x.mod, model_name, xlim, ylim)
+plot.orig.model.resid <- function(x.ts, x.mod, orig_name, model_name, xlim, ylim)
 {
   df <- data.frame(cbind(x.ts,fitted(x.mod),x.mod$residuals ))
   class(df)  
@@ -121,14 +121,14 @@ plot.orig.model.resid <- function(x.ts, x.mod, model_name, xlim, ylim)
   summary(x.mod$residuals)
   par(mfrow=c(1,1))
   plot.ts(x.ts, col="red", 
-        main=paste("Orivinal vs Estimated", model_name,
+        main=paste(orig_name, "Original vs Estimated", model_name,
                    "Series with Resdiauls", sep=" "),
-        ylab="Original and Estimated Values",
+        ylab=paste(orig_name, "Original and Estimated Values", sep=" "),
         xlim=xlim, ylim=ylim, pch=1, lty=2)
   par(new=T)
   plot.ts(fitted(x.mod),col="blue",axes=T,xlab="",ylab="",
         xlim=xlim, ylim=ylim, lty=1) 
-  leg.txt <- c("Original Series", "Estimated Series", "Residuals")
+  leg.txt <- c(paste(orig_name, "Original Series", sep=" "), "Estimated Series", "Residuals")
   legend("topleft", legend=leg.txt, lty=c(2,1,2), 
        col=c("red","blue","green"), bty='n', cex=1)
   par(new=T)
@@ -138,18 +138,18 @@ plot.orig.model.resid <- function(x.ts, x.mod, model_name, xlim, ylim)
   mtext("Residuals", side=4, line=2,col="green")
 }
 
-plot.model.forecast <- function(x.mod, mod.fcast, num_steps, x, y)
+plot.model.forecast <- function(x.mod, mod.fcast, orig_name, num_steps, x, y)
 {
   par(mfrow=c(1,1))
   plot(mod.fcast,
-       main=paste(num_steps, "-Step Ahead Forecast and Original & Estimated Series", sep=""),
-       xlab="Simulated Time Period",
-       ylab="Original, Estimated, and Forecasted Values",
+       main=paste(num_steps, "-Step Ahead Forecast and", orig_name, "Original & Estimated Series", sep=" "),
+       xlab="Time",
+       ylab=paste(orig_name, "Original, Estimated, and Forecasted Values", sep=" "),
        xlim=x, ylim=y, lty=2, lwd=1.5)
   par(new=T)
   plot.ts(fitted(x.mod),col="blue", 
         lty=2, lwd=2, xlab="", ylab="", xlim=x, ylim=y)
-  leg.txt <- c("Original Series", "Estimated Series", "Forecast")
+  leg.txt <- c(paste(orig_name, "Original Series", sep=" "), "Estimated Series", "Forecast")
   legend("topleft", legend=leg.txt, lty=c(2,2,1), lwd=c(1,2,2),
        col=c("black","blue","blue"), bty='n', cex=1)
 }
@@ -201,7 +201,7 @@ glob.warm.ar1=arima(glob.warm.ts, order=c(1,0,0))
 # Plot the residuals
 plot.residuals.ts(glob.warm.ar1, "AR(1)")
 # Plot the In-sample fit
-plot.orig.model.resid(glob.warm.ts, glob.warm.ar1, "AR(1)", c(2004,2016), c(-0.7,4))
+plot.orig.model.resid(glob.warm.ts, glob.warm.ar1, "", "AR(1)", c(2004,2016), c(-0.7,4))
 
 ### 2. Try ARIMA models
 #gw.arima.best <- get.best.arima(glob.warm.ts, maxord=c(4,2,2))
@@ -211,7 +211,7 @@ glob.warm.arima=arima(glob.warm.ts, order=c(1,1,1))
 # Plot the residuals
 plot.residuals.ts(glob.warm.arima,"ARIMA(1,1,1)")
 # Plot the In-sample fit
-plot.orig.model.resid(glob.warm.ts, glob.warm.arima, "ARIMA(1,1,1)", c(2004,2016), c(-0.7,4))
+plot.orig.model.resid(glob.warm.ts, glob.warm.arima, "", "ARIMA(1,1,1)", c(2004,2016), c(-0.7,4))
 
 ### 3. Try SARIMA models
 #gw.seas.best <- get.best.sarima(glob.warm.ts, maxord=c(2,2,2,2,2,2), 52)
@@ -230,7 +230,7 @@ plot.residuals.ts(glob.warm.arima.seas,"SARIMA(0,1,1,1,0,1)")
 par(mfrow=c(1,1))
 acf(glob.warm.arima.seas.res^2)
 # Plot the In-sample fit
-plot.orig.model.resid(glob.warm.ts, glob.warm.arima.seas, "SARIMA(0,1,1,1,0,1)", c(2004,2016), c(-0.7,4))
+plot.orig.model.resid(glob.warm.ts, glob.warm.arima.seas, "", "SARIMA(0,1,1,1,0,1)", c(2004,2016), c(-0.7,4))
 
 ### 4. Try using GARCH.
 glob.warm.garch.fit = garchFit(~ garch(1, 1), data = glob.warm.arima.seas.res, trace = FALSE)
@@ -240,7 +240,7 @@ acf(glob.warm.garch.res)
 acf(glob.warm.garch.res^2)
 ```
 
-5. __Using a portion of the data.__ Since no satisfactory model was found using the full data series, using a portion of the data will be considered.  The data has a clear split around 2012 or 2013 where it goes from being stationary in the mean to being non-stationary in the mean.  Since we are interested in forecasting this information after 2016, we will try creating a model for the latter part of the data, the part that contains the most recent information and then forecasting after that.  2012 could have been chosen, but it still had some of the non-trending data contained in it, so 2013 was chosen as a start year.  We will repeat the same analysis as above.
+5. __Using a portion of the data.__ Since no satisfactory model was found using the full data series, using a portion of the data will be considered.  The data has a clear split around 2012 or 2013 where it goes from being stationary in the mean to being non-stationary in the mean.  Since we are interested in forecasting this information after 2016, we will try creating a model for the latter part of the data, the part that contains the most recent information and then forecasting after that.  2012 could have been chosen, but it still had some of the non-trending data contained in it, so 2013 was chosen as a start year.  We will repeat the same analysis as above.  When graphs are created with this 2013-2016 series, they will be denoted by the phrase "Abrv. Original" instead of "Original"
 
 6. __Try AR models.__  Use the ar() command in R to find AR(p) models or order p that potentially fit the time series.  This command output a model or order 1.  Check if the residuals look like white noise.
 - Histogram:  Yes.  This looks like a normal distribution.
@@ -252,11 +252,11 @@ In summary, the residuals for this model do not look like white noise, so there 
 
 7. __Try ARIMA models.__  Use the get.best.arima() function to find the best model.  The best model output from the function had an AIC of -25.091124 with parameters = c(0, 1, 0).  An ARIMA(0,1,0) model was created.  Check if the residuals look like white noise.  No, the residuals do not look like white noise.  They exhibit the same characteristics as the AR(1) model from step 6.  The In-Sample fit of this estimated model matches the original model very well as evidenced in the plot.
 
-8. __Try SARIMA models.__  Use the get.best.sarima() function.  The best AIC output is -90.17105 with parameters c(0,1,1,1,0,1), but for parsimony we will choose a SARIMA(0,1,0,0,0,1) with an AIC of -76.45286 which is very close to the other model.  Check the residuals.  Yes, the residuals look basically like white noise.  There is one place in the squared residuals where the value exceeds the 95% confidence interval.  The residuals plot exhibits evidence of time-varying volatility.  The In-Sample fit of this estimated model.
+8. __Try SARIMA models.__  Use the get.best.sarima() function.  The best AIC output is -90.17105 with parameters c(0,1,1,1,0,1), but for parsimony we will choose a SARIMA(0,1,0,0,0,1) with an AIC of -76.45286 which is very close to the other model.  Check the residuals.  Yes, the residuals look basically like white noise.  There is one place in the squared residuals where the value exceeds the 95% confidence interval.  The In-Sample fit of this estimated model.  The model now has a satisfactory fit and we will move on to backtesting and forecasting.
 
-9. __Backtesting.__ MJ WILL FINISH WRITING THIS LATER.  Backtesting looks good with all values in the confidence intervals.
+9. __Backtesting.__ For backtesting, 10% of the values from the end of the 2013-2016 time series were withheld, in this case 10 values.  The backtesting model shows mean predicted values that follow the up and down changes of the original time series, but the mean predicted values are are not as extreme as the orignal values.  The seasonality of the original series is being modeled to some extent.  We also note that the original series, for the most part, falls within the 95% confidence interval of the forecast, giving us confidence that this model could be used as a decent predictive model for the original time series.
 
-10. __Forecast the model.__  MJ WILL FINISH WRITING LATER.  Using the SARIMA model, we will make the requested 12-step ahead forecast of the model.  The forecast looks like it captures the seasonality of the model as it matches the upward trend and the seasonal volatility.
+10. __Forecast the model.__  Using the SARIMA(0,1,0,0,0,1) model with the 2013-2016 version of the time series, we made the requested 12-step ahead forecast of the model.  The forecast looks like it captures the seasonality of the model as it matches the upward trend and the seasonal volatility.  We also note that all of the forecasted values are within the 80% confidence interval of the prediction.
 
 **Conclusion**
 
@@ -266,6 +266,8 @@ MJ WILL FINISH WRITING LATE.  The 2013-2016 abbreviated time series is satisfact
 ### 5. Using a portion of the data
 # Create 2013 to 2016 series
 glob.warm.2013.ts = ts(glob.warm.ts[471:length(glob.warm.ts)],start=2013,frequency = 52)
+# Create a string label to prepend to the word "Original" for proper labeling in graphs
+part_name = "Abrv."
 # Rename series
 glob.warm.part.ts = glob.warm.2013.ts
 # Descriptive statistics
@@ -274,7 +276,7 @@ summary(glob.warm.part.ts)
 cbind(head(glob.warm.part.ts), tail(glob.warm.part.ts))
 quantile(as.numeric(glob.warm.part.ts), c(.01,.05,.1,.25,.5,.75,.9,.95,.99))
 # Plot the time series
-plot.time.series(glob.warm.part.ts,50, "GW 2013-2016")
+plot.time.series(glob.warm.part.ts,50, "Abrv. GW 2013-2016")
 
 ### 6. Try AR models.
 # Use the ar function to find an ar estimate
@@ -283,12 +285,10 @@ summary(glob.warm.ar)
 # Create an AR(1) model
 glob.warm.part.ar1=arima(glob.warm.part.ts, order=c(1,0,0))
 # Plot residuals
-par(mfrow=c(1,1))
-hist(glob.warm.part.ar1$residuals,30)
 plot.residuals.ts(glob.warm.part.ar1, "AR(1)")
 par(mfrow=c(2,1))
 # Plot the In-sample fit
-plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.ar1, "AR(1)", c(2013,2016), c(-0.7,4))
+plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.ar1, part_name, "AR(1)", c(2013,2016), c(-0.7,4))
 
 ### Try ARIMA models
 #gw.part.arima.best <- get.best.arima(glob.warm.part.ts, maxord=c(3,3,3))
@@ -298,11 +298,9 @@ plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.ar1, "AR(1)", c(2013,201
 # Create ARIMA(0,1,0) model
 glob.warm.part.arima=arima(glob.warm.part.ts, order=c(0,1,0))
 # Plot residuals
-par(mfrow=c(1,1))
-hist(glob.warm.part.arima$residuals,30)
 plot.residuals.ts(glob.warm.part.arima, "AR(0,1,0)")
 # Plot In-sample fit
-plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.arima, "AR(0,1,0)", c(2013,2016), c(-0.7,4))
+plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.arima, part_name, "AR(0,1,0)", c(2013,2016), c(-0.7,4))
 
 ### Try SARIMA models
 gw.part.seas.best <- get.best.sarima(glob.warm.part.ts, maxord=c(1,1,1,1,1,1), 52)
@@ -312,14 +310,12 @@ gw.part.seas.best$others[order(gw.part.seas.best$others$aics)[1:5],]
 glob.warm.part.sarima = arima(glob.warm.part.ts, order = c(0,1,0),
                              seas = list(order = c(0,0,1), 52), method="CSS")
 # Plot the residuals
-par(mfrow=c(1,1))
-hist(glob.warm.part.sarima$residuals,30)
 plot.residuals.ts(glob.warm.part.sarima, "SARIMA(0,1,0,0,0,1)")
 par(mfrow=c(2,1))
-acf(glob.warm.part.sarima$residuals, main="GW 2013-2016 SARIMA(0,1,0,0,0,1) Residuals")
-acf(glob.warm.part.sarima$residuals^2, main="GW 2013-2016 SARIMA(0,1,0,0,0,1) Residuals")
+acf(glob.warm.part.sarima$residuals, main="Abrv. GW 2013-2016 SARIMA(0,1,0,0,0,1) Residuals")
+acf(glob.warm.part.sarima$residuals^2, main="Abrv. GW 2013-2016 SARIMA(0,1,0,0,0,1) Residuals")
 # Plot the In-sample fit
-plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.sarima, "SARIMA(0,1,0,0,0,1)", c(2014,2016.5), c(-0.7,5))
+plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.sarima, part_name, "SARIMA(0,1,0,0,0,1)", c(2014,2016.5), c(-0.7,5))
 
 #### Backtesting
 # Create a time series cutting off the last 10% of the values
@@ -333,15 +329,15 @@ df.part = cbind(glob.warm.part.bt.ts,
            glob.warm.part.sarima.bt$resid)
 colnames(df.part) = c("orig_series", "fitted_vals", "resid")
 head(df.part)
-# Plot the original and estimate series with residuals
+# Plot the Abrv. Original and estimate series with residuals
 par(mfrow = c(1, 1))
-plot.ts(df.part[, "orig_series"], col = "red", main = "Original vs a SARIMA Estimated Series with Residuals",
-        ylab = "Original and Estimated Values", xlim = c(2013, 2016),
+plot.ts(df.part[, "orig_series"], col = "red", main = "Abrv. Original vs SARIMA Estimated Series with Residuals",
+        ylab = "Abrv. Original and Estimated Values", xlim = c(2013, 2016),
         ylim = c(-.7,4))
 par(new = T)
 plot.ts(df.part[, "fitted_vals"], col = "blue", axes = T, xlab = "",
         ylab = "", xlim = c(2013, 2016), ylim = c(-.7,4))
-leg.txt <- c("Original Series", "Estimated Series", "Residuals")
+leg.txt <- c("Abrv. Original Series", "Estimated Series", "Residuals")
 legend("top", legend = leg.txt, lty = 1, col = c("red", "navy",
                                                  "green"), bty = "n", cex = 1)
 par(new = T)
@@ -353,13 +349,13 @@ mtext("Residuals", side = 4, line = 2, col = "green")
 # Create a forecast for backtesting and plot it
 glob.warm.part.sarima.bt.fcast = forecast.Arima(glob.warm.part.sarima.bt, h=10)
 par(mfrow = c(1, 1))
-plot(glob.warm.part.sarima.bt.fcast, lty = 2, col = "navy", main = "Out-of-Sample Forecast",
-     ylab = "Original, Estimated, and Forecast Values",
+plot(glob.warm.part.sarima.bt.fcast, lty = 2, col = "navy", main = "10-Step Out-of-Sample Forecast for Abrv. GW 2013-2016 Series",
+     ylab = "Abrv. Original, Estimated, and Forecast Values",
      xlim = c(2013, 2017), ylim = c(-.7, 4.5))
 par(new = T)
 plot.ts(glob.warm.part.ts, axes=F, lty = 1, col = "black", xlim = c(2013, 2017),
         ylim = c(-.7, 4.5), ylab = "")
-leg.txt <- c("Original Series", "Forecast series")
+leg.txt <- c("Abrv. Original Series", "Forecast series")
 legend("top", legend = leg.txt, lty = 1, col = c("black", "blue"),
        bty = "n", cex = 1)
 
@@ -367,7 +363,7 @@ legend("top", legend = leg.txt, lty = 1, col = c("black", "blue"),
 glob.warm.part.sarima.fcast = forecast.Arima(glob.warm.part.sarima, h=12)
 print(str(glob.warm.part.sarima.fcast))
 print(summary(glob.warm.part.sarima.fcast$mean))
-plot.model.forecast(glob.warm.part.sarima, glob.warm.part.sarima.fcast,
-                    "12", c(2013,2017.5), c(-0.7,5.5))
+plot.model.forecast(glob.warm.part.sarima, glob.warm.part.sarima.fcast, part_name,
+                    "12", c(2013,2017), c(-0.7,5.5))
 
 ```
