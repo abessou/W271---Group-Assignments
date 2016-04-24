@@ -578,7 +578,7 @@ length(data.fit.back.fcast$mean)
 par(mfrow=c(1,1))
 plot(data.fit.back.fcast,lty=2, col="navy",
      main="Out-of-Sample Forecast",
-     ylab="Original, Estimated, and Forecast Values",
+     ylab="Original and Forecast Values",
      xlim=c(0, 3000), ylim=c(0,110))
 par(new=T)
 plot.ts(data$DXCM,axes=F,lty=1, xlim=c(0, 3000), ylim=c(0,110), ylab="")
@@ -587,14 +587,14 @@ legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
        bty='n', cex=1)
 ```
 
-We observe from the residual time series that the variance of the series is non-stationary.  The series exhibits volatility with a variance changing in a regular way. It exhibits conditional heteroskedasticity. An observation of the PACF of the squared residuals series provides confirmation of the variance dynamics. Therefore, we decide to model its residuals using GARCH
+We observe from the residual time series that the variance of the series is non-stationary.  The series exhibits volatility with a variance changing in a regular way. It exhibits conditional heteroskedasticity. An observation of the ACF of the squared residuals series provides confirmation of the variance dynamics. Therefore, we decide to model its residuals using GARCH
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Plot the residuals time series
 par(mfrow=c(3,2))
 plot.ts(data.res, main="Residuals of Financial Time Series",
         ylab="Value", xlab ="Time Units",
         col="blue")
-hist(data.res, col="gray", main="Value")
+hist(data.res, col="gray", main="Histogram of Residuals")
 acf(data.res, main="ACF of Residuals")
 pacf(data.res, main="PACF of Residuals")
 acf(data.res^2, main="ACF of Squared Residuals")
@@ -613,7 +613,7 @@ data.garch.res <- resid(data.garch)[-1]
 
 # Plot a histogram, ACF and PACF of the residuals after fitting a GARCH model
 par(mfrow=c(2,2))
-hist(data.garch.res, col="gray", main="Value")
+hist(data.garch.res, col="gray", main="Histogram of GARCH Residuals")
 acf(data.garch.res, na.action=na.pass, main="ACF of GARCH Residuals")
 pacf(data.garch.res, na.action=na.pass, main="PACF of GARCH Residuals")
 ```
@@ -629,8 +629,8 @@ data.fit.ahead.fcast <- forecast.Arima(data.fit, h=36)
 length(data.fit.ahead.fcast$mean)
 par(mfrow=c(1,1))
 plot(data.fit.ahead.fcast,lty=2, col="navy",
-     main="Out-of-Sample Forecast",
-     ylab="Original, Estimated, and Forecast Values",
+     main="36-Step Ahead Forecast and Original Values",
+     ylab="Original and Forecast Values",
      xlim=c(0, 3000), ylim=c(0,110))
 par(new=T)
 plot.ts(data$DXCM,axes=F,lty=1, xlim=c(0, 3000), ylim=c(0,110),ylab="")
@@ -673,8 +673,8 @@ data.fit.ahead.fcast$upper[,1] <- data.fit.ahead.fcast$mean
 # Plot the forecast with the updated 95% confidence inteval
 par(mfrow=c(1,1))
 plot(data.fit.ahead.fcast,lty=2, col="navy",
-     main="Out-of-Sample Forecast",
-     ylab="Original, Estimated, and Forecast Values",
+     main="36-Step Ahead Forecast and Original Series",
+     ylab="Original and Forecast Values",
      xlim=c(0, 3000), ylim=c(0,110))
 par(new=T)
 plot.ts(data$DXCM,axes=F,lty=1, xlim=c(0, 3000), ylim=c(0,110),ylab="")
