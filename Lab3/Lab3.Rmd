@@ -81,16 +81,19 @@ get.best.sarima <- function(x.ts, maxord=c(1,1,1,1,1,1), freq=frequency(x.ts))
   list(best=list(best.aic, best.fit, best.model), others=data.frame(aics=all.aics, models=all.models))
 }
 
-plot.time.series <- function(x.ts,bins=30, name)
+plot.time.series <- function(x.ts,bins=30, name, lag=25, plot="quad")
 {
   str(x.ts)
   par(mfrow=c(2,2))
+  if (plot == "single") {
+      par(mfrow=c(1,1))
+  }
   hist(x.ts,bins, main = paste("Histogram of", name, sep=" "),
        xlab="Values")
   plot(x.ts, main=paste("Plot of", name, sep=" "),
        ylab="Values", xlab="Time")
-  acf(x.ts, main = paste("ACF of", name, sep=" "))
-  pacf(x.ts, main = paste("PACF of", name, sep=" "))
+  acf(x.ts, lag=lag, main = paste("ACF of", name, sep=" "))
+  pacf(x.ts, lag=lag, main = paste("PACF of", name, sep=" "))
 }
 
 plot.residuals.ts <- function(x.mod, model_name)
@@ -131,7 +134,7 @@ plot.orig.model.resid <- function(x.ts, x.mod, orig_name, model_name, xlim, ylim
   par(mfrow=c(1,1))
   plot.ts(x.ts, col="red", 
         main=paste(orig_name, "Original vs Estimated", model_name,
-                   "Series with Resdiauls", sep=" "),
+                   "Series with Residuals", sep=" "),
         ylab=paste(orig_name, "Original and Estimated Values", sep=" "),
         xlim=xlim, ylim=ylim, pch=1, lty=2)
   par(new=T)
@@ -684,6 +687,17 @@ data.fit.ahead.fcast$lower[,2] <- -(((data.fit.ahead.fcast$mean-data.fit.ahead.f
 
 data.fit.ahead.fcast$upper[,2] <- (((data.fit.ahead.fcast$upper[,2]-data.fit.ahead.fcast$mean)/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*data.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
 
+##### MEGAN'S CALCULATION ###
+fcast=data.fit.ahead.fcast
+sdGARCH = data.garch.pred$standardDeviation
+v1 = ((fcast$upper[,2] - fcast$mean) / sqrt(fcast$model$sigma2)) * sdGARCH
+lower = fcast$mean - v1
+upper = fcast$mean + v1
+print(data.fit.ahead.fcast$lower[,2]) # Charles' calc
+print(lower) # Megan's calc
+print(data.fit.ahead.fcast$upper[,2]) # Charles' calc
+print(upper) # Megan's calc
+
 df<-data.frame(cbind(data.fit.ahead.fcast$mean, data.fit.ahead.fcast$lower[,2], data.fit.ahead.fcast$upper[,2]))
 names(df) <- c("Mean", "Lower 95% conf", "Upper 95% conf")
 stargazer(df, type="text", summary=FALSE)
@@ -711,31 +725,38 @@ legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
 
 \newpage
 
-Part 3 (25 points): Forecast the Web Search Activity for global Warming
+Part 3 (25 points): Forecast the Web Search Activity for Global Warming
 =======================================================================
-**Data Analysis**
+**Data Analysis - Original Series**
 
  1. The time series has weekly values (630 of them) starting at 1/4/04 and ending at 1/24/16.  The minimum value is -0.551 and the maximum value is 4.104.
  2. Time series plot shows that the series is very persistent,  The series is basically flat from 2004 to 2012.  After 2012, there is a sharp trend upward.  There is more volatility after 2012.  There are spikes and dips which could be seasonal with a yearly frequency.  The series is not stationary in the mean.
  3. Histogram shows is heavily positively skewed with most values between -0.551 and -0.3.
- 3. ACF of the series has correlations at around 0.75 for almost 25 lags.
- 4. PACF drops off immediately after first lag.  There are 4 points that fall outside the 95% confidence interval (blue lines) at lags 3, 5, 11 and 14.  The PACF could show some signs of seasonality.
+ 4. ACF of the series has a gradual decay toward 0.  The plot of the ACF is for 104 lags (2 years).  There is a gradual decay from correlation 1 at 0 lags to correlation 0.2 at 104 lags.  This gradual decay is an indication that the series likely has an AR(p) component.  There is also a slight dip in the correlation just after lag 0 and just after lag 52 (labeled 1.0 on the plot).  This supports a theory that there is seasonality at frequency 52 lags (or 52 weeks or 1 year) in the time series.
+ 5. PACF drops off immediately after first lag.  This gives an indication that the series likely has an AR(1) component.  There are 4 points that fall outside the 95% confidence interval (blue lines) at lags 3, 5, 11 and 14.  The PACF shows some signs of seasonality.
 
-**Model Selection Process**
+**Data Analysis - 1st Difference of Original Series**
 
-1. __Try AR models.__  Use the ar() command in R to find AR(p) models or order p that potentially fit the time series.  This command output a model or order 15, but looking at the difference in AICs, the AIC for the AR(1) model is not that different (only 29.85 point away) from the AIC of the AR(15), so for parsimony we will try using that one.  Check if the residuals look like white noise.
-- Histogram:  Yes.  This looks like a normal distribution.
-- Fitted vs. Residuals:  No.  The plot does not look like an evenly distributed cloud.
-- Plot:  No.  The plot does not look random, there is a lot of volatility on the right hand side of the graph.
-- ACF:  No.  The ACF drops off after lag 0, but has only a few lags where the correlation comes out of the 95% confidence interval (CI)
-- PACF:  No.  The PACF shows correlation with several values outside of the 95% CI.
-In summary, the residuals for this model do not look like white noise, so there is more variation that could be explained by our model.  The In-Sample fit of this estimated model matches the original model very well as evidenced in the plot.
+1.  Plot.  The plot of the 1st differenced time series shows that it is stationary in the mean.  It does not look like white noise.  It has a lot more volatility on the right hand side of the equation.
+2.  Histogram.  This has a normal distribution like white noise.
+3.  ACF.  Mostly drops off after 1 lag with several lags out of the 95% confidence interval.  ?? Does this suggest a MA(1) component in the 1st differenced series.
+4.  PACF.  Mostly drops off after 2 lags and slowly oscillates to zero.
 
-2. __Try ARIMA models.__  Use the get.best.arima() function which will try models with c(p,d,q) where p=0-4, d=0-2 and q=0-2.  And then we can print out a list in ascending order by AIC of the 20 models with the lowest AIC.  And then inspect these models for parsimony and select one with a good AIC and a small number of parameters.  The best model output from the function had an AIC of -1058.794 with parameters = c(1, 2, 2).  For parsimony a model of ARIMA(1,1,1) was chosen with an AIC of -1032.364 which is not that different from the best AIC.  Check if the residuals look like white noise.  No, the residuals do not look like white noise.  They exhibit the same characteristics as the AR(1) model from step 1.  The In-Sample fit of this estimated model matches the original model very well as evidenced in the plot.
+**Part A - Using Entire Dataset**
 
-3. __Try SARIMA models.__  From the plot of the original series, it looks like this series has a seasonal component with a 52-week periodicity.  Use the get.best.sarima() function with parameters c(2,2,2,2,2,2).  The best AIC output is -1276.817 with a model of SARIMA(1,2,2,1,0,2).  For parsimony try running get.best.sarima() with c(1,1,1,1,1,1).  A parsimonious model from this output is SARIMA(0,1,1,1,0,1) with AIC -1246.412 which is very close to the AIC output from c(2,2,2,2,2,2).  For parsimony we will choose SARIMA(0,1,1,1,0,1) and check the residuals.  No, the residuals do not look like white noise.  They exhibit the same characteristics as the AR(1) model from step 1.  The residuals plot exhibits evidence of time-varying volatility.  The In-Sample fit of this estimated model matches the original model very well as evidenced in the plot.
+Summary:  Below, we try and fit a SARIMA model to the entire dataset. We find the fit unsuitable, and in Part B move on to analysis of a smaller part in order to produce a better forecast. We detail below the procedure used.
 
-4. __Try using GARCH.__ Since the residuals exhibit evidence of time-varying volatility, we will try to use GARCH to model that.  A GARCH model is fit with the residuals from the SARIMA(0,1,1,1,0,1) model from step 3.  Looking at the residuals of the GARCH model, the square of the residuals is still not completely inside the 95% CI indicating that there is still time-varying volatility present.  Since we haven't found a model with a satisfactory fit, we will look at only modeling part of the original time series.
+1. __Try AR models.__  Since AR models are used to model time series that are stationary in the mean and the non-differenced version of this model is not stationary in the mean, then we will not estimate an AR model for this series.
+
+2. __Try ARIMA models.__  Since we have identified that there is a seasonal component in this series, we will skip estimating models that do not incorporate a seasonal component and move to SARIMA models.
+
+3. __Try SARIMA models.__  From the plot of the original series, it looks like this series has a seasonal component with a 52-week periodicity.  Use the get.best.sarima() function to estimate a SARIMA(p,d,q,P,D,Q) model with maximum parameters c(2,2,2,2,2,2).  The best AIC output is -1276.817 with a model of SARIMA(1,2,2,1,0,2).  For parsimony try running get.best.sarima() with c(1,1,1,1,1,1).  A parsimonious model from this output is SARIMA(0,1,1,1,0,1) with AIC -1246.412 which is very close to the AIC output from c(2,2,2,2,2,2).  For parsimony we will choose SARIMA(0,1,1,1,0,1).  The In-Sample fit of this estimated model matches the original model very well as evidenced in the plot.  The coefficients: ma1=-0.4493386, sar1=1.2826553, sma1=-0.4615329 are all significant and fall in to the 95% confidence interval as shown below in the R code.\newline
+However, the residuals do not look like white noise (see analysis below) which means that there is more variance to be explained.  
+- Histogram: Yes. This looks like a normal distribution.
+- Fitted vs. Residuals: No. The plot does not look like an evenly distributed cloud.
+- Plot: No. The plot does not look random, there is a lot of volatility on the right hand side of the graph which looks like time-varying volatility.
+- ACF: No. The ACF drops off after lag 0, but has only a few lags where the correlation comes out of the 95% confidence interval (CI)
+- PACF: No. The PACF shows correlation with several values outside of the 95% CI.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Read in the time series data
@@ -747,25 +768,9 @@ summary(glob.warm.ts)
 cbind(head(glob.warm.ts), tail(glob.warm.ts))
 quantile(as.numeric(glob.warm.ts), c(.01,.05,.1,.25,.5,.75,.9,.95,.99))
 # Plot the time series
-plot.time.series(glob.warm.ts, 50, "Global Warming")
-
-### 1. Try AR models
-glob.warm.ar = estimate.ar(glob.warm.ts)
-glob.warm.ar1=arima(glob.warm.ts, order=c(1,0,0))
-# Plot the residuals
-plot.residuals.ts(glob.warm.ar1, "AR(1)")
-# Plot the In-sample fit
-plot.orig.model.resid(glob.warm.ts, glob.warm.ar1, "", "AR(1)", c(2004,2016), c(-0.7,4))
-
-### 2. Try ARIMA models
-#gw.arima.best <- get.best.arima(glob.warm.ts, maxord=c(4,2,2))
-# Print the top 20 best models based on AIC
-#gw.arima.best$others[order(gw.arima.best$others$aics)[1:20],]
-glob.warm.arima=arima(glob.warm.ts, order=c(1,1,1))
-# Plot the residuals
-plot.residuals.ts(glob.warm.arima,"ARIMA(1,1,1)")
-# Plot the In-sample fit
-plot.orig.model.resid(glob.warm.ts, glob.warm.arima, "", "ARIMA(1,1,1)", c(2004,2016), c(-0.7,4))
+plot.time.series(glob.warm.ts, 50, "Global Warming", 104, "single")
+# Plot the 1st difference of time series
+plot.time.series(diff(glob.warm.ts), 50, "GW 1st Difference", 25, "single")
 
 ### 3. Try SARIMA models
 #gw.seas.best <- get.best.sarima(glob.warm.ts, maxord=c(2,2,2,2,2,2), 52)
@@ -778,6 +783,10 @@ plot.orig.model.resid(glob.warm.ts, glob.warm.arima, "", "ARIMA(1,1,1)", c(2004,
 glob.warm.arima.seas = arima(glob.warm.ts, order = c(0,1,1),
                              seas = list(order = c(1,0,1), 52),
                              method="CSS")
+# Examine the coefficients.  The coefficients fall in the 95% CI.
+glob.warm.arima.seas$coef
+t(confint(glob.warm.arima.seas))
+
 # Plot the residuals
 glob.warm.arima.seas.res = glob.warm.arima.seas$residuals
 plot.residuals.ts(glob.warm.arima.seas,"SARIMA(0,1,1,1,0,1)")
@@ -786,38 +795,41 @@ acf(glob.warm.arima.seas.res^2, main="ACF of SARIMA(0,1,1,1,0,1) Residuals^2")
 # Plot the In-sample fit
 plot.orig.model.resid(glob.warm.ts, glob.warm.arima.seas, "", "SARIMA(0,1,1,1,0,1)", c(2004,2016), c(-0.7,4))
 
-### 4. Try using GARCH.
-glob.warm.garch.fit = garchFit(~ garch(1, 1), data = glob.warm.arima.seas.res, trace = FALSE)
-glob.warm.garch.res <- glob.warm.garch.fit@residuals
-par(mfrow=c(2,1))
-acf(glob.warm.garch.res, main="ACF of GARCH with SARIMA(0,1,1,1,0,1) Residuals")
-acf(glob.warm.garch.res^2, main="ACF of GARCH SARIMA(0,1,1,1,0,1) Residuals^2")
 ```
 
-5. __Using a portion of the data.__ Since no satisfactory model was found using the full data series, using a portion of the data will be considered.  The data has a clear split around 2012 or 2013 where it goes from being stationary in the mean to being non-stationary in the mean.  Since we are interested in forecasting this information after 2016, we will try creating a model for the latter part of the data, the part that contains the most recent information and then forecasting after that.  2012 could have been chosen, but it still had some of the non-trending data contained in it, so 2013 was chosen as a start year.  We will repeat the same analysis as above.  When graphs are created with this 2013-2016 series, they will be denoted by the phrase "Abrv. Original" instead of "Original"
+**Part B - Abbreviated Dataset**
 
-6. __Try AR models.__  Use the ar() command in R to find AR(p) models or order p that potentially fit the time series.  This command output a model or order 1.  Check if the residuals look like white noise.
-- Histogram:  Yes.  This looks like a normal distribution.
-- Fitted vs. Residuals:  Yes.  The plot looks like an evenly distributed cloud.
-- Plot:  Yes.  The plot looks mostly like white noise.  There is a little more volatility on the right hand side of the graph.
-- ACF:  No.  The ACF drops off after lag 0, but has only a few lags where the correlation comes out of the 95% confidence interval (CI)
-- PACF:  No.  The PACF shows correlation with a few values outside of the 95% CI.
-In summary, the residuals for this model do not look like white noise, so there is more variation that could be explained by our model.
+Summary:  We decided to use 2013 onwards as our abberviated dataset and were able to produce a much more suitable forecast.  The Abbreviated 2013-2016 Global Warming time series is satisfactorily modeled with a SARMIMA(0,1,0,0,0,1) model to handle trends and seasonality.  The residuals are close enough to white noise and the seasonality is modeled.
 
-7. __Try ARIMA models.__  Use the get.best.arima() function to find the best model.  The best model output from the function had an AIC of -25.091124 with parameters = c(0, 1, 0).  An ARIMA(0,1,0) model was created.  Check if the residuals look like white noise.  No, the residuals do not look like white noise.  They exhibit the same characteristics as the AR(1) model from step 6.  The In-Sample fit of this estimated model matches the original model very well as evidenced in the plot.
+4. __Using a portion of the data.__ Since no satisfactory model was found using the full data series, using a portion of the data will be considered.  The data has a clear split around 2012 or 2013 where it goes from being stationary in the mean to being non-stationary in the mean.  Since we are interested in forecasting this information after 2016, we will try creating a model for the latter part of the data, the part that contains the most recent information and then forecasting after that.  2012 could have been chosen, but it still had some of the non-trending data contained in it, so 2013 was chosen as a start year.  When graphs are created with this 2013-2016 series, they will be denoted by the phrase "Abrv. Original" instead of "Original".
 
-8. __Try SARIMA models.__  Use the get.best.sarima() function.  The best AIC output is -90.17105 with parameters c(0,1,1,1,0,1), but for parsimony we will choose a SARIMA(0,1,0,0,0,1) with an AIC of -76.45286 which is very close to the other model.  Check the residuals.  Yes, the residuals look basically like white noise.  There is one place in the squared residuals where the value exceeds the 95% confidence interval.  The In-Sample fit of this estimated model.  The model now has a satisfactory fit and we will move on to backtesting and forecasting.
+5. __Data Analysis of Abbreviated Series.__ 
 
-9. __Backtesting.__ For backtesting, 10% of the values from the end of the 2013-2016 time series were withheld, in this case 10 values.  The backtesting model shows mean predicted values that follow the up and down changes of the original time series, but the mean predicted values are are not as extreme as the orignal values.  The seasonality of the original series is being modeled to some extent.  We also note that the original series, for the most part, falls within the 95% confidence interval of the forecast, giving us confidence that this model could be used as a decent predictive model for the original time series.
+- The time series has weekly values (160 of them) starting at 1/6/13 and ending at 1/24/16.  The minimum value is -0.2180 and the maximum value is 4.104.
+- Time series plot shows that the series is very persistent.  There is a sharp trend upward.  There is more volatility after 2012.  There are spikes and dips which could be seasonal with a yearly frequency.  The series is not stationary in the mean.
+- Histogram is multimodal showing about 5 hills over the range of values.
+- ACF of the series has a gradual decay toward 0.  At lag 25, there is still a correlation of about 0.6. This gradual decay is an indication that the series likely has an AR(p) component.  There is also a slight dip in the correlation just after lag 0 which supports a theory that there is seasonality in the time series.
+- PACF drops off immediately after first lag.  This gives an indication that the series likely has an AR(1) component.  After lag 1, there are no points that fall outside of the 95% confidence interval.  The PACF shows some signs of seasonality.
 
-10. __Forecast the model.__  Using the SARIMA(0,1,0,0,0,1) model with the 2013-2016 version of the time series, we made the requested 12-step ahead forecast of the model.  The forecast looks like it captures the seasonality of the model as it matches the upward trend and the seasonal volatility.  We also note that all of the forecasted values are within the 80% confidence interval of the prediction.
+6. __Data Analysis of Abbreviated 1st Differenced Series.__ 
 
-**Conclusion**
+- Plot.  The plot of the 1st differenced time series shows that it is stationary in the mean.  It looks a lot like white noise.  It has a lot more volatility on the right hand side of the equation.
+- Histogram.  This has a normal distribution like white noise.
+- ACF.  Mostly drops off after 1 lag with several lags out of the 95% confidence interval.  ?? Does this suggest a MA(1) component in the 1st differenced series.
+- PACF.  Mostly drops off after 0 lags and slowly oscillates to zero.
 
-The Abbrieviated 2013-2016 Global Warming time series is satisfactorily modeled with a SARMIMA(0,1,0,0,0,1) model to handle trends and seasonality.  The residuals are close enough to white noise and the seasonality is modeled.  Given this, we will stay with the Abbrieviated time series to make our forecast.
+7. __Try AR models.__  Since AR models are used to model time series that are stationary in the mean and the non-differenced abbreviated version of this model is not stationary in the mean, then we will not estimate an AR model for this series.
+
+8. __Try ARIMA models.__  Since we have identified that there is a seasonal component in this series, we will skip estimating models that do not incorporate a seasonal component and move to SARIMA models.
+
+9. __Try SARIMA models.__  Use the get.best.sarima() function.  The best AIC output is -90.17105 with parameters c(0,1,1,1,0,1), but for parsimony we will choose a SARIMA(0,1,0,0,0,1) with an AIC of -76.45286 which is very close to the other model.  Check the residuals.  Yes, the residuals look basically like white noise.  There is one place in the squared residuals where the value exceeds the 95% confidence interval.  The In-Sample fit of this estimated model.  The model now has a satisfactory fit and we will move on to backtesting and forecasting.  The coefficient sma1=5.793727 is significant and falls in to the 95% confidence interval as shown below in the R code.
+
+10. __Backtesting.__ For backtesting, 10% of the values from the end of the 2013-2016 time series were withheld, in this case 10 values.  The backtesting model shows mean predicted values that follow the up and down changes of the original time series, but the mean predicted values are are not as extreme as the orignal values.  The seasonality of the original series is being modeled to some extent.  We also note that the original series, for the most part, falls within the 95% confidence interval of the forecast, giving us confidence that this model could be used as a decent predictive model for the original time series.
+
+11. __Forecast the model.__  Using the SARIMA(0,1,0,0,0,1) model with the 2013-2016 version of the time series, we made the requested 12-step ahead forecast of the model.  The forecast looks like it captures the seasonality of the model as it matches the upward trend and the seasonal volatility.  We also note that all of the forecasted values are within the 80% confidence interval of the prediction.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-### 5. Using a portion of the data
+### 4. Using a portion of the data
 # Create 2013 to 2016 series
 glob.warm.2013.ts = ts(glob.warm.ts[471:length(glob.warm.ts)],start=2013,frequency = 52)
 # Create a string label to prepend to the word "Original" for proper labeling in graphs
@@ -831,38 +843,20 @@ cbind(head(glob.warm.part.ts), tail(glob.warm.part.ts))
 quantile(as.numeric(glob.warm.part.ts), c(.01,.05,.1,.25,.5,.75,.9,.95,.99))
 # Plot the time series
 plot.time.series(glob.warm.part.ts,50, "Abrv. GW 2013-2016")
+# Plot the 1st difference of time series
+plot.time.series(diff(glob.warm.part.ts), 50, "Abrv. GW 1st Difference")
 
-### 6. Try AR models.
-# Use the ar function to find an ar estimate
-glob.warm.ar = estimate.ar(glob.warm.part.ts)
-summary(glob.warm.ar)
-# Create an AR(1) model
-glob.warm.part.ar1=arima(glob.warm.part.ts, order=c(1,0,0))
-# Plot residuals
-plot.residuals.ts(glob.warm.part.ar1, "AR(1)")
-par(mfrow=c(2,1))
-# Plot the In-sample fit
-plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.ar1, part_name, "AR(1)", c(2013,2016), c(-0.7,4))
-
-### Try ARIMA models
-#gw.part.arima.best <- get.best.arima(glob.warm.part.ts, maxord=c(3,3,3))
-# Print the top 10 best models based on AIC
-#gw.part.arima.best$others[order(gw.part.arima.best$others$aics)[1:10],]
-
-# Create ARIMA(0,1,0) model
-glob.warm.part.arima=arima(glob.warm.part.ts, order=c(0,1,0))
-# Plot residuals
-plot.residuals.ts(glob.warm.part.arima, "AR(0,1,0)")
-# Plot In-sample fit
-plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.arima, part_name, "AR(0,1,0)", c(2013,2016), c(-0.7,4))
-
-### Try SARIMA models
+### 9.  Try SARIMA models
 gw.part.seas.best <- get.best.sarima(glob.warm.part.ts, maxord=c(1,1,1,1,1,1), 52)
 # Print the top 20 best models based on AIC
 gw.part.seas.best$others[order(gw.part.seas.best$others$aics)[1:5],]
 # Create SARIMA(0,1,0,0,0,1) model
 glob.warm.part.sarima = arima(glob.warm.part.ts, order = c(0,1,0),
                              seas = list(order = c(0,0,1), 52), method="CSS")
+# Examine the coefficients.  The coefficients fall in the 95% CI.
+glob.warm.part.sarima$coef
+t(confint(glob.warm.part.sarima))
+
 # Plot the residuals
 plot.residuals.ts(glob.warm.part.sarima, "SARIMA(0,1,0,0,0,1)")
 par(mfrow=c(2,1))
@@ -871,7 +865,7 @@ acf(glob.warm.part.sarima$residuals^2, main="ACF of Abrv. GW 2013-2016 SARIMA(0,
 # Plot the In-sample fit
 plot.orig.model.resid(glob.warm.part.ts, glob.warm.part.sarima, part_name, "SARIMA(0,1,0,0,0,1)", c(2014,2016.5), c(-0.7,5))
 
-#### Backtesting
+#### 10.  Backtesting
 # Create a time series cutting off the last 10% of the values
 glob.warm.part.bt.ts = ts(glob.warm.part.ts[1:(length(glob.warm.part.ts)-10)],start=2013,frequency = 52)
 # Recreate SARIMA(0,1,0,0,0,1) model
@@ -913,13 +907,16 @@ leg.txt <- c("Abrv. Original Series", "Forecast series")
 legend("top", legend = leg.txt, lty = 1, col = c("black", "blue"),
        bty = "n", cex = 1)
 
-#### Forecasting - Forecast the request 12-step ahead forecast
+#### 11.  Forecasting - Forecast the request 12-step ahead forecast
 glob.warm.part.sarima.fcast = forecast.Arima(glob.warm.part.sarima, h=12)
-print(str(glob.warm.part.sarima.fcast))
 print(summary(glob.warm.part.sarima.fcast$mean))
 plot.model.forecast(glob.warm.part.sarima, glob.warm.part.sarima.fcast, part_name,
                     "12", c(2013,2017), c(-0.7,5.5))
 
+# Print the forecasted values and 95% CI.
+df=data.frame(cbind(glob.warm.part.sarima.fcast$mean, glob.warm.part.sarima.fcast$lower[,2], glob.warm.part.sarima.fcast$upper[,2]))
+names(df) = c("Mean", "Lower 95% conf", "Upper 95% conf")
+stargazer(df, type="text", summary=FALSE)
 ```
 
 \newpage
