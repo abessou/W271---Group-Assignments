@@ -924,10 +924,11 @@ Part 4 (25 points): Forecast Inflation-Adjusted Gas Price
 
 The dataframe contains three variables. Date, Production and Price. It consists of 410 observations of those variables. The Date variable indicates that the data ranges from January 01 1978 to February 01 2012. We next perform some exploratory data analysis of those variables.
 
-1 __Variable Production__ The histogram shows a data distribution of the variable that appears to be multimodal. It does not appear that the underlying distribution of the data is a normal distribution. However, there are no outliers or singularities in the data that would require that we investigate further or that we remove them from the data set.
+1 __Variable Production__ The histogram shows a data distribution of the variable that appears to be multimodal. It does not appear that the underlying distribution of the data is a normal distribution. However, there are no outliers or singularities in the data.
 
-2 __Variable Price__ The histogram shows a data distribution that is positively skewed. There are no indications from the histogram that the data follow a Normal distribution. However, there are no outliers or singularities in the data that would require that we investigate further or that we remove them from the data set. Our side by side plot of both series shows trends up and down and volatility. 
+2 __Variable Price__ The histogram shows a data distribution that is positively skewed. There are no indications from the histogram that the data follow a Normal distribution. However, there are no outliers or singularities in the data. 
 
+Our side by side plot of both series shows trends up and down and volatility. 
 Both series appear to be non-stationary in the mean.
  
 
@@ -935,7 +936,7 @@ Both series appear to be non-stationary in the mean.
 # Load the data
 gas.data <- load(file.path('gasOil.Rdata'))
 
-# Sumamry information about the data
+# Summary information about the data
 str(gasOil)
 summary(gasOil)
 cbind(head(gasOil$Date), head(gasOil$Price), head(gasOil$Production), 
@@ -983,13 +984,12 @@ axis(side=4, col="green")
 leg.txt <- c("Oil Prices", "Oil Production")
 legend("top", legend=leg.txt, lty=1, col=c("navy", "green"),
        bty='n', cex=1)
-
 ```
 
 Task1
 -----
-We can assume that the AP tested the correlation of the time series of Oil Price and Oil Production. We can replicate the calculation of the reported p-value with a test of the correlation of the
-variables Price and Production. The test reports a p-value of 0.5752, which is non-significant. The reported 95% confidence interval for the correlation is [-0.06927648  0.12427029]. Since the p-value for the test is non-significant, the confidence interval non-surprisingly spans the zero value.
+We can assume that the AP tested the correlation of the time series of Oil Price and Oil Production. We can replicate the calculation of the reported p-value with a test of the correlation of the variables Price and Production. 
+The test reports a p-value of 0.5752, which is non-significant. The reported 95% confidence interval for the correlation is [-0.06927648  0.12427029]. Since the p-value for the test is non-significant, the confidence interval non-surprisingly spans the zero value.
 
 When computing the correlation of two sets of observations of data, we assume that the data is from random samples each drawn from their respective population with distributions that have constant means and variances. 
 We know that our data is from a time time series. We have seen from the side by side plots that these series are non-stationary in the mean. Therefore the assumption of constant mean in the calculation of the correlation does not hold and the calculated p-value is flawed.
@@ -1003,8 +1003,13 @@ cor.test(gasOil$Price, gasOil$Production)
 
 Task 2
 -------
+__Approach summary__
+We fit the series with a SARIMA(0, 1, 1, 1, 0, 3) model, followed by fitting the residuals of our fitted model with GARCH and using the results of both fitted series to make our forecast with accurate confidence intervals depicting the series. The next sections provide the details of our approach.
+
+__EDA on the series__
 The series exhibits trends up and down and a lot of volatility. It appears to be non-stationary in the mean.
-We can also see that ACF is gradually descending, indicating a possible ARIMA or SARIMA dynamics. Knowing the series to be that of oil prices, we can speculate that it incorporates seasonality as we'd expect prices to follow the seasons of the year. We would expect yearly seasonality. The PACF shows significant correlations at lags 1 and less so at lag 2, suggesting that the series might have characteristics of an AR(1) or AR(2) component. 
+We can also see that ACF is gradually descending, indicating a possible ARIMA or SARIMA dynamics. 
+Knowing the series to be that of oil prices, we can speculate that it incorporates seasonality as we'd expect prices to follow the seasons of the year and the corresponding changes in oil compsumption. We would expect yearly seasonality. The PACF shows significant correlations at lags 1 and less so at lag 2, suggesting that the series might have characteristics of an AR(1) or AR(2) component. 
 To verify our observations, we next study 1 and 2 order differences of the series.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 #EDA on series
@@ -1017,7 +1022,7 @@ acf(price.ts, main="ACF of Time Series")
 pacf(price.ts, main="PACF of Time Series")
 ```
 
-As expected, the lag(1) and lag(2) series are stationary in the mean. They appear to show conditional volatility that will need to be analyzed with a GARCH model.
+As expected, the diff(1) and diff(2) series are stationary in the mean. They appear to show conditional volatility that will need to be analyzed with a GARCH model.
 We can also observe patterns that appear to be seasonal patterns of repetition on yearly basis in the series. That observation would support the ituition that weather cycles and corresponding consuption changes may affect gas prices.
 Because the first difference series is stationary in the mean, we will not need the second order differencing of the series when we study it furter. 
 We can also see that the ACF of the first and second order series drop sharply after lag 1 indicating the presence of an MA(1) component in the series. Similarly, the PACF of the first and second difference series have a single significant correlation at lag 1, indicating the possible presence of an AR(1) component in the series. 
@@ -1040,7 +1045,8 @@ acf(diff(price.ts, lag=2), main="ACF of Time Series")
 pacf(diff(price.ts, lag=2), main="PACF of Time Series")
 ```
 
-The best SARIMA model fitted is a (p,d,q,P,D,Q) of (0, 1, 2, 1, 0, 3) with an AIC of -672.50. We note that immediately following that model, is a SARIMA of parameters (0, 1, 1, 1, 0, 3) with an AIC of -672.19.
+__Fitting a model to the time series data__
+The best SARIMA model fitted is a (p,d,q,P,D,Q) of orders (0, 1, 2, 1, 0, 3) with an AIC of -672.50. We note that immediately following that model, is a SARIMA of parameters (0, 1, 1, 1, 0, 3) with an AIC of -672.19.
 With parsimony in mind, we select that model to fit our data and proceed to assess the in-sample fit of that model. It matches our earlier observations of a stationary first difference series, and of the possible presence of AR(1) and MA(1) components in the time series, along with that of a seasonal component.
 An inspection of the confidence intervals of the paramaters of this model indicate that the parameter for the second MA component of the seasonal model is not significant. But the third parameter of the same seasonal component is significant.
 We next perform in-sample fit using the fitted series to assess our fitted model.
@@ -1124,8 +1130,9 @@ legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
 ```
 
 The ACF and PACF of the residual series resemble those of a white noise series. But we observe from the squared residuals time series that the variance of the series is non-stationary. 
-The series exhibits volatility with a variance changing in a regular way. It exhibits conditional heteroskedasticity behavior. Therefore, we will model its residuals using GARCH.
+The series exhibits volatility with a variance changing in a regular way. It exhibits conditional heteroskedasticity. Therefore, we will model its residuals using GARCH.
 
+__48 steps ahead forecasting__
 With this in mind, we proceed to an initial 48 steps ahead forecast of the oil price series.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Plot the residuals time series
@@ -1158,7 +1165,7 @@ legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
 ```
 
 We observe from the ACF of the residuals of the GARCH fitted series that they have characteristics of white noise with mostly non-significant correlations at all lags of the ACF. What the GARCH model of the residuals tells is that we can expect more or less volatility through the forecast of the point series. 
-That volatility affects the confidence intervals of the estimates of our SARIMA model as previously observed with the backstesting.
+That volatility affects the confidence intervals of the estimates of our SARIMA model as previously observed with backstesting.
 Using our fitted GARCH model, we can now better predict the variance of the point estimates from 2012 to 2016.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Fit a GARCH model to the residuals of the fitted time series
