@@ -739,8 +739,7 @@ Part 3 (25 points): Forecast the Web Search Activity for Global Warming
 
 1.  Plot.  The plot of the 1st differenced time series shows that it is stationary in the mean.  It does not look like white noise.  It has a lot more volatility on the right hand side of the equation.
 2.  Histogram.  This has a normal distribution like white noise.
-3.  ACF.  Mostly drops off after 1 lag with several lags out of the 95% confidence interval.  ?? Does this suggest a MA(1) component in the 1st differenced series.
-4.  PACF.  Mostly drops off after 2 lags and slowly oscillates to zero.
+3.  ACF.  Mostly drops off after 1 lag with several lags out of the 95% confidence interval. 4.  PACF.  Mostly drops off after 2 lags and slowly oscillates to zero.
 
 **Part A - Using Entire Dataset**
 
@@ -815,8 +814,7 @@ Summary:  We decided to use 2013 onwards as our abberviated dataset and were abl
 
 - Plot.  The plot of the 1st differenced time series shows that it is stationary in the mean.  It looks a lot like white noise.  It has a lot more volatility on the right hand side of the equation.
 - Histogram.  This has a normal distribution like white noise.
-- ACF.  Mostly drops off after 1 lag with several lags out of the 95% confidence interval.  ?? Does this suggest a MA(1) component in the 1st differenced series.
-- PACF.  Mostly drops off after 0 lags and slowly oscillates to zero.
+- ACF.  Mostly drops off after 1 lag with several lags out of the 95% confidence interval.  - PACF.  Mostly drops off after 0 lags and slowly oscillates to zero.
 
 7. __Try AR models.__  Since AR models are used to model time series that are stationary in the mean and the non-differenced abbreviated version of this model is not stationary in the mean, then we will not estimate an AR model for this series.
 
