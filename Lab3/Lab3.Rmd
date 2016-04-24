@@ -288,10 +288,10 @@ We examine bivariate correlations and scatterplots for all variables in the data
 ##Conclusions
 
 1. A lot of variables show strong correlations with each other in the dataset (absolute val of correlation > 0.7). We must be wary of multicollinearity when including these variables together in our regression models which would make our model coefficients lose precision. At the same time, it is important to include necessary variables in order to prevent any omitted variable bias.
- * logCrimeRate shows a strong correlation with logdistanceToCity, distanceToHighway and pollutionIndex
- * nonRetailBusiness shows a strong correlation with logdistanceToCity and pollutionIndex
+ * logCrimeRate shows a strong correlation with logdistanceToCity, distanceToHighway, pollutionIndex and nonRetailBusiness
+ * nonRetailBusiness shows a strong correlation with logdistanceToCity, pollutionIndex and logCrimeRate
  * ageHouse also shows a strong correlation with logdistanceToCity and pollutionIndex
- * logDistancetoCity shows a strong correlation with pollutionIndex
+ * logDistancetoCity shows a strong correlation with pollutionIndex, logCrimeRate, nonRetailBusiness, ageHouse
  
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 panel.hist <- function(x, ...)
@@ -340,6 +340,8 @@ In this model, we see that several variables do not have statistical significanc
 
 Before we move on to more parsimonious models, we will examine interaction variables to see if they add any explanatory power to our model. We have two categorical variables in our dataset: withWater and distanceToHighway (though a numerical variable, it has only nine distinct values, effectively functioning as a categorical). We add all possible interactions with these variables to see if we obtain any noteworthy result.
 
+Although it is possible to include interaction terms of continuous variables, the results are complex to explain.  For simplicity, these interactions are excluded from the analysis.
+
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 model.2 = lm(logHomeValue~logCrimeRate_pc+nonRetailBusiness+withWater+ageHouse+
         logDistanceToCity+distanceToHighway+pupilTeacherRatio+pctLowIncome+
@@ -385,7 +387,7 @@ AIC(model.4)
 BIC(model.4)
 ```
 
-We still obtain no significance for our pollutionIndex variable, and are unable to make any confident claims about this variable's impact on homeValue. Perhaps this variable, which was significant in earlier models with more variables, is losing precision due to an omitted variable bias. 
+We only see significance at the 10% level for our pollutionIndex variable, and are unable to make any confident claims about this variable's impact on homeValue. Perhaps this variable, which was significant at a lower level in earlier models with more variables, is losing precision due to an omitted variable bias. 
 
 We try adding back the pupilTeacherRatio variable to see if that makes any difference to the model.
 
@@ -397,18 +399,20 @@ AIC(model.5)
 BIC(model.5)
 ```
 
-We obtain statistical significance for all our coefficients, while maintaining a high R square value. While AIC and BIC values are not the lowest, we prefer the parsimony of this model, and choose this as our final model to present to the think-tank.
+We obtain statistical significance at at least the 5% level for all our coefficients, while maintaining a high R squared value. While AIC and BIC values are not the lowest, we prefer the parsimony of this model, and choose this as our final model to present to the think-tank.
 
 We do not consider introducing instrument variables to the model for the following reasons:
 
-1. None of our predictors seems to have any correlation with the error term, making them all exogenous (shown above).
-2. While some variables do meet the criteria for instrument relevance, they are correlated with multiple variables in the model, so they do not make good overall candidates for instruments as they would introduct multicollinearity to the prediction of the variable for which they would serve as instruments.
+1. The predictors have extremely low correlation with the error term, making them all effectively exogenous (shown below).
+2. While some variables do meet the criteria for instrument relevance, they are correlated with multiple variables in the model, so they do not make good overall candidates for instruments as they would introduce multicollinearity to the prediction of the variable for which they would serve as instruments.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
+# Correlations of predictors with residuals (error term)
 cor(q1.dataset$pctLowIncome, model.5$residuals)
 cor(q1.dataset$pollutionIndex, model.5$residuals)
 cor(q1.dataset$pupilTeacherRatio, model.5$residuals)
 
+# Plots of predictors with residuals (error term)
 plot(q1.dataset$pctLowIncome, model.5$residuals)
 plot(q1.dataset$pollutionIndex, model.5$residuals)
 plot(q1.dataset$pupilTeacherRatio, model.5$residuals)
@@ -417,9 +421,9 @@ plot(q1.dataset$pupilTeacherRatio, model.5$residuals)
 Now, we look at diagnostics for our final model.
 
 1. The residuals vs fitted plot shows a very slight upward trend. The slope is negligible, so we assume zero conditional mean to hold.
-2. Errors follow a close to normal distribution. In either case, we have 400 observations, enabling us to rely on OLS asymptotics
+2. Errors follow a close to normal distribution. In either case, we have 400 observations, enabling us to rely on OLS asymptotics.
 3. The scale-location plot shows some trend which is not a significant cause for concern. It shows some heteroskedasticity, which we account for by taking robust standard errors below. Variables in our model remain significant. The Wald-Test shows that the model also remains significant.
-4. The Residuals vs Leverrage plot shows some outliers but no major cause for concern.
+4. The Residuals vs Leverage plot shows some outliers but no major cause for concern.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 coeftest(model.5)
@@ -427,13 +431,12 @@ waldtest(model.5, vcov=vcovHC)
 plot(model.5)
 ```
 
-
 \newpage
 
 Step 4 - Final Model Conclusions
 --------------------------------
 ##Conclusion
-Below we present the a comparison of initial and the final models run. We see that despite removing 6 variables, we see a reduction of only around 4% in R square, implying that we have preserved most of the explanatory power of the model, while sticking with parsimony.
+Below we present a comparison of the initial and the final models run. We see that despite removing 6 variables, there is a reduction of only around 4% in R squared, implying that we have preserved most of the explanatory power of the model, while sticking with parsimony.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 stargazer(model.1, model.5, type="text")
@@ -446,7 +449,6 @@ The final results from the model we present to the think-tank are as follows:
 2. For every unit percentage increase in low-income households, home values are close to 3% lower. 
 3. For every one unit increase in the pupilTeacherRatio in a neighbourhood, home values are close to 4% lower.
 4. For an additional unit on the pollutionIndex, we expect to see a decrease in home value of 0.2% if it is in a neighbourhood not within 5 miles of a water body. However, if it is within 5 miles of a water body, we expect an almost 1% decrease in home value.
-
 
 \newpage
 
