@@ -172,17 +172,17 @@ Part 1 (25 points): Modeling House Values
 
 Step 1 - Univariate Analysis
 ----------------------------
-1. **Crime Rate** - This variable is positively skewed, with 90% of datapoints having a crime rate below 11.2%, but outliers above that going upto 89%. We take the log to create a new variable before proceeding.
+1. **Crime Rate** - This variable is positively skewed, with 90% of datapoints having a crime rate below 11.2%, but outliers above that go up to 89%. We take the log to create a new variable before proceeding.
 2. **nonRetailBusiness** - Has a suspiciously high mode at 0.18, which may indicate that a lot of the data points come from the same neighbourhood, which would explain the high number of occurences of a single value.
 3. **withWater** - This is a categorical variable. 6.75% of homes in the given sample are in neighbourhoods within 5 miles of a water body.
-4. **ageHouse** - This value is in percentage terms and not in strict proportion like other variables in the dataset. Over 50% of the houses in the dataset are in neighbourhoods with a proportion of houses older than 1950 that is greater than 78%
-5. **distanceToCity** - 75% of the houses are less than 15 miles away from a city, and 90% are less than 25 miles away. However, the variable has a lage outlier, which is almost 55 miles away from a city. We take a log of the variable before proceeding, in order to make it more evenly distributed.
-6. **distanceToHighway** - Definition of the variable is not provided in the dictionary. We see that there are 104 datapoints, exactly 24 miles away from the highway, so we assume this variable measures distance of a neighbourhood from the highway. This is exactly the same number of points for which nonRetailBusiness has a value of 0.18, so it further strengthens the argument that a lot of the datapoints seem to be for houses in the same or very close neighbourhood.
-7. **pupilTeacherRatio** - We find another variable with a high modal value of exactly 23.2 pupils per teacher. Furthers the above argument that a large part of the sample is taken from a single neighbourhood.
+4. **ageHouse** - This value is in percentage terms and not in strict proportion like other variables in the dataset. Over 50% of the houses in the dataset are in neighbourhoods with a proportion of houses older than 1950 that is greater than 78%.
+5. **distanceToCity** - 75% of the houses are less than 15 miles away from a city, and 90% are less than 25 miles away. However, the variable has a large outlier, which is almost 55 miles away from a city. We take a log of the variable before proceeding, in order to make it more evenly distributed.
+6. **distanceToHighway** - Definition of the variable is not provided in the dictionary. We see that there are 104 datapoints, exactly 24 miles away from the highway, so we assume this variable measures distance of a neighbourhood from the highway. This is exactly the same number of points for which nonRetailBusiness has a value of 0.18, so it further strengthens the argument that a lot of the datapoints seem to be for houses in the same or very close neighbourhoods.
+7. **pupilTeacherRatio** - We find another variable with a high modal value of exactly 23.2 pupils per teacher. This furthers the above argument that a large part of the sample is taken from a single neighbourhood.
 8. **pctLowIncome** - 90% of the homes come from neighbourhoods with less than 30% households being low-income, however we do have values going up to 49% in the dataset.
 9. **homeValue** - The distribution has 95% of houses valued at well below $1 million, however, there are outliers above that value upto $1.125 million. We take the log of the variable to make it closer to a normal distribution.
-10. **pollutionIndex** - Has a scattered distribution with a median of 38.8, and a large outlier at 72.1.
-11. **nBedRooms** - Close to normal distribution, with the mean and median around 4.25 bedrooms on average for a single family home, however there are small, as well as large outliers in the distribution. 
+10. **pollutionIndex** - The distribution is scattered with a median of 38.8, and a large outlier at 72.1.
+11. **nBedRooms** - This variable has close to a normal distribution, with the mean and median around 4.25 bedrooms on average for a single family home, however there are small, as well as large outliers in the distribution. 
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 q1.dataset = read.csv('houseValueData.csv')
@@ -263,7 +263,7 @@ q1.dataset$logHomeValue = log(q1.dataset$homeValue)
 hist(q1.dataset$logHomeValue, breaks=60, col="blue", main = "Distribution of Log(Home Value)",  xlab = "Log(Home Value)")
 #Pretty normal
 
-#poll Index
+#pollution Index
 summary(q1.dataset$pollutionIndex)
 quantile(q1.dataset$pollutionIndex, 
          probs = c(.01, .05, .10, .25, .50, .75, .90, .95, .99, 1))
@@ -277,7 +277,6 @@ quantile(q1.dataset$nBedRooms,
 hist(q1.dataset$nBedRooms, breaks=60, col="blue", main = "Distribution of nBedRooms", xlab = "nBedRooms")
 #Pretty normal
 ```
-
 
 
 \newpage
