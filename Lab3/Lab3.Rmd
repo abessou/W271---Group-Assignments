@@ -283,7 +283,7 @@ hist(q1.dataset$nBedRooms, breaks=60, col="blue", main = "Distribution of nBedRo
 
 Step 2 - Bivariate Analysis
 ----------------------------
-We examine bivariate correlations and scatterplots for all (transformed) variables in the dataset.
+We examine bivariate correlations and scatterplots for all variables in the dataset.  In this analysis if a variable was transformed, the transformed version is used.
 
 ##Conclusions
 
@@ -293,8 +293,6 @@ We examine bivariate correlations and scatterplots for all (transformed) variabl
  * ageHouse also shows a strong correlation with logdistanceToCity and pollutionIndex
  * logDistancetoCity shows a strong correlation with pollutionIndex
  
-
-
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 panel.hist <- function(x, ...)
    {
@@ -322,7 +320,6 @@ pairs(logHomeValue~logCrimeRate_pc+nonRetailBusiness+withWater+ageHouse+
         pollutionIndex+nBedRooms, data=q1.dataset, upper.panel=panel.smooth, 
       lower.panel=panel.cor, diag.panel=panel.hist)
 ```
-
 
 \newpage
 
