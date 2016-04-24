@@ -457,7 +457,7 @@ Part 2 (25 points): Modeling and Forecasting a Real-World Macroeconomic / Financ
 The series appears to be a time series of financial data, presumably one of a daily closing price of some financial instrumemt or index.
 
 We observe that the time series is non-stationary in the mean. Therefore we can attempt to diff the time series to see if the resulting series is stationary in the mean. 
-We also observe that the PACF of the time series indicates a correlation at lag 1 that ressembles and AR(1) series.
+We also observe that the PACF of the time series indicates a correlation at lag 1 that ressembles an AR(1) series.
 
 The plot of the original financial series does not indicate any amount of seasonality. The observation is confirmed by the ACF which doesn't display any significant amount of correlation at any lag other than the first.
 We will therefore not try to fit a model that includes a seasonal component to the data.
@@ -483,7 +483,7 @@ par(mfrow=c(2,2))
 plot.ts(data$DXCM.Close, main="Financial Time Series",
         ylab="Value", xlab ="Time Units",
         col="blue")
-hist(data$DXCM.Close, col="gray", main="Value")
+hist(data$DXCM.Close, col="gray", main="Histogram of Time Series")
 acf(data$DXCM.Close, main="ACF of Time Series")
 pacf(data$DXCM.Close, main="PACF of Time Series")
 ```
@@ -494,12 +494,12 @@ par(mfrow=c(2,2))
 plot.ts(diff(data$DXCM.Close), main="First Difference Financial Time Series",
         ylab="Value", xlab ="Time Units",
         col="blue")
-hist(diff(data$DXCM.Close), col="gray", main="Value")
+hist(diff(data$DXCM.Close), col="gray", main="Histogram of Time Series")
 acf(diff(data$DXCM.Close), main="ACF of Time Series")
 pacf(diff(data$DXCM.Close), main="PACF of Time Series")
 ```
 
-We now try to determine a best SARIMA model based on the best AIC for that series.
+We now try to determine the best SARIMA model based on the best AIC for that series.
 Interestingly enough, the best model based on AIC is a seasonal model with (p,d,q,P,D,Q) of values
 (0, 0, 0, 0, 1, 0). Since we're assuming a frequency of one, that model is the same as the second best model, which has orders (p,d,q,P,D,Q) of (0, 1, 0, 0, 0, 0). We therefore decide to use (p,d,q,P,D,Q)=(0, 1, 0, 0, 0, 0) as our fitted model going forward.
 
@@ -525,7 +525,7 @@ The fitted series models the original series very well and the model selection s
 # Performing in-sample fit using our fitted series
 par(mfrow=c(1,1))
 plot.ts(data$DXCM,col="navy",lty=2,
-        main="Original vs a SAMIMA(0,1,0,0,0,0) Estimated Series with Residuals",
+        main="Original vs a SARIMA(0,1,0,0,0,0) Estimated Series with Residuals",
         ylab="Original and Estimate Values", ylim=c(0, 110))
 par(new=T)
 plot(fitted(data.fit),col="blue",axes=F,ylab="", ylim=c(0, 110))
@@ -557,7 +557,7 @@ head(df)
 # Step 1: Plot the original and estimate series 
 par(mfrow=c(1,1))
 plot.ts(df[,"orig_series"], col="red", 
-        main="Original vs a AR(1) Estimated Series with Residuals",
+        main="Original vs a SARIMA(0,1,0,0,0,0) Estimated Series with Residuals",
         ylab="Original and Estimated Values",
         xlim=c(0, 3000), ylim=c(0,110))
 par(new=T)
