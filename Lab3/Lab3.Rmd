@@ -212,6 +212,7 @@ tail(sort(table(q1.dataset$nonRetailBusiness)),5)
 
 #withWater
 summary(q1.dataset$withWater)
+q1.dataset$withWater=factor(q1.dataset$withWater)
 #7% have water
 
 #ageHouse
@@ -325,6 +326,22 @@ pairs(logHomeValue~logCrimeRate_pc+nonRetailBusiness+withWater+ageHouse+
 
 Step 3 - Model Estimation
 -------------------------
+
+#Conclusion
+We end up with the following model:
+
+\begin{equation}
+\begin{split}
+log(homeValue)= \\
+&\beta_{0} + \beta_{1}withWater + \beta_{2}pctLowIncome + \\ 
+&\beta_{3}pupilTeacherRatio + \beta_{4}pollutionIndex + \\ 
+&\beta_{5}nBedRooms + \beta_{6}withWater*pollutionIndex
+\end{split}
+\end{equation}
+
+Procedure used to select the model, along with diagnostics detailed below. The practical conclusions of the model, and the final interpretation are detailed in the next section.
+
+#Procedure
 We start off with a naive approach, including all variables in the regression to observe results.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
@@ -353,7 +370,7 @@ BIC(model.2)
 waldtest(model.1, model.2)
 ```
 
-We do see some additional explanatory power through the addition of the interaction terms as we obtain a model with higher R square, lower AIC and lower BIC, as well as a significant Wald Test p value. However, apart from having a model which is extremely difficult to interpret, we also notice that most of the coefficient estimates are extremely small, having very little practical significance.
+We do see some additional explanatory power through the addition of the interaction terms as we obtain a model with higher R square, lower AIC and lower BIC, as well as a significant Wald Test p value. However, apart from having a model which is extremely difficult to interpret, we also notice that most of the coefficient estimates are extremely small, having very little practical significance. Since we are not aiming for a predictive model, we remove most of these terms to get a model which can be easily interpreted.
 
 Now, we want to narrow down our model to include only variables that really add to the explanatory power of the model, that reduce multicollinearity, that provide some valuable practical significance, while meeting the think-tank's specific ask of desirable neighbourhood features and environmental features' relation to home values.
 
@@ -362,14 +379,14 @@ We remove the following variables:
 1. nonRetailBusiness: It has a high correlation with several of the variables in the dataset, and is not of direct interest to answering the question asked.
 2. ageHouse: It is not of direct consequence to the question asked.
 3. DistanceToCity has a high correlation with pollutionIndex, a variable we are definitely interested in, so we remove it to reduce the loss of precision that comes with multicollinearity
-4. nBedRooms: It is not of direct consequence to the question asked.
-5. distanceToHighway interactions except the interaction with log crime: This is the only interaction with a variable still in the model which has statistical and practical significance.
-6. withWater interactions except the interaction with pollutionIndex: This interaction seems to have some practical as well as statistical significance.
+4. distanceToHighway interactions except the interaction with log crime: This is the only interaction with a variable still in the model which has statistical and practical significance.
+5. withWater interactions except the interaction with pollutionIndex: This interaction seems to have some practical as well as statistical significance.
+6. pupilToTeacherRatio: It is not of direct consequence to the question asked.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 model.3 = lm(logHomeValue~logCrimeRate_pc+withWater+
         distanceToHighway+pctLowIncome+
-        pollutionIndex+distanceToHighway:logCrimeRate_pc+
+        pollutionIndex+nBedRooms+distanceToHighway:logCrimeRate_pc+
         withWater:pollutionIndex, data=q1.dataset)
 summary(model.3)
 AIC(model.3)
@@ -380,26 +397,26 @@ We see that the distanceToHighway and pollutionIndex variables don't seem to hav
 Note that this also means that we remove the interaction of distanceToHighway and logCrimeRate
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
-model.4 = lm(logHomeValue~withWater+  pctLowIncome+
+model.4 = lm(logHomeValue~withWater+pctLowIncome+nBedRooms+
         pollutionIndex+withWater:pollutionIndex, data=q1.dataset)
 summary(model.4)
 AIC(model.4)
 BIC(model.4)
 ```
 
-We only see significance at the 10% level for our pollutionIndex variable, and are unable to make any confident claims about this variable's impact on homeValue. Perhaps this variable, which was significant at a lower level in earlier models with more variables, is losing precision due to an omitted variable bias. 
+We fail to find statistical significance for our pollutionIndex variable, and are unable to make any confident claims about this variable's impact on homeValue. Perhaps this variable, which was significant at a lower level in earlier models with more variables, is losing precision due to an omitted variable bias. 
 
 We try adding back the pupilTeacherRatio variable to see if that makes any difference to the model.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 model.5 = lm(logHomeValue~withWater+  pctLowIncome+pupilTeacherRatio+
-        pollutionIndex+withWater:pollutionIndex, data=q1.dataset)
+        pollutionIndex+nBedRooms+withWater:pollutionIndex, data=q1.dataset)
 summary(model.5)
 AIC(model.5)
 BIC(model.5)
 ```
 
-We obtain statistical significance at at least the 5% level for all our coefficients, while maintaining a high R squared value. While AIC and BIC values are not the lowest, we prefer the parsimony of this model, and choose this as our final model to present to the think-tank.
+We obtain statistical significance at the 5% level for all our coefficients, while maintaining a high R squared value. While AIC and BIC values are not the lowest, we prefer the parsimony of this model, and choose this as our final model to present to the think-tank.
 
 We do not consider introducing instrument variables to the model for the following reasons:
 
@@ -411,11 +428,14 @@ We do not consider introducing instrument variables to the model for the followi
 cor(q1.dataset$pctLowIncome, model.5$residuals)
 cor(q1.dataset$pollutionIndex, model.5$residuals)
 cor(q1.dataset$pupilTeacherRatio, model.5$residuals)
+cor(q1.dataset$nBedRooms, model.5$residuals)
 
 # Plots of predictors with residuals (error term)
 plot(q1.dataset$pctLowIncome, model.5$residuals)
 plot(q1.dataset$pollutionIndex, model.5$residuals)
 plot(q1.dataset$pupilTeacherRatio, model.5$residuals)
+plot(q1.dataset$nBedRooms, model.5$residuals)
+
 ```
 
 Now, we look at diagnostics for our final model.
@@ -436,7 +456,7 @@ plot(model.5)
 Step 4 - Final Model Conclusions
 --------------------------------
 ##Conclusion
-Below we present a comparison of the initial and the final models run. We see that despite removing 6 variables, there is a reduction of only around 4% in R squared, implying that we have preserved most of the explanatory power of the model, while sticking with parsimony.
+Below we present a comparison of the initial and the final models run. We see that despite removing 5 variables, there is a reduction of only approximately 2% in R squared, implying that we have preserved most of the explanatory power of the model, while sticking with parsimony.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
 stargazer(model.1, model.5, type="text")
@@ -445,10 +465,11 @@ stargazer(model.1, model.5, type="text")
 ##Explanation of the Model
 The final results from the model we present to the think-tank are as follows:
 
-1. Home values are 50% greater for homes located within 5 miles of water.
-2. For every unit percentage increase in low-income households, home values are close to 3% lower. 
-3. For every one unit increase in the pupilTeacherRatio in a neighbourhood, home values are close to 4% lower.
-4. For an additional unit on the pollutionIndex, we expect to see a decrease in home value of 0.2% if it is in a neighbourhood not within 5 miles of a water body. However, if it is within 5 miles of a water body, we expect an almost 1% decrease in home value.
+1. Home values are 41% greater for homes located within 5 miles of water. (Interaction effect of withWater explained below with pollutionIndex)
+2. For every unit percentage increase in low-income households, home values are close to 2-3% lower. 
+3. For every one unit increase in the pupilTeacherRatio in a neighbourhood, home values are 3-4% lower.
+4. For an additional unit on the pollutionIndex, we expect to see a decrease in home value of 0.3% if it is in a neighbourhood not within 5 miles of a water body. However, if it is within 5 miles of a water body, we expect an almost 1% decrease in home value.
+5. If the number of bedrooms in a single-family house is one unit higher, we see 11% higher home values.
 
 \newpage
 
@@ -895,6 +916,8 @@ plot.model.forecast(glob.warm.part.sarima, glob.warm.part.sarima.fcast, part_nam
                     "12", c(2013,2017), c(-0.7,5.5))
 
 ```
+
+\newpage
 
 Part 4 (25 points): Forecast Inflation-Adjusted Gas Price
 ==========================================================
