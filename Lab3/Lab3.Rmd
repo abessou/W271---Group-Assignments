@@ -327,7 +327,7 @@ pairs(logHomeValue~logCrimeRate_pc+nonRetailBusiness+withWater+ageHouse+
 Step 3 - Model Estimation
 -------------------------
 
-#Conclusion
+##Conclusion
 We end up with the following model:
 
 \begin{equation}
@@ -341,7 +341,7 @@ log(homeValue)= \\
 
 Procedure used to select the model, along with diagnostics detailed below. The practical conclusions of the model, and the final interpretation are detailed in the next section.
 
-#Procedure
+##Procedure
 We start off with a naive approach, including all variables in the regression to observe results.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=70)}
