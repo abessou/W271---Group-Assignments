@@ -531,9 +531,9 @@ We now try to determine the best ARIMA model based on the best AIC for that seri
 Interestingly enough, the best model based on AIC is a seasonal model with (p,d,q,P,D,Q) of values (0, 0, 0, 0, 1, 0). Since we're assuming a frequency of one, that model is the same as the second best model, which has orders (p,d,q,P,D,Q) of (0, 1, 0, 0, 0, 0). We therefore decide to use (p,d,q,P,D,Q)=(0, 1, 0, 0, 0, 0) as our fitted model going forward.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-#data.best <- get.best.sarima(data$DXCM, maxord=rep(3,6),1)
-#data.best$best
-#data.best$others[order(data.best$others$aics)[1:20],]
+data.best <- get.best.sarima(data$DXCM, maxord=rep(3,6),1)
+data.best$best
+data.best$others[order(data.best$others$aics)[1:20],]
 ```
 
 The fitted model is one with a differential component of value one, and has no other parameters for which we need to validate 95 confidence intervals.
@@ -742,17 +742,20 @@ Summary:  Below, we try and fit a SARIMA model to the entire dataset. We find th
 2. __Try ARIMA models.__  Since we have identified that there is a seasonal component in this series, we will skip estimating models that do not incorporate a seasonal component and move to SARIMA models.
 
 3. __Try SARIMA models.__  From the plot of the original series, it looks like this series has a seasonal component with a 52-week periodicity.  Use the get.best.sarima() function to estimate a SARIMA(p,d,q,P,D,Q) model with maximum parameters c(2,2,2,2,2,2).  The best AIC output is -1276.817 with a model of SARIMA(1,2,2,1,0,2).  For parsimony try running get.best.sarima() with c(1,1,1,1,1,1).  A parsimonious model from this output is SARIMA(0,1,1,1,0,1) with AIC -1246.412 which is very close to the AIC output from c(2,2,2,2,2,2).  For parsimony we will choose SARIMA(0,1,1,1,0,1).  The In-Sample fit of this estimated model matches the original model very well as evidenced in the plot.  The coefficients: ma1=-0.4493386, sar1=1.2826553, sma1=-0.4615329 are all significant and fall in to the 95% confidence interval as shown below in the R code.\newline
-However, the residuals do not look like white noise (see analysis below) which means that there is more variance to be explained.  
+The residuals do not look like white noise (see analysis below).  This is probably because there is time-varying volatility in the model.
 - Histogram: Yes. This looks like a normal distribution.
 - Fitted vs. Residuals: No. The plot does not look like an evenly distributed cloud.
 - Plot: No. The plot does not look random, there is a lot of volatility on the right hand side of the graph which looks like time-varying volatility.
 - ACF: No. The ACF drops off after lag 0, but has only a few lags where the correlation comes out of the 95% confidence interval (CI)
-- PACF: No. The PACF shows correlation with several values outside of the 95% CI.
+- PACF: No. The PACF shows correlation with several values outside of the 95% CI.\newline
+\newline
+We have a decent fit for the model, but we notice that there are 2 distinct parts of this time series and we move to an investigation of whether to split the series or not.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Read in the time series data
 glob.warm = read.csv("globalWarming.csv", header=TRUE)
 glob.warm.ts = ts(glob.warm$data.science, start=2004, frequency = 52)
+### Data Analysis - Original Series
 # Print descriptive statistics
 str(glob.warm.ts)
 summary(glob.warm.ts)
@@ -760,17 +763,19 @@ cbind(head(glob.warm.ts), tail(glob.warm.ts))
 quantile(as.numeric(glob.warm.ts), c(.01,.05,.1,.25,.5,.75,.9,.95,.99))
 # Plot the time series
 plot.time.series(glob.warm.ts, 50, "Global Warming", 104, "single")
+
+### Data Analysis - 1st Difference of Original Series
 # Plot the 1st difference of time series
 plot.time.series(diff(glob.warm.ts), 50, "GW 1st Difference", 25, "single")
 
 ### 3. Try SARIMA models
-#gw.seas.best <- get.best.sarima(glob.warm.ts, maxord=c(2,2,2,2,2,2), 52)
+gw.seas.best <- get.best.sarima(glob.warm.ts, maxord=c(2,2,2,2,2,2), 52)
 # Print the top 20 best models based on AIC
-#gw.seas.best$others[order(gw.seas.best$others$aics)[1:20],]
+gw.seas.best$others[order(gw.seas.best$others$aics)[1:20],]
 
-#gw.seas.best1 <- get.best.sarima(glob.warm.ts, maxord=c(1,1,1,1,1,1), 52)
+gw.seas.best1 <- get.best.sarima(glob.warm.ts, maxord=c(1,1,1,1,1,1), 52)
 # Print the top 20 best models based on AIC
-#gw.seas.best1$others[order(gw.seas.best1$others$aics)[1:20],]
+gw.seas.best1$others[order(gw.seas.best1$others$aics)[1:20],]
 glob.warm.arima.seas = arima(glob.warm.ts, order = c(0,1,1),
                              seas = list(order = c(1,0,1), 52),
                              method="CSS")
@@ -792,7 +797,7 @@ plot.orig.model.resid(glob.warm.ts, glob.warm.arima.seas, "", "SARIMA(0,1,1,1,0,
 
 Summary:  We decided to use 2013 onwards as our abberviated dataset and were able to produce a much more suitable forecast.  The Abbreviated 2013-2016 Global Warming time series is satisfactorily modeled with a SARMIMA(0,1,0,0,0,1) model to handle trends and seasonality.  The residuals are close enough to white noise and the seasonality is modeled.
 
-4. __Using a portion of the data.__ Since no satisfactory model was found using the full data series, using a portion of the data will be considered.  The data has a clear split around 2012 or 2013 where it goes from being stationary in the mean to being non-stationary in the mean.  Since we are interested in forecasting this information after 2016, we will try creating a model for the latter part of the data, the part that contains the most recent information and then forecasting after that.  2012 could have been chosen, but it still had some of the non-trending data contained in it, so 2013 was chosen as a start year.  When graphs are created with this 2013-2016 series, they will be denoted by the phrase "Abrv. Original" instead of "Original".
+4. __Using a portion of the data.__ The data has a clear split around 2012 or 2013 where it goes from being stationary in the mean to being non-stationary in the mean.  The behavior of the series before this split is very different than after the split.  The series before the split has no trend and the series after the split has a clear upward trend and what looks like yearly seasonality.  Since we are trying to make a forecast for data after 2016, we are going to use the part of the series after the split.  Since that is the data closest in time to 2016.  2012 could have been chosen, but it still had some of the non-trending data contained in it, so 2013 was chosen as a start year.  When graphs are created with this Abbreviated 2013-2016 series, they will be denoted by the phrase "Abrv. Original" instead of "Original".
 
 5. __Data Analysis of Abbreviated Series.__ 
 
@@ -827,6 +832,8 @@ glob.warm.2013.ts = ts(glob.warm.ts[471:length(glob.warm.ts)],start=2013,frequen
 part_name = "Abrv."
 # Rename series
 glob.warm.part.ts = glob.warm.2013.ts
+
+### 5. Data Analysis of Abbreviated Series.
 # Descriptive statistics
 str(glob.warm.part.ts)
 summary(glob.warm.part.ts)
@@ -834,6 +841,8 @@ cbind(head(glob.warm.part.ts), tail(glob.warm.part.ts))
 quantile(as.numeric(glob.warm.part.ts), c(.01,.05,.1,.25,.5,.75,.9,.95,.99))
 # Plot the time series
 plot.time.series(glob.warm.part.ts,50, "Abrv. GW 2013-2016")
+
+### 6. Data Analysis of Abbreviated 1st Differenced Series.
 # Plot the 1st difference of time series
 plot.time.series(diff(glob.warm.part.ts), 50, "Abrv. GW 1st Difference")
 
@@ -1044,9 +1053,9 @@ With parsimony in mind, we select that model to fit our data and proceed to asse
 An inspection of the confidence intervals of the paramaters of this model indicate that the parameter for the second MA component of the seasonal model is not significant. But the third parameter of the same seasonal component is significant.
 We next perform in-sample fit using the fitted series to assess our fitted model.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
-#price.best <- get.best.sarima(price.ts, maxord=rep(3,6))
-#price.best$best
-#price.best$others[order(price.best$others$aics)[1:20],]
+price.best <- get.best.sarima(price.ts, maxord=rep(3,6))
+price.best$best
+price.best$others[order(price.best$others$aics)[1:20],]
 ```
 
 The fitted series models the original series very well and the model selection seems appropriate based on in-sample fit.
@@ -1201,9 +1210,9 @@ par(mfrow=c(1,1))
 plot(price.fit.ahead.fcast,lty=2, col="navy",
      main="Out-of-Sample Forecast",
      ylab="Original, Estimated, and Forecast Values",
-     ylim=c(1,5))
+     ylim=c(1,7))
 par(new=T)
-plot.ts(price.ts,axes=F,lty=1, ylim=c(1,5),xlim=c(1978,2016), ylab="")
+plot.ts(price.ts,axes=F,lty=1, ylim=c(1,7),xlim=c(1978,2016), ylab="")
 leg.txt <- c("Original Series", "Forecast series")
 legend("top", legend=leg.txt, lty=1, col=c("black","blue"),
        bty='n', cex=1)
