@@ -685,20 +685,9 @@ The mean series of the 36 steps ahead predctions obtained from the fitted ARIMA(
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Reset the 95% confidence interval using the conditional variance from GARCH
-data.fit.ahead.fcast$lower[,2] <- -(((data.fit.ahead.fcast$mean-data.fit.ahead.fcast$lower[,2])/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*data.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
+data.fit.ahead.fcast$lower[,2] <- -(((data.fit.ahead.fcast$mean-data.fit.ahead.fcast$lower[,2])/(sqrt(data.fit.ahead.fcast$model$sigma2)))*data.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
 
-data.fit.ahead.fcast$upper[,2] <- (((data.fit.ahead.fcast$upper[,2]-data.fit.ahead.fcast$mean)/(1.96*sqrt(data.fit.ahead.fcast$model$sigma2)))*data.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
-
-##### MEGAN'S CALCULATION ###
-fcast=data.fit.ahead.fcast
-sdGARCH = data.garch.pred$standardDeviation
-v1 = ((fcast$upper[,2] - fcast$mean) / sqrt(fcast$model$sigma2)) * sdGARCH
-lower = fcast$mean - v1
-upper = fcast$mean + v1
-print(data.fit.ahead.fcast$lower[,2]) # Charles' calc
-print(lower) # Megan's calc
-print(data.fit.ahead.fcast$upper[,2]) # Charles' calc
-print(upper) # Megan's calc
+data.fit.ahead.fcast$upper[,2] <- (((data.fit.ahead.fcast$upper[,2]-data.fit.ahead.fcast$mean)/(sqrt(data.fit.ahead.fcast$model$sigma2)))*data.garch.pred$standardDeviation)+data.fit.ahead.fcast$mean
 
 df<-data.frame(cbind(data.fit.ahead.fcast$mean, data.fit.ahead.fcast$lower[,2], data.fit.ahead.fcast$upper[,2]))
 names(df) <- c("Mean", "Lower 95% conf", "Upper 95% conf")
@@ -1197,8 +1186,8 @@ Having better estimates of the variance with GARCH, we next update our estimated
 price.fit.ahead.fcast$lower[,1] <- price.fit.ahead.fcast$mean
 price.fit.ahead.fcast$upper[,1] <- price.fit.ahead.fcast$mean
 
-price.fit.ahead.fcast$lower[,2] <- -(((price.fit.ahead.fcast$mean-price.fit.ahead.fcast$lower[,2])/(1.96*sqrt(price.fit.ahead.fcast$model$sigma2)))*price.garch.pred$standardDeviation)+price.fit.ahead.fcast$mean
-price.fit.ahead.fcast$upper[,2] <- (((price.fit.ahead.fcast$upper[,2]-price.fit.ahead.fcast$mean)/(1.96*sqrt(price.fit.ahead.fcast$model$sigma2)))*price.garch.pred$standardDeviation)+price.fit.ahead.fcast$mean
+price.fit.ahead.fcast$lower[,2] <- -(((price.fit.ahead.fcast$mean-price.fit.ahead.fcast$lower[,2])/(sqrt(price.fit.ahead.fcast$model$sigma2)))*price.garch.pred$standardDeviation)+price.fit.ahead.fcast$mean
+price.fit.ahead.fcast$upper[,2] <- (((price.fit.ahead.fcast$upper[,2]-price.fit.ahead.fcast$mean)/(sqrt(price.fit.ahead.fcast$model$sigma2)))*price.garch.pred$standardDeviation)+price.fit.ahead.fcast$mean
 
 df<-data.frame(cbind(price.fit.ahead.fcast$mean, price.fit.ahead.fcast$lower[,2], price.fit.ahead.fcast$upper[,2]))
 names(df) <- c("Mean", "Lower 95% conf", "Upper 95% conf")
