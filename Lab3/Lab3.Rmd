@@ -618,11 +618,13 @@ __Residuals analysis__\newline
 We observe from the residual time series that the variance of the series is non-stationary.  The series exhibits volatility with a variance changing in a regular way. It exhibits conditional heteroskedasticity. An observation of the ACF of the squared residuals series provides confirmation of the variance dynamics. Therefore, we decide to model its residuals using GARCH
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Plot the residuals time series
-par(mfrow=c(3,2))
+par(mfrow=c(1,1))
 plot.ts(data.res, main="Residuals of Financial Time Series",
         ylab="Value", xlab ="Time Units",
         col="blue")
+par(mfrow=c(1,1))
 hist(data.res, col="gray", main="Histogram of Residuals")
+par(mfrow=c(2,2))
 acf(data.res, main="ACF of Residuals")
 pacf(data.res, main="PACF of Residuals")
 acf(data.res^2, main="ACF of Squared Residuals")
@@ -739,7 +741,8 @@ Part 3 (25 points): Forecast the Web Search Activity for Global Warming
 
 1.  Plot.  The plot of the 1st differenced time series shows that it is stationary in the mean.  It does not look like white noise.  It has a lot more volatility on the right hand side of the equation.
 2.  Histogram.  This has a normal distribution like white noise.
-3.  ACF.  Mostly drops off after 1 lag with several lags out of the 95% confidence interval. 4.  PACF.  Mostly drops off after 2 lags and slowly oscillates to zero.
+3.  ACF.  Mostly drops off after 1 lag with several lags out of the 95% confidence interval.
+4.  PACF.  Mostly drops off after 2 lags and slowly oscillates to zero.
 
 **Part A - Using Entire Dataset**
 
@@ -814,7 +817,8 @@ Summary:  We decided to use 2013 onwards as our abberviated dataset and were abl
 
 - Plot.  The plot of the 1st differenced time series shows that it is stationary in the mean.  It looks a lot like white noise.  It has a lot more volatility on the right hand side of the equation.
 - Histogram.  This has a normal distribution like white noise.
-- ACF.  Mostly drops off after 1 lag with several lags out of the 95% confidence interval.  - PACF.  Mostly drops off after 0 lags and slowly oscillates to zero.
+- ACF.  Mostly drops off after 1 lag with several lags out of the 95% confidence interval.
+- PACF.  Mostly drops off after 0 lags and slowly oscillates to zero.
 
 7. __Try AR models.__  Since AR models are used to model time series that are stationary in the mean and the non-differenced abbreviated version of this model is not stationary in the mean, then we will not estimate an AR model for this series.
 
@@ -824,7 +828,7 @@ Summary:  We decided to use 2013 onwards as our abberviated dataset and were abl
 
 10. __Backtesting.__ For backtesting, 10% of the values from the end of the 2013-2016 time series were withheld, in this case 10 values.  The backtesting model shows mean predicted values that follow the up and down changes of the original time series, but the mean predicted values are are not as extreme as the orignal values.  The seasonality of the original series is being modeled to some extent.  We also note that the original series, for the most part, falls within the 95% confidence interval of the forecast, giving us confidence that this model could be used as a decent predictive model for the original time series.
 
-11. __Forecast the model.__  Using the SARIMA(0,1,0,0,0,1) model with the 2013-2016 version of the time series, we made the requested 12-step ahead forecast of the model.  The forecast looks like it captures the seasonality of the model as it matches the upward trend and the seasonal volatility.  We also note that all of the forecasted values are within the 80% confidence interval of the prediction.
+11. __Forecast the model.__  Using the SARIMA(0,1,0,0,0,1) model with the 2013-2016 version of the time series, we made the requested 12-step ahead forecast of the model.  The forecast looks like it captures the seasonality of the model as it matches the upward trend and the seasonal volatility.  We also note that all of the forecasted values are within the 80% confidence interval of the prediction from the graph and table show below.
 
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 ### 4. Using a portion of the data
@@ -911,9 +915,9 @@ print(summary(glob.warm.part.sarima.fcast$mean))
 plot.model.forecast(glob.warm.part.sarima, glob.warm.part.sarima.fcast, part_name,
                     "12", c(2013,2017), c(-0.7,5.5))
 
-# Print the forecasted values and 95% CI.
-df=data.frame(cbind(glob.warm.part.sarima.fcast$mean, glob.warm.part.sarima.fcast$lower[,2], glob.warm.part.sarima.fcast$upper[,2]))
-names(df) = c("Mean", "Lower 95% conf", "Upper 95% conf")
+# Print the forecasted values and 80% CI.
+df=data.frame(cbind(glob.warm.part.sarima.fcast$mean, glob.warm.part.sarima.fcast$lower[,1], glob.warm.part.sarima.fcast$upper[,1]))
+names(df) = c("Mean", "Lower 80% conf", "Upper 80% conf")
 stargazer(df, type="text", summary=FALSE)
 ```
 
@@ -1136,11 +1140,13 @@ __48 steps ahead forecasting__\newline
 With this in mind, we proceed to an initial 48 steps ahead forecast of the oil price series.
 ```{r, tidy=TRUE, tidy.opts=list(width.cutoff=60)}
 # Plot the residuals time series
-par(mfrow=c(3,2))
+par(mfrow=c(1,1))
 plot.ts(price.res, main="Residuals of Oil Prices Series",
         ylab="Value", xlab ="Time Units",
         col="blue")
+par(mfrow=c(1,1))
 hist(price.res, col="gray", main="Value")
+par(mfrow=c(2,2))
 acf(price.res, main="ACF of Residuals")
 pacf(price.res, main="PACF of Residuals")
 acf(price.res^2, main="ACF of Squared Residuals")
